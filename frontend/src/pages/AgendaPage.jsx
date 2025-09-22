@@ -4,6 +4,7 @@ import Menu from "../components/Menu";
 import CalendarComponent from "../components/CalendarComponent";
 import List from "../components/List";
 import Details from "../components/Details";
+import PassChange from "../components/PassChange";
 
 export default function AgendaPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());

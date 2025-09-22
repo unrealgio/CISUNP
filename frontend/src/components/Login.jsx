@@ -1,27 +1,58 @@
 import React, { useState } from "react";
+import PassChange from "./PassChange";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [email, setEmail] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
-    // Simulação de login
-    setTimeout(() => setLoading(false), 1200);
-    // Aqui você pode usar useNavigate para redirecionar
+    setError("");
+    const emailInput = e.target.usuario.value;
+    const senhaInput = e.target.senha.value;
+
+    try {
+      const res = await fetch("http://localhost:3001/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: emailInput, senha: senhaInput }),
+      });
+      const data = await res.json();
+
+      if (res.ok && data.token) {
+        localStorage.setItem("token", data.token);
+        setEmail(emailInput);
+        if (data.firstAccess) {
+          setShowChangePassword(true);
+        } else {
+          window.location.href = "/";
+        }
+      } else {
+        setError(data.error || "Usuário ou senha inválidos.");
+      }
+    } catch {
+      setError("Erro de conexão com o servidor.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleSenhaAlterada() {
+    setShowChangePassword(false);
+    window.location.href = "/agenda";
   }
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center relative"
-      style={{
-        backgroundImage: "url('https://lh3.googleusercontent.com/pw/AP1GczMLu294ue1TPyyB2fKyX0wSnU0dda95B84ZbYxZiPOQYXKFArWEAR8w__sGh2eIIBrkaqT0iTPPXWdv8xG_8aqTOfPB6SjojvKaTVxaM7kj_QRBbCqktBnM4fMqXsIQZELMctsh4kibugcFFcsyCQPJ=w1378-h919-s-no-gm?authuser=0')",
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-      }}
-    >
+    <div className="min-h-screen flex items-center justify-center relative" style={{
+      backgroundImage: "url('https://lh3.googleusercontent.com/pw/AP1GczMLu294ue1TPyyB2fKyX0wSnU0dda95B84ZbYxZiPOQYXKFArWEAR8w__sGh2eIIBrkaqT0iTPPXWdv8xG_8aqTOfPB6SjojvKaTVxaM7kj_QRBbCqktBnM4fMqXsIQZELMctsh4kibugcFFcsyCQPJ=w1378-h919-s-no-gm?authuser=0')",
+      backgroundSize: "cover",
+      backgroundPosition: "center",
+    }}>
       <div className="absolute inset-0 bg-black opacity-60"></div>
       <div className="relative z-10 w-full max-w-md md:max-w-lg bg-gray-100 rounded-xl shadow-lg p-8 flex flex-col items-center">
         <img src="/img/Unp_Final_Logo.png" alt="Logo UnP" className="h-14 md:h-16 mb-2" />
@@ -73,6 +104,10 @@ export default function Login() {
               </button>
             </div>
           </div>
+          {/* Erro */}
+          {error && (
+            <div className="text-red-600 text-sm mb-2 text-center">{error}</div>
+          )}
           {/* Botão acessar */}
           <button
             type="submit"
@@ -104,6 +139,10 @@ export default function Login() {
           </a>
         </div>
       </div>
+      {/* Modal de troca de senha no primeiro acesso */}
+      {showChangePassword && (
+        <PassChange email={email} onSenhaAlterada={handleSenhaAlterada} />
+      )}
     </div>
   );
 }
