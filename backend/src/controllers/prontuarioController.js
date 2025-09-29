@@ -33,7 +33,10 @@ exports.adicionar = async (req, res) => {
 
     fs.mkdirSync(path.dirname(pdfPath), { recursive: true });
 
-    const doc = new PDFDocument();
+    const doc = new PDFDocument({
+      size: [900, 700], // Define o tamanho da página igual ao canvas do frontend
+      margin: 40
+    });
     const stream = fs.createWriteStream(pdfPath);
     doc.pipe(stream);
 
@@ -79,21 +82,21 @@ exports.adicionar = async (req, res) => {
         // CARREGA O DESENHO DO PACIENTE
         const desenho = await Jimp.read(desenhoBuffer);
 
+        // REDIMENSIONA AMBAS AS IMAGENS PARA 900x700
+        arcada.resize(900, 700);
+        desenho.resize(900, 700);
+
         // MESCLA O DESENHO COM A IMAGEM DA ARCADA
         arcada.composite(desenho, 0, 0);
 
         // CONVERTE A IMAGEM FINAL PARA BUFFER
         const finalBuffer = await arcada.getBufferAsync(Jimp.MIME_PNG);
 
-        doc.addPage();
+        doc.addPage({ size: [900, 700], margin: 40 });
         doc
           .fontSize(14)
           .text("Desenho da arcada dentária:", { align: "center" });
-        doc.image(finalBuffer, {
-          fit: [500, 300],
-          align: "center",
-          valign: "center",
-        });
+        doc.image(finalBuffer, 0, 40, { width: 900, height: 700 });
         doc.moveDown();
         pdfCriado = true;
       } catch (imgErr) {
