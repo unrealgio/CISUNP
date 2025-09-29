@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
 import PacienteTabs from "../components/PacienteTabs";
@@ -9,38 +10,89 @@ import TabProntuario from "../components/TabProntuario";
 import TabArquivos from "../components/TabArquivos";
 
 export default function PacientePage() {
+  const { cpf } = useParams();
   const [activeTab, setActiveTab] = useState("info");
-  const [arquivos, setArquivos] = useState([
-    { id: 1, nome: "Exame de Sangue.pdf", tipo: "PDF", data: "12/09/2025" },
-    { id: 2, nome: "Raio-X.jpg", tipo: "Imagem", data: "18/09/2025" },
-  ]);
-  const prescricoes = [
-    { id: 1, medicamento: "Paracetamol", dose: "500mg", frequencia: "2x ao dia", observacao: "Após refeições" },
-    { id: 2, medicamento: "Amoxicilina", dose: "250mg", frequencia: "3x ao dia", observacao: "Por 7 dias" },
-  ];
-  const prontuario = [
-    { id: 1, data: "10/09/2025", descricao: "Restauração no dente 16. Sem complicações." },
-    { id: 2, data: "15/09/2025", descricao: "Extração do dente 28. Orientações pós-operatórias fornecidas." },
-  ];
-  const paciente = {
-    nome: "Giovanni Felipe Oliveira da Silva",
-    idade: 26,
-    telefone: "(84)99882-0265",
-    avatar: "",
-    observacoes: "Paciente mais sensível à dor! Agendar procedimento com tempo extra.",
-    observacoesAutor: "Fulano Flor",
-    observacoesData: "20/09/2025 17:21",
-    agendamentos: [
-      { tipo: "Consulta", profissional: "Fulano Flor", data: "25/09/2025", hora: "15:00" },
-      { tipo: "Procedimento", profissional: "Cicrano Arruda", data: "27/09/2025", hora: "16:00" },
-    ],
-    resumo: {
-      consultas: 5,
-      procedimentos: 2,
-      exames: 3,
-      faltas: 0,
-    },
-  };
+  const [paciente, setPaciente] = useState(undefined);
+  const [arquivos, setArquivos] = useState([]);
+  const [prescricoes, setPrescricoes] = useState([]);
+  const [prontuario, setProntuario] = useState([]);
+
+  useEffect(() => {
+    fetch(`http://localhost:3001/api/pacientes?cpf=${encodeURIComponent(cpf)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0 && data[0].patient) {
+          const agendamentos = data.map(a => ({
+            tipo: "Consulta",
+            profissional: a.medico,
+            data: a.date,
+            hora: a.time,
+            observacoes: a.notes,
+          }));
+          setPaciente({
+            nome: data[0].patient,
+            cpf: data[0].cpf,
+            telefone: data[0].phone,
+            idade: 30, // valor fictício, ajuste conforme necessário
+            observacoes: data[0].notes || "",
+            observacoesAutor: data[0].medico || "Equipe",
+            observacoesData: data[0].date || "",
+            agendamentos,
+            resumo: {
+              consultas: agendamentos.length,
+              procedimentos: 0,
+              exames: 0,
+              faltas: 0,
+            },
+          });
+          setProntuario(
+            agendamentos.map((a, idx) => ({
+              id: idx + 1,
+              data: a.data,
+              descricao: a.observacoes || "Consulta realizada.",
+            }))
+          );
+          setArquivos([
+            { id: 1, nome: "Exame de Sangue.pdf", tipo: "PDF", data: "12/09/2025" },
+          ]);
+        } else {
+          setPaciente(null);
+        }
+      })
+      .catch(() => {
+        setPaciente(null);
+      });
+  }, [cpf]);
+
+  useEffect(() => {
+    fetch(`http://localhost:3001/api/prescricoes?cpf=${encodeURIComponent(cpf)}`)
+      .then(res => res.json())
+      .then(setPrescricoes);
+  }, [cpf]);
+
+  function handleAddPrescricao(nova) {
+    setPrescricoes(prev => [...prev, nova]);
+  }
+
+  if (paciente === undefined) {
+    return (
+      <>
+        <Header />
+        <Menu active="pacientes" />
+        <div className="p-6">Carregando...</div>
+      </>
+    );
+  }
+
+  if (paciente === null) {
+    return (
+      <>
+        <Header />
+        <Menu active="pacientes" />
+        <div className="p-6 text-red-600">Paciente não encontrado!</div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -52,7 +104,13 @@ export default function PacientePage() {
           <PacienteInfoCard paciente={paciente} />
           <PacienteResumoCards resumo={paciente.resumo} />
         </div>
-        {activeTab === "prescricoes" && <TabPrescricoes prescricoes={prescricoes} />}
+        {activeTab === "prescricoes" && (
+          <TabPrescricoes
+            prescricoes={prescricoes}
+            cpf={cpf}
+            onAdd={handleAddPrescricao}
+          />
+        )}
         {activeTab === "prontuario" && <TabProntuario prontuario={prontuario} />}
         {activeTab === "arquivos" && <TabArquivos arquivos={arquivos} setArquivos={setArquivos} />}
       </div>

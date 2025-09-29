@@ -15,7 +15,7 @@ function App() {
         <Route path="/" element={<LoginPage />} />
         <Route path='/agenda' element={<AgendaPage />} />
         <Route path="/buscar-paciente" element={<BuscarPacientePage />} />
-        <Route path="/paciente/:id" element={<PacientePage />} />
+        <Route path="/paciente/:cpf" element={<PacientePage />} />
         <Route path="/consultas" element={<ConsultaPage />} />
       </Routes>
     </BrowserRouter>

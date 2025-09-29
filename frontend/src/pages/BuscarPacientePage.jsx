@@ -1,131 +1,39 @@
-import React, { useState } from "react";
-import { FaSearch, FaUserMd, FaIdCard, FaUsers, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import {
+  FaSearch,
+  FaUserMd,
+  FaIdCard,
+  FaUsers,
+  FaChevronLeft,
+  FaChevronRight,
+} from "react-icons/fa";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
+import { useNavigate } from "react-router-dom";
 
-// Removido o filtro de RA
 const filtros = [
-  { key: "nome", label: "Paciente", icon: <FaUsers /> },
+  { key: "patient", label: "Paciente", icon: <FaUsers /> },
   { key: "cpf", label: "CPF", icon: <FaIdCard /> },
-  { key: "equipe", label: "Equipe", icon: <FaUserMd /> },
+  { key: "phone", label: "Telefone", icon: <FaUserMd /> },
   { key: "medico", label: "Médico", icon: <FaUserMd /> },
-  { key: "telefone", label: "Telefone", icon: <FaIdCard /> },
 ];
 
-// Removido o campo RA dos pacientes
-const pacientesExemplo = [
-  {
-    cpf: "123.456.789-00",
-    nome: "Ana Paula Silva",
-    equipe: "Cardiologia",
-    medico: "Dr. João Souza",
-    telefone: "(11) 91234-5678"
-  },
-  {
-    cpf: "234.567.890-11",
-    nome: "Bruno Costa",
-    equipe: "Pediatria",
-    medico: "Dra. Maria Oliveira",
-    telefone: "(11) 92345-6789"
-  },
-  {
-    cpf: "345.678.901-22",
-    nome: "Carla Mendes",
-    equipe: "Ortopedia",
-    medico: "Dr. Pedro Lima",
-    telefone: "(11) 93456-7890"
-  },
-  {
-    cpf: "456.789.012-33",
-    nome: "Daniela Rocha",
-    equipe: "Dermatologia",
-    medico: "Dra. Fernanda Alves",
-    telefone: "(11) 94567-8901"
-  },
-  {
-    cpf: "567.890.123-44",
-    nome: "Eduardo Martins",
-    equipe: "Neurologia",
-    medico: "Dr. Ricardo Torres",
-    telefone: "(11) 95678-9012"
-  },
-  {
-    cpf: "678.901.234-55",
-    nome: "Fernanda Lima",
-    equipe: "Ginecologia",
-    medico: "Dra. Juliana Freitas",
-    telefone: "(11) 96789-0123"
-  },
-  {
-    cpf: "789.012.345-66",
-    nome: "Gabriel Souza",
-    equipe: "Oncologia",
-    medico: "Dr. Marcelo Pinto",
-    telefone: "(11) 97890-1234"
-  },
-  {
-    cpf: "890.123.456-77",
-    nome: "Helena Castro",
-    equipe: "Psiquiatria",
-    medico: "Dra. Patrícia Ramos",
-    telefone: "(11) 98901-2345"
-  },
-  {
-    cpf: "901.234.567-88",
-    nome: "Igor Almeida",
-    equipe: "Urologia",
-    medico: "Dr. André Santos",
-    telefone: "(11) 99012-3456"
-  },
-  {
-    cpf: "012.345.678-99",
-    nome: "Juliana Pereira",
-    equipe: "Endocrinologia",
-    medico: "Dra. Camila Costa",
-    telefone: "(11) 90123-4567"
-  },
-  {
-    cpf: "111.222.333-44",
-    nome: "Kleber Nunes",
-    equipe: "Reumatologia",
-    medico: "Dr. Fábio Lima",
-    telefone: "(11) 91234-5670"
-  },
-  {
-    cpf: "222.333.444-55",
-    nome: "Larissa Gomes",
-    equipe: "Oftalmologia",
-    medico: "Dra. Renata Dias",
-    telefone: "(11) 92345-6781"
-  },
-  {
-    cpf: "333.444.555-66",
-    nome: "Marcos Tavares",
-    equipe: "Otorrinolaringologia",
-    medico: "Dr. Sérgio Alves",
-    telefone: "(11) 93456-7892"
-  },
-  {
-    cpf: "444.555.666-77",
-    nome: "Natália Fernandes",
-    equipe: "Gastroenterologia",
-    medico: "Dra. Bianca Souza",
-    telefone: "(11) 94567-8903"
-  },
-  {
-    cpf: "555.666.777-88",
-    nome: "Otávio Barros",
-    equipe: "Nefrologia",
-    medico: "Dr. Gustavo Martins",
-    telefone: "(11) 95678-9014"
-  }
-];
-
-export default function BuscarPacientePage({ onSelectPaciente }) {
+export default function BuscarPacientePage() {
   const [busca, setBusca] = useState({});
-  const [resultados, setResultados] = useState(pacientesExemplo);
+  const [todosPacientes, setTodosPacientes] = useState([]);
+  const [resultados, setResultados] = useState([]);
   const [page, setPage] = useState(1);
   const itemsPerPage = 10;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch("http://localhost:3001/api/pacientes/todos")
+      .then((res) => res.json())
+      .then((data) => {
+        setTodosPacientes(data);
+        setResultados(data);
+      });
+  }, []);
 
   function handleChange(e, key) {
     setBusca({ ...busca, [key]: e.target.value });
@@ -133,14 +41,24 @@ export default function BuscarPacientePage({ onSelectPaciente }) {
 
   function handleBuscar(e) {
     e.preventDefault();
-    let filtrados = pacientesExemplo.filter(p =>
-      Object.entries(busca).every(([k, v]) =>
-        !v || (p[k] && p[k].toLowerCase().includes(v.toLowerCase()))
+    let filtrados = todosPacientes.filter((p) =>
+      Object.entries(busca).every(
+        ([k, v]) =>
+          !v ||
+          (p[k] && p[k].toLowerCase().includes(v.toLowerCase()))
       )
     );
     setResultados(filtrados);
     setPage(1);
   }
+
+  // Volta a mostrar todos ao limpar os campos de busca
+  useEffect(() => {
+    const algumCampoPreenchido = Object.values(busca).some((v) => v);
+    if (!algumCampoPreenchido) {
+      setResultados(todosPacientes);
+    }
+  }, [busca, todosPacientes]);
 
   const totalPages = Math.ceil(resultados.length / itemsPerPage);
   const paginatedResults = resultados.slice(
@@ -157,8 +75,11 @@ export default function BuscarPacientePage({ onSelectPaciente }) {
           className="flex flex-wrap gap-4 bg-[#7A97B6] rounded-xl p-6 mb-6 shadow"
           onSubmit={handleBuscar}
         >
-          {filtros.map(filtro => (
-            <div key={filtro.key} className="flex flex-col flex-1 min-w-[160px]">
+          {filtros.map((filtro) => (
+            <div
+              key={filtro.key}
+              className="flex flex-col flex-1 min-w-[160px]"
+            >
               <label className="text-white font-semibold mb-1 flex items-center gap-2">
                 {filtro.icon} {filtro.label}:
               </label>
@@ -166,7 +87,7 @@ export default function BuscarPacientePage({ onSelectPaciente }) {
                 className="rounded-lg px-3 py-2 bg-white border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] transition outline-none text-black placeholder-black text-base font-medium"
                 type="text"
                 value={busca[filtro.key] || ""}
-                onChange={e => handleChange(e, filtro.key)}
+                onChange={(e) => handleChange(e, filtro.key)}
                 placeholder={`Buscar por ${filtro.label.toLowerCase()}`}
                 aria-label={filtro.label}
               />
@@ -186,33 +107,39 @@ export default function BuscarPacientePage({ onSelectPaciente }) {
           <table className="w-full text-left">
             <thead>
               <tr className="bg-[#7A97B6] text-white">
-                <th className="py-2 px-4 rounded-tl-lg">CPF</th>
-                <th className="py-2 px-4">Paciente</th>
-                <th className="py-2 px-4">Equipe</th>
-                <th className="py-2 px-4">Médico</th>
-                <th className="py-2 px-4 rounded-tr-lg">Telefone</th>
+                <th className="py-2 px-4 rounded-tl-lg">Paciente</th>
+                <th className="py-2 px-4">CPF</th>
+                <th className="py-2 px-4">Telefone</th>
+                <th className="py-2 px-4 rounded-tr-lg">Médico</th>
               </tr>
             </thead>
             <tbody>
               {paginatedResults.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-6 text-gray-500">
+                  <td colSpan={4} className="text-center py-6 text-gray-500">
                     Nenhum paciente encontrado.
                   </td>
                 </tr>
               ) : (
                 paginatedResults.map((p, idx) => (
                   <tr
-                    key={p.cpf + idx}
+                    key={p.cpf || p.patient || idx}
                     className="hover:bg-blue-50 cursor-pointer transition"
-                    onClick={() => onSelectPaciente && onSelectPaciente(p)}
+                    onClick={() => {
+                      if (p.cpf) {
+                        navigate(`/paciente/${encodeURIComponent(p.cpf)}`);
+                      } else {
+                        alert("Paciente sem CPF cadastrado!");
+                      }
+                    }}
                     title="Ver detalhes do paciente"
                   >
+                    <td className="py-2 px-4 font-semibold text-[#045397] hover:underline">
+                      {p.patient}
+                    </td>
                     <td className="py-2 px-4">{p.cpf}</td>
-                    <td className="py-2 px-4 font-semibold text-[#045397] hover:underline">{p.nome}</td>
-                    <td className="py-2 px-4">{p.equipe}</td>
+                    <td className="py-2 px-4">{p.phone}</td>
                     <td className="py-2 px-4">{p.medico}</td>
-                    <td className="py-2 px-4">{p.telefone}</td>
                   </tr>
                 ))
               )}

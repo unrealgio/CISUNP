@@ -4,6 +4,7 @@ import { MdEdit, MdDelete, MdSave, MdCancel } from "react-icons/md";
 export default function Details({ schedule, onSave, onDelete, editField, setEditField }) {
   const [editMode, setEditMode] = useState(false);
   const [patient, setPatient] = useState(schedule?.patient || "");
+  const [cpf, setCpf] = useState(schedule?.cpf || "");
   const [phone, setPhone] = useState(schedule?.phone || "");
   const [notes, setNotes] = useState(schedule?.notes || "");
   const [medico, setMedico] = useState(schedule?.medico || "");
@@ -14,6 +15,7 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
 
   useEffect(() => {
     setPatient(schedule?.patient || "");
+    setCpf(schedule?.cpf || "");
     setPhone(schedule?.phone || "");
     setNotes(schedule?.notes || "");
     setMedico(schedule?.medico || "");
@@ -58,6 +60,7 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
       onSave({
         ...schedule,
         patient,
+        cpf,
         phone,
         notes,
         medico,
@@ -77,7 +80,7 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
   }
 
   return (
-    <div className="bg-gray-200 rounded-xl p-4 mt-4 w-full">
+    <div className="bg-gray-200 rounded-xl p-4 mt-4 w-full relative">
       {error && (
         <div className="text-red-600 text-sm text-center mb-2">{error}</div>
       )}
@@ -94,6 +97,19 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
           />
         ) : (
           schedule.patient
+        )}
+      </div>
+      <div className="mb-2">
+        <span className="font-bold">CPF:</span>{" "}
+        {editMode && !editField ? (
+          <input
+            type="text"
+            className="border rounded px-2 py-1"
+            value={cpf}
+            onChange={e => setCpf(e.target.value)}
+          />
+        ) : (
+          schedule.cpf || <span className="text-gray-400">Não informado</span>
         )}
       </div>
       <div className="mb-2">

@@ -8,9 +8,9 @@ const Agendamentos = sequelize.define("Agendamentos", {
   patient: { type: DataTypes.STRING, allowNull: true },
   phone: { type: DataTypes.STRING, allowNull: true },
   notes: { type: DataTypes.STRING, allowNull: true },
-  medico: { type: DataTypes.STRING, allowNull: true } // <-- Adicionado
+  medico: { type: DataTypes.STRING, allowNull: true },
+  cpf: { type: DataTypes.STRING, allowNull: true },
 });
 
 module.exports = Agendamentos;
 
-module.exports = Agendamentos;

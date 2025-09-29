@@ -13,9 +13,8 @@ const fixedTimes = [
 export default function AgendaPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [selectedSchedule, setSelectedSchedule] = useState(null);
-  const [editField, setEditField] = useState(""); // "patient" ou "medico" ou ""
+  const [editField, setEditField] = useState("");
   const [patients, setPatients] = useState({});
-  // Removido o estado loading e message
 
   useEffect(() => {
     fetch("http://localhost:3001/api/agendamentos?date=" + selectedDate.toISOString().slice(0,10))
@@ -25,6 +24,7 @@ export default function AgendaPage() {
         data.forEach(item => {
           map[item.time] = {
             patient: item.patient || "",
+            cpf: item.cpf || "",
             phone: item.phone || "",
             notes: item.notes || "",
             medico: item.medico || ""
@@ -47,6 +47,7 @@ export default function AgendaPage() {
         time: item.time,
         date: selectedDate.toISOString().slice(0,10),
         patient: patientName,
+        cpf: patients[item.time]?.cpf || "",
         phone: patients[item.time]?.phone || "",
         notes: patients[item.time]?.notes || "",
         medico: medicoName || patients[item.time]?.medico || ""
@@ -58,6 +59,7 @@ export default function AgendaPage() {
           ...prev,
           [item.time]: {
             patient: patientName,
+            cpf: prev[item.time]?.cpf || "",
             phone: prev[item.time]?.phone || "",
             notes: prev[item.time]?.notes || "",
             medico: medicoName || prev[item.time]?.medico || ""
@@ -77,6 +79,7 @@ export default function AgendaPage() {
         time: updated.time,
         date: selectedDate.toISOString().slice(0,10),
         patient: updated.patient,
+        cpf: updated.cpf || "",
         phone: updated.phone,
         notes: updated.notes,
         medico: updated.medico
@@ -88,6 +91,7 @@ export default function AgendaPage() {
           ...prev,
           [updated.time]: {
             patient: updated.patient,
+            cpf: updated.cpf || "",
             phone: updated.phone,
             notes: updated.notes,
             medico: updated.medico
@@ -99,7 +103,7 @@ export default function AgendaPage() {
   }
 
   function handleDeleteAgendamento(item) {
-    fetch("http://localhost:3001/api/agendamentos/delete", {
+    fetch("http://localhost:3001/api/agendamentos/excluir", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -111,7 +115,7 @@ export default function AgendaPage() {
       .then(() => {
         setPatients(prev => ({
           ...prev,
-          [item.time]: { patient: "", phone: "", notes: "", medico: "" }
+          [item.time]: { patient: "", cpf: "", phone: "", notes: "", medico: "" }
         }));
         if (selectedSchedule && selectedSchedule.time === item.time) {
           setSelectedSchedule(null);
@@ -128,6 +132,7 @@ export default function AgendaPage() {
   const schedules = fixedTimes.map(time => ({
     time,
     patient: patients[time]?.patient || "",
+    cpf: patients[time]?.cpf || "",
     phone: patients[time]?.phone || "",
     notes: patients[time]?.notes || "",
     medico: patients[time]?.medico || "",

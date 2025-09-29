@@ -1,0 +1,8 @@
+const express = require('express');
+const router = express.Router();
+const pacienteController = require('../controllers/pacienteController');
+
+router.get('/', pacienteController.buscarPorCpf);
+router.get('/todos', pacienteController.listarTodos);
+
+module.exports = router;

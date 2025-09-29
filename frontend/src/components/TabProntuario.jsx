@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   FaNotesMedical,
   FaCalendarAlt,
@@ -9,11 +9,15 @@ import {
   FaPencilAlt,
   FaSmile,
   FaCheckCircle,
+  FaDownload,
+  FaSave,
 } from "react-icons/fa";
 import { ReactSketchCanvas } from "react-sketch-canvas";
+import { useParams } from "react-router-dom";
 
-export default function TabProntuario({ prontuario }) {
+export default function TabProntuario({ prontuario, onAdd }) {
   const canvasRef = useRef();
+  const { cpf } = useParams();
   const [saudeBucal, setSaudeBucal] = useState({
     anestesia: "",
     dor: "",
@@ -41,6 +45,15 @@ export default function TabProntuario({ prontuario }) {
   });
   const [alteracoes, setAlteracoes] = useState("");
   const [toast, setToast] = useState(null);
+  const [registros, setRegistros] = useState([]);
+
+  useEffect(() => {
+    fetch(
+      `http://localhost:3001/api/prontuarios?cpf=${encodeURIComponent(cpf)}`
+    )
+      .then((res) => res.json())
+      .then(setRegistros);
+  }, [cpf, onAdd]);
 
   function handleClearCanvas() {
     canvasRef.current.clearCanvas();
@@ -58,21 +71,50 @@ export default function TabProntuario({ prontuario }) {
     setExame({ ...exame, [e.target.name]: e.target.value });
   }
 
-  // Toast desaparece após 2s
-  React.useEffect(() => {
+  useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 2000);
       return () => clearTimeout(timer);
     }
   }, [toast]);
 
+  async function handleSalvarProntuario() {
+    let desenho = "";
+    if (canvasRef.current) {
+      desenho = await canvasRef.current.exportImage("png");
+      console.log("Desenho exportado:", desenho.slice(0, 100));
+    }
+    const dados = {
+      saudeBucal,
+      antecedentes,
+      exame,
+      alteracoes,
+      desenho,
+    };
+    const date = new Date().toISOString().slice(0, 10);
+    const time = new Date().toLocaleTimeString("pt-BR").slice(0, 5);
+
+    const res = await fetch("http://localhost:3001/api/prontuarios", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cpf, date, time, dados }),
+    });
+    const registro = await res.json();
+    setToast({ type: "success", message: "Prontuário salvo e PDF gerado!" });
+    setRegistros((prev) => [...prev, registro]);
+    if (onAdd) onAdd(registro);
+  }
+
   return (
     <div className="bg-white rounded-xl shadow p-8 mt-6 animate-fade-in">
-      {/* Toast de feedback */}
       {toast && (
         <div
           className={`fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg flex items-center gap-2
-            ${toast.type === "info" ? "bg-[#F9A23B] text-white" : "bg-green-500 text-white"}
+            ${
+              toast.type === "info"
+                ? "bg-[#F9A23B] text-white"
+                : "bg-green-500 text-white"
+            }
             animate-toast`}
         >
           <FaCheckCircle />
@@ -82,7 +124,6 @@ export default function TabProntuario({ prontuario }) {
       <h2 className="text-2xl font-bold mb-6 text-[#045397] flex items-center gap-2 animate-slide-in">
         <FaNotesMedical className="text-[#7A97B6]" /> Prontuário Odontológico
       </h2>
-      {/* Saúde Bucal */}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaSmile /> Saúde Bucal
@@ -223,7 +264,6 @@ export default function TabProntuario({ prontuario }) {
           </div>
         </div>
       </div>
-      {/* Antecedentes Familiares */}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaUserMd /> Antecedentes Familiares
@@ -236,7 +276,6 @@ export default function TabProntuario({ prontuario }) {
           onChange={(e) => setAntecedentes(e.target.value)}
         />
       </div>
-      {/* Exame Clínico */}
       <div className="mb-6">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg">
           Exame Clínico
@@ -352,7 +391,6 @@ export default function TabProntuario({ prontuario }) {
           </div>
         </div>
       </div>
-      {/* Arcada dentária desenhável */}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaPencilAlt /> Marque os procedimentos na arcada dentária:
@@ -362,7 +400,7 @@ export default function TabProntuario({ prontuario }) {
             style={{
               width: "100%",
               maxWidth: "900px",
-              height: "700  px",
+              height: "700px",
               borderRadius: "0.75rem",
               boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
               border: "1px solid #e5e7eb",
@@ -374,32 +412,24 @@ export default function TabProntuario({ prontuario }) {
             }}
             className="animate-canvas"
           >
-            <img
-              src="/img/arcada.jpg"
-              alt="Arcada Dentária"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-                gridArea: "1 / 1 / 2 / 2",
-                zIndex: 1,
-                pointerEvents: "none",
-                transition: "transform 0.3s",
-              }}
-            />
             <ReactSketchCanvas
               ref={canvasRef}
               width="900px"
-              height="350px"
+              height="700px"
+              backgroundImage="http://localhost:5173/img/arcada.jpg"
               strokeWidth={3}
               strokeColor="#FF5733"
               canvasColor="transparent"
               style={{
                 width: "100%",
                 height: "100%",
-                gridArea: "1 / 1 / 2 / 2",
-                zIndex: 2,
-                transition: "box-shadow 0.2s",
+                borderRadius: "0.75rem",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
+                border: "1px solid #e5e7eb",
+                marginBottom: "1rem",
+                background: "#fff",
+                overflow: "hidden",
+                display: "block",
               }}
             />
           </div>
@@ -421,7 +451,6 @@ export default function TabProntuario({ prontuario }) {
           </div>
         </div>
       </div>
-      {/* Alterações */}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaSmile /> Alterações
@@ -434,16 +463,24 @@ export default function TabProntuario({ prontuario }) {
           onChange={(e) => setAlteracoes(e.target.value)}
         />
       </div>
-      {/* Registros do Prontuário */}
+      <div className="mb-8 flex justify-end">
+        <button
+          className="bg-green-600 text-white px-4 py-2 rounded font-bold flex items-center gap-2"
+          onClick={handleSalvarProntuario}
+          type="button"
+        >
+          <FaSave /> Salvar/Exportar PDF
+        </button>
+      </div>
       <div>
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaCalendarAlt /> Registros do Prontuário:
         </div>
-        {prontuario.length === 0 ? (
+        {registros.length === 0 ? (
           <p className="text-gray-500">Nenhum registro de prontuário.</p>
         ) : (
           <div className="space-y-4">
-            {prontuario.map((registro) => (
+            {registros.map((registro) => (
               <div
                 key={registro.id}
                 className="bg-gradient-to-r from-[#f9fafb] to-[#e3eaf6] rounded-lg p-4 border-l-4 border-[#7A97B6] shadow transition hover:scale-[1.02] hover:shadow-lg flex gap-4 items-center animate-slide-in"
@@ -451,11 +488,19 @@ export default function TabProntuario({ prontuario }) {
                 <FaCalendarAlt className="text-[#7A97B6] text-2xl mr-2" />
                 <div>
                   <p>
-                    <strong>Data:</strong> {registro.data}
+                    <strong>Data:</strong> {registro.date}
                   </p>
                   <p>
-                    <strong>Descrição:</strong> {registro.descricao}
+                    <strong>Hora:</strong> {registro.time}
                   </p>
+                  <a
+                    href={`http://localhost:3001/uploads/prontuarios/${registro.pdf}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-700 underline flex items-center gap-1 mt-2"
+                  >
+                    <FaDownload /> Baixar PDF do Prontuário
+                  </a>
                 </div>
               </div>
             ))}
