@@ -13,25 +13,41 @@ export default function List({
   const [editingIndex, setEditingIndex] = useState(null);
   const [patientName, setPatientName] = useState("");
   const [medicoName, setMedicoName] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [phone, setPhone] = useState("");
+  const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
 
-  function startEdit(idx, patient, medico) {
+  function startEdit(idx, paciente, medico, cpfValue, phoneValue, notesValue) {
     setEditingIndex(idx);
-    setPatientName(patient || "");
+    setPatientName(paciente || "");
     setMedicoName(medico || "");
+    setCpf(cpfValue || "");
+    setPhone(phoneValue || "");
+    setNotes(notesValue || "");
     setError("");
   }
 
   function handleSave(idx, item) {
     if (!patientName.trim()) {
-      setError("O nome do paciente é obrigatório!");
+      setError("Digite o nome do paciente!");
       return;
     }
     setError("");
-    onSavePatient(item, patientName.trim(), medicoName.trim());
+    onSavePatient(
+      item,
+      patientName.trim(),
+      medicoName.trim(),
+      cpf,
+      phone,
+      notes
+    );
     setEditingIndex(null);
     setPatientName("");
     setMedicoName("");
+    setCpf("");
+    setPhone("");
+    setNotes("");
   }
 
   function handleKeyDown(e, idx, item) {
@@ -42,6 +58,22 @@ export default function List({
       setEditingIndex(null);
       setPatientName("");
       setMedicoName("");
+      setCpf("");
+      setPhone("");
+      setNotes("");
+      setError("");
+    }
+  }
+
+  function handleDelete(idx, item) {
+    onDelete && onDelete(item);
+    if (editingIndex === idx) {
+      setEditingIndex(null);
+      setPatientName("");
+      setMedicoName("");
+      setCpf("");
+      setPhone("");
+      setNotes("");
       setError("");
     }
   }
@@ -88,15 +120,38 @@ export default function List({
             </span>
             <span className="text-center flex items-center justify-center gap-2">
               {editingIndex === idx ? (
-                <input
-                  type="text"
-                  className="px-2 py-1 border border-gray-400 rounded focus:outline-[#045397] w-32"
-                  placeholder="Nome do paciente"
-                  value={patientName}
-                  onChange={e => setPatientName(e.target.value)}
-                  autoFocus
-                  onKeyDown={e => handleKeyDown(e, idx, item)}
-                />
+                <div className="flex flex-col gap-1 w-full">
+                  <input
+                    type="text"
+                    className="px-2 py-1 border border-gray-400 rounded w-full"
+                    placeholder="Nome do paciente"
+                    value={patientName}
+                    onChange={e => setPatientName(e.target.value)}
+                    onKeyDown={e => handleKeyDown(e, idx, item)}
+                    autoFocus
+                  />
+                  <input
+                    type="text"
+                    className="px-2 py-1 border border-gray-400 rounded w-full"
+                    placeholder="CPF"
+                    value={cpf}
+                    onChange={e => setCpf(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    className="px-2 py-1 border border-gray-400 rounded w-full"
+                    placeholder="Telefone"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                  />
+                  <input
+                    type="text"
+                    className="px-2 py-1 border border-gray-400 rounded w-full"
+                    placeholder="Observações"
+                    value={notes}
+                    onChange={e => setNotes(e.target.value)}
+                  />
+                </div>
               ) : item.patient ? (
                 <span className="font-semibold">{item.patient}</span>
               ) : (
@@ -107,7 +162,14 @@ export default function List({
                     aria-label="Adicionar paciente"
                     onClick={e => {
                       e.stopPropagation();
-                      startEdit(idx, "", item.medico);
+                      startEdit(
+                        idx,
+                        item.patient,
+                        item.medico,
+                        item.cpf,
+                        item.phone,
+                        item.notes
+                      );
                     }}
                     title="Adicionar paciente"
                   >
@@ -136,7 +198,14 @@ export default function List({
                     aria-label="Adicionar médico"
                     onClick={e => {
                       e.stopPropagation();
-                      startEdit(idx, item.patient, "");
+                      startEdit(
+                        idx,
+                        item.patient,
+                        "",
+                        item.cpf,
+                        item.phone,
+                        item.notes
+                      );
                     }}
                     title="Adicionar médico"
                   >
@@ -163,6 +232,9 @@ export default function List({
                       setEditingIndex(null);
                       setPatientName("");
                       setMedicoName("");
+                      setCpf("");
+                      setPhone("");
+                      setNotes("");
                       setError("");
                     }}
                     title="Cancelar"
@@ -177,7 +249,14 @@ export default function List({
                     aria-label="Editar"
                     onClick={e => {
                       e.stopPropagation();
-                      startEdit(idx, item.patient, item.medico);
+                      startEdit(
+                        idx,
+                        item.patient,
+                        item.medico,
+                        item.cpf,
+                        item.phone,
+                        item.notes
+                      );
                     }}
                     title="Editar"
                   >
@@ -188,7 +267,7 @@ export default function List({
                     aria-label="Excluir"
                     onClick={e => {
                       e.stopPropagation();
-                      onDelete && onDelete(item);
+                      handleDelete(idx, item);
                     }}
                     disabled={!item.patient}
                     title="Excluir"

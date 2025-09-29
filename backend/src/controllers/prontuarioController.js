@@ -4,6 +4,7 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const Jimp = require("jimp");
 
+// LISTA OS PRONTUÁRIOS DE UM PACIENTE PELO CPF
 exports.listarPorCpf = async (req, res) => {
   try {
     const { cpf } = req.query;
@@ -13,14 +14,19 @@ exports.listarPorCpf = async (req, res) => {
     const registros = await Prontuario.findAll({ where: { cpf } });
     res.json(registros);
   } catch (err) {
-    console.error("Erro ao listar prontuários:", err);
     res.status(500).json({ error: "Erro ao listar prontuários." });
   }
 };
 
+// ADICIONA UM NOVO PRONTUÁRIO E GERA O PDF
 exports.adicionar = async (req, res) => {
   try {
     const { cpf, date, time, dados } = req.body;
+    if (!cpf || !date || !time || !dados) {
+      return res
+        .status(400)
+        .json({ error: "CPF, data, hora e dados são obrigatórios." });
+    }
 
     const pdfName = `prontuario_${cpf}_${Date.now()}.pdf`;
     const pdfPath = path.join(__dirname, "../../uploads/prontuarios", pdfName);
@@ -44,53 +50,88 @@ exports.adicionar = async (req, res) => {
     doc.fontSize(12).text(JSON.stringify(dadosSemDesenho, null, 2));
     doc.moveDown();
 
-    // Mesclar desenho PNG com arcada antes de inserir no PDF
-    if (dados.desenho && typeof dados.desenho === "string" && dados.desenho.startsWith("data:image/png")) {
-      console.log("Mesclando desenho com arcada...");
-      const base64Data = dados.desenho.replace(/^data:image\/png;base64,/, "");
-      const desenhoBuffer = Buffer.from(base64Data, "base64");
+    let pdfCriado = false;
 
-      // Carregue a imagem da arcada dentária
-      const arcadaPath = path.join(__dirname, "../../..", "frontend", "public", "img", "arcada.jpg");
-      const arcada = await Jimp.read(arcadaPath);
+    // FAZ A MESCLA DO DESENHO COM A IMAGEM DA ARCADA DENTÁRIA
+    if (
+      dados.desenho &&
+      typeof dados.desenho === "string" &&
+      dados.desenho.startsWith("data:image/png")
+    ) {
+      try {
+        const base64Data = dados.desenho.replace(
+          /^data:image\/png;base64,/,
+          ""
+        );
+        const desenhoBuffer = Buffer.from(base64Data, "base64");
 
-      // Carregue o desenho do usuário
-      const desenho = await Jimp.read(desenhoBuffer);
+        // CARREGA A IMAGEM DA ARCADA DENTÁRIA
+        const arcadaPath = path.join(
+          __dirname,
+          "../../..",
+          "frontend",
+          "public",
+          "img",
+          "arcada.jpg"
+        );
+        const arcada = await Jimp.read(arcadaPath);
 
-      // Mescle o desenho sobre a arcada
-      arcada.composite(desenho, 0, 0);
+        // CARREGA O DESENHO DO PACIENTE
+        const desenho = await Jimp.read(desenhoBuffer);
 
-      // Converta para buffer PNG
-      const finalBuffer = await arcada.getBufferAsync(Jimp.MIME_PNG);
+        // MESCLA O DESENHO COM A IMAGEM DA ARCADA
+        arcada.composite(desenho, 0, 0);
 
-      doc.addPage();
-      doc.fontSize(14).text("Desenho da arcada dentária:", { align: "center" });
-      doc.image(finalBuffer, {
-        fit: [500, 300],
-        align: "center",
-        valign: "center",
-      });
-      doc.moveDown();
+        // CONVERTE A IMAGEM FINAL PARA BUFFER
+        const finalBuffer = await arcada.getBufferAsync(Jimp.MIME_PNG);
+
+        doc.addPage();
+        doc
+          .fontSize(14)
+          .text("Desenho da arcada dentária:", { align: "center" });
+        doc.image(finalBuffer, {
+          fit: [500, 300],
+          align: "center",
+          valign: "center",
+        });
+        doc.moveDown();
+        pdfCriado = true;
+      } catch (imgErr) {
+        doc.addPage();
+        doc
+          .fontSize(14)
+          .text("Não foi possível renderizar o desenho.", { align: "center" });
+      }
     } else {
       doc.addPage();
-      doc.fontSize(14).text("Não foi possível renderizar o desenho.", { align: "center" });
+      doc
+        .fontSize(14)
+        .text("Não foi possível renderizar o desenho.", { align: "center" });
     }
 
     doc.end();
 
     await new Promise((resolve) => stream.on("finish", resolve));
 
-    const prontuario = await Prontuario.create({
-      cpf,
-      date,
-      time,
-      dados,
-      pdf: pdfName,
-    });
-
-    res.json(prontuario);
+    try {
+      const prontuario = await Prontuario.create({
+        cpf,
+        date,
+        time,
+        dados,
+        pdf: pdfName,
+      });
+      res.json(prontuario);
+    } catch (dbErr) {
+      // REMOVE O PDF SE HOUVER ERRO AO SALVAR NO BANCO
+      if (fs.existsSync(pdfPath)) {
+        fs.unlinkSync(pdfPath);
+      }
+      res
+        .status(500)
+        .json({ error: "Erro ao salvar prontuário no banco de dados." });
+    }
   } catch (err) {
-    console.error("Erro ao adicionar prontuário:", err);
     res.status(500).json({ error: "Erro ao adicionar prontuário." });
   }
 };

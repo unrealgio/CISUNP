@@ -9,6 +9,8 @@ import TabPrescricoes from "../components/TabPrescricoes";
 import TabProntuario from "../components/TabProntuario";
 import TabArquivos from "../components/TabArquivos";
 
+const resumoPadrao = { consultas: 0, procedimentos: 0, exames: 0, faltas: 0 };
+
 export default function PacientePage() {
   const { cpf } = useParams();
   const [activeTab, setActiveTab] = useState("info");
@@ -18,43 +20,14 @@ export default function PacientePage() {
   const [prontuario, setProntuario] = useState([]);
 
   useEffect(() => {
-    fetch(`http://localhost:3001/api/pacientes?cpf=${encodeURIComponent(cpf)}`)
-      .then(res => res.json())
-      .then(data => {
-        if (Array.isArray(data) && data.length > 0 && data[0].patient) {
-          const agendamentos = data.map(a => ({
-            tipo: "Consulta",
-            profissional: a.medico,
-            data: a.date,
-            hora: a.time,
-            observacoes: a.notes,
-          }));
-          setPaciente({
-            nome: data[0].patient,
-            cpf: data[0].cpf,
-            telefone: data[0].phone,
-            idade: 30, // valor fictício, ajuste conforme necessário
-            observacoes: data[0].notes || "",
-            observacoesAutor: data[0].medico || "Equipe",
-            observacoesData: data[0].date || "",
-            agendamentos,
-            resumo: {
-              consultas: agendamentos.length,
-              procedimentos: 0,
-              exames: 0,
-              faltas: 0,
-            },
-          });
-          setProntuario(
-            agendamentos.map((a, idx) => ({
-              id: idx + 1,
-              data: a.data,
-              descricao: a.observacoes || "Consulta realizada.",
-            }))
-          );
-          setArquivos([
-            { id: 1, nome: "Exame de Sangue.pdf", tipo: "PDF", data: "12/09/2025" },
-          ]);
+    fetch(`http://localhost:3001/api/pacientes/${encodeURIComponent(cpf)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data && data.patient) {
+          // Garante que o campo resumo sempre existe
+          setPaciente({ ...data, resumo: data.resumo || resumoPadrao });
+          setProntuario([]);
+          setArquivos([]);
         } else {
           setPaciente(null);
         }
@@ -65,13 +38,15 @@ export default function PacientePage() {
   }, [cpf]);
 
   useEffect(() => {
-    fetch(`http://localhost:3001/api/prescricoes?cpf=${encodeURIComponent(cpf)}`)
-      .then(res => res.json())
+    fetch(
+      `http://localhost:3001/api/prescricoes?cpf=${encodeURIComponent(cpf)}`
+    )
+      .then((res) => res.json())
       .then(setPrescricoes);
   }, [cpf]);
 
   function handleAddPrescricao(nova) {
-    setPrescricoes(prev => [...prev, nova]);
+    setPrescricoes((prev) => [...prev, nova]);
   }
 
   if (paciente === undefined) {
@@ -111,8 +86,12 @@ export default function PacientePage() {
             onAdd={handleAddPrescricao}
           />
         )}
-        {activeTab === "prontuario" && <TabProntuario prontuario={prontuario} />}
-        {activeTab === "arquivos" && <TabArquivos arquivos={arquivos} setArquivos={setArquivos} />}
+        {activeTab === "prontuario" && (
+          <TabProntuario prontuario={prontuario} />
+        )}
+        {activeTab === "arquivos" && (
+          <TabArquivos arquivos={arquivos} setArquivos={setArquivos} />
+        )}
       </div>
     </>
   );

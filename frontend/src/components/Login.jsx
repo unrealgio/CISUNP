@@ -104,11 +104,11 @@ export default function Login() {
               </button>
             </div>
           </div>
-          {/* Erro */}
+          {/* MENSAGEM DE ERRO */}
           {error && (
             <div className="text-red-600 text-sm mb-2 text-center">{error}</div>
           )}
-          {/* Botão acessar */}
+          {/* BOTÃO DE LOGIN*/}
           <button
             type="submit"
             disabled={loading}
@@ -129,7 +129,7 @@ export default function Login() {
             )}
           </button>
         </form>
-        {/* Esqueci minha senha */}
+        {/* ESQUECI A SENHA */}
         <div className="w-full flex justify-center items-center mt-2">
           <a
             href="#"
@@ -139,7 +139,7 @@ export default function Login() {
           </a>
         </div>
       </div>
-      {/* Modal de troca de senha no primeiro acesso */}
+      {/* COMPONENTE DE MUDANÇA DE SENHA */}
       {showChangePassword && (
         <PassChange email={email} onSenhaAlterada={handleSenhaAlterada} />
       )}

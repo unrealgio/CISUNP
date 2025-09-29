@@ -8,6 +8,9 @@ const Prontuario = sequelize.define("Prontuario", {
   time: DataTypes.STRING,
   dados: DataTypes.JSON, // Salva todos os campos do prontuário
   pdf: DataTypes.STRING, // Caminho do PDF gerado
-}, { timestamps: true });
+}, {
+  tableName: "prontuarios",
+  timestamps: true
+});
 
 module.exports = Prontuario;

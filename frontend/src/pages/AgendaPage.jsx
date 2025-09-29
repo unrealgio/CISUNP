@@ -6,8 +6,18 @@ import List from "../components/List";
 import Details from "../components/Details";
 
 const fixedTimes = [
-  "12:30", "13:00", "13:30", "14:00", "14:30", "15:00",
-  "15:30", "16:00", "16:30", "17:00", "17:30", "18:00"
+  "12:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+  "16:30",
+  "17:00",
+  "17:30",
+  "18:00",
 ];
 
 export default function AgendaPage() {
@@ -17,26 +27,41 @@ export default function AgendaPage() {
   const [patients, setPatients] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:3001/api/agendamentos?date=" + selectedDate.toISOString().slice(0,10))
-      .then(res => res.json())
-      .then(data => {
+    fetchAgendamentos();
+    // eslint-disable-next-line
+  }, [selectedDate]);
+
+  function fetchAgendamentos() {
+    fetch(
+      "http://localhost:3001/api/agendamentos?date=" +
+        selectedDate.toISOString().slice(0, 10)
+    )
+      .then((res) => res.json())
+      .then((data) => {
         const map = {};
-        data.forEach(item => {
+        data.forEach((item) => {
           map[item.time] = {
             patient: item.patient || "",
             cpf: item.cpf || "",
             phone: item.phone || "",
             notes: item.notes || "",
-            medico: item.medico || ""
+            medico: item.medico || "",
           };
         });
         setPatients(map);
         setSelectedSchedule(null);
         setEditField("");
       });
-  }, [selectedDate]);
+  }
 
-  function handleSavePatient(item, patientName, medicoName = "") {
+  function handleSavePatient(
+    item,
+    patientName,
+    medicoName = "",
+    cpf = "",
+    phone = "",
+    notes = ""
+  ) {
     if (!patientName.trim()) {
       return;
     }
@@ -45,26 +70,17 @@ export default function AgendaPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         time: item.time,
-        date: selectedDate.toISOString().slice(0,10),
+        date: selectedDate.toISOString().slice(0, 10),
         patient: patientName,
-        cpf: patients[item.time]?.cpf || "",
-        phone: patients[item.time]?.phone || "",
-        notes: patients[item.time]?.notes || "",
-        medico: medicoName || patients[item.time]?.medico || ""
+        cpf,
+        phone,
+        medico: medicoName,
+        notes
       }),
     })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(() => {
-        setPatients(prev => ({
-          ...prev,
-          [item.time]: {
-            patient: patientName,
-            cpf: prev[item.time]?.cpf || "",
-            phone: prev[item.time]?.phone || "",
-            notes: prev[item.time]?.notes || "",
-            medico: medicoName || prev[item.time]?.medico || ""
-          }
-        }));
+        fetchAgendamentos();
       });
   }
 
@@ -77,26 +93,17 @@ export default function AgendaPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         time: updated.time,
-        date: selectedDate.toISOString().slice(0,10),
+        date: selectedDate.toISOString().slice(0, 10),
         patient: updated.patient,
         cpf: updated.cpf || "",
-        phone: updated.phone,
-        notes: updated.notes,
-        medico: updated.medico
+        phone: updated.phone || "",
+        medico: updated.medico || "",
+        notes: updated.notes || ""
       }),
     })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(() => {
-        setPatients(prev => ({
-          ...prev,
-          [updated.time]: {
-            patient: updated.patient,
-            cpf: updated.cpf || "",
-            phone: updated.phone,
-            notes: updated.notes,
-            medico: updated.medico
-          }
-        }));
+        fetchAgendamentos();
         setSelectedSchedule(updated);
         setEditField("");
       });
@@ -108,19 +115,14 @@ export default function AgendaPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         time: item.time,
-        date: selectedDate.toISOString().slice(0,10)
+        date: selectedDate.toISOString().slice(0, 10),
       }),
     })
-      .then(res => res.json())
+      .then((res) => res.json())
       .then(() => {
-        setPatients(prev => ({
-          ...prev,
-          [item.time]: { patient: "", cpf: "", phone: "", notes: "", medico: "" }
-        }));
-        if (selectedSchedule && selectedSchedule.time === item.time) {
-          setSelectedSchedule(null);
-          setEditField("");
-        }
+        fetchAgendamentos();
+        setSelectedSchedule(null);
+        setEditField("");
       });
   }
 
@@ -129,14 +131,14 @@ export default function AgendaPage() {
     setEditField(field);
   }
 
-  const schedules = fixedTimes.map(time => ({
+  const schedules = fixedTimes.map((time) => ({
     time,
     patient: patients[time]?.patient || "",
     cpf: patients[time]?.cpf || "",
     phone: patients[time]?.phone || "",
     notes: patients[time]?.notes || "",
     medico: patients[time]?.medico || "",
-    date: selectedDate.toLocaleDateString("pt-BR")
+    date: selectedDate.toLocaleDateString("pt-BR"),
   }));
 
   return (

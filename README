@@ -1,0 +1,120 @@
+# CIS - Sistema de Gestão Clínica
+
+Desenvolvido por **Giovanni Felipe Oliveira da Silva**  
+Email: [giovannifelipedev@gmail.com](mailto:giovannifelipedev@gmail.com)  
+GitHub: [https://github.com/unrealgio](https://github.com/unrealgio)
+
+---
+
+## Sobre o Projeto
+
+O CIS é um sistema desenvolvido para a **faculdade UnP**, com o objetivo de automatizar os agendamentos e processos da clínica **CIS (Centro Integrado de Saúde)**.  
+Projetado para proporcionar maior eficiência, organização e segurança, o CIS facilita o gerenciamento de pacientes, consultas, prontuários odontológicos, prescrições e demais rotinas clínicas, atendendo às necessidades de alunos, profissionais e gestores da clínica.
+
+O sistema conta com uma arquitetura moderna e escalável, utilizando tecnologias de ponta como **Node.js**, **Express**, **Sequelize** e **PostgreSQL** no backend, além de **React**, **Vite** e **Tailwind CSS** no frontend.  
+Essas ferramentas garantem uma interface intuitiva, responsiva e de alto desempenho, além de recursos avançados como autenticação JWT, geração de PDFs, upload de arquivos e integração completa entre as áreas da clínica.
+
+O CIS foi desenvolvido para ser facilmente adaptável e expandido, tornando-se uma solução robusta para o ambiente acadêmico e clínico da UnP.
+
+---
+
+## Funcionalidades
+
+- Cadastro e busca de pacientes
+- Agendamento de consultas
+- Prontuário odontológico com exportação em PDF
+- Prescrições médicas
+- Prontuário dinâmico com a possibilidade de desenhar em cima de um desenho da arcada dentária
+- Autenticação de usuários (JWT)
+- Upload e download de arquivos
+- Interface moderna e responsiva
+
+---
+
+## Tecnologias Utilizadas
+
+- **Backend:** Node.js, Express, Sequelize, PostgreSQL, PDFKit, Jimp, Bcrypt
+- **Frontend:** React, Vite, Tailwind CSS, React Icons
+- **Outros:** JWT, ESLint
+
+---
+
+## Como Executar o Projeto
+
+### 1. **Clone o repositório**
+
+```bash
+git clone https://github.com/unrealgio/cis.git
+cd cis
+```
+
+### 2. **Configuração do Backend**
+
+- Acesse a pasta `backend`
+- Crie um banco de dados PostgreSQL e configure o arquivo `.env` conforme exemplo:
+
+```env
+DB_NAME=nomedobanco
+DB_USER=nomedousuariodobanco
+DB_PASS=suasenha
+DB_HOST=localhost
+DB_PORT=5432
+JWT_SECRET=suasecretkey
+```
+
+- Instale as dependências:
+
+```bash
+cd backend
+npm install
+```
+
+- Inicie o servidor:
+
+```bash
+npm start
+```
+
+O backend estará rodando em `http://localhost:3001`.
+
+---
+
+### 3. **Configuração do Frontend**
+
+- Acesse a pasta `frontend`
+- Instale as dependências:
+
+```bash
+cd ../frontend
+npm install
+```
+
+- Inicie o servidor de desenvolvimento:
+
+```bash
+npm run dev
+```
+
+O frontend estará rodando em `http://localhost:5173`.
+
+---
+
+### 4. **Acesso ao Sistema**
+
+- Acesse `http://localhost:5173` no navegador.
+- Usuário padrão:  
+  **Email:** admin@cis.com  
+  **Senha:** BemVindo
+
+---
+
+## Licença
+
+Este projeto está licenciado sob os termos da licença MIT.  
+Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## Desenvolvido por Giovanni Felipe Oliveira da Silva  
+Email: [giovannifelipedev@gmail.com](mailto:giovannifelipedev@gmail.com)  
+GitHub: [https://github.com/unrealgio](https://github.com/unrealgio)

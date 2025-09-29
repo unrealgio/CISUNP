@@ -8,6 +8,9 @@ const Prescricao = sequelize.define("Prescricao", {
   dose: DataTypes.STRING,
   frequencia: DataTypes.STRING,
   observacao: DataTypes.STRING,
-}, { timestamps: true });
+}, {
+  tableName: "prescricoes",
+  timestamps: true
+});
 
 module.exports = Prescricao;

@@ -15,7 +15,7 @@ import {
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import { useParams } from "react-router-dom";
 
-export default function TabProntuario({ prontuario, onAdd }) {
+export default function TabProntuario({  onAdd }) {
   const canvasRef = useRef();
   const { cpf } = useParams();
   const [saudeBucal, setSaudeBucal] = useState({
@@ -46,22 +46,36 @@ export default function TabProntuario({ prontuario, onAdd }) {
   const [alteracoes, setAlteracoes] = useState("");
   const [toast, setToast] = useState(null);
   const [registros, setRegistros] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState(null);
 
+  // BUSCAR REGISTROS DO PRONTUÁRIO AO CARREGAR O COMPONENTE OU QUANDO UM NOVO REGISTRO FOR ADICIONADO
   useEffect(() => {
+    setLoading(true);
+    setErro(null);
     fetch(
       `http://localhost:3001/api/prontuarios?cpf=${encodeURIComponent(cpf)}`
     )
       .then((res) => res.json())
-      .then(setRegistros);
+      .then((data) => {
+        if (Array.isArray(data)) setRegistros(data);
+        else setRegistros([]);
+      })
+      .catch(() => setErro("Erro ao carregar registros do prontuário."))
+      .finally(() => setLoading(false));
   }, [cpf, onAdd]);
 
   function handleClearCanvas() {
-    canvasRef.current.clearCanvas();
-    setToast({ type: "info", message: "Canvas limpo!" });
+    if (canvasRef.current) {
+      canvasRef.current.clearCanvas();
+      showToast("info", "Canvas limpo!");
+    }
   }
   function handleUndoCanvas() {
-    canvasRef.current.undo();
-    setToast({ type: "info", message: "Último traço desfeito!" });
+    if (canvasRef.current) {
+      canvasRef.current.undo();
+      showToast("info", "Último traço desfeito!");
+    }
   }
 
   function handleSaudeBucalChange(e) {
@@ -69,6 +83,10 @@ export default function TabProntuario({ prontuario, onAdd }) {
   }
   function handleExameChange(e) {
     setExame({ ...exame, [e.target.name]: e.target.value });
+  }
+
+  function showToast(type, message) {
+    setToast({ type, message });
   }
 
   useEffect(() => {
@@ -79,30 +97,40 @@ export default function TabProntuario({ prontuario, onAdd }) {
   }, [toast]);
 
   async function handleSalvarProntuario() {
+    setLoading(true);
+    setErro(null);
     let desenho = "";
-    if (canvasRef.current) {
-      desenho = await canvasRef.current.exportImage("png");
-      console.log("Desenho exportado:", desenho.slice(0, 100));
-    }
-    const dados = {
-      saudeBucal,
-      antecedentes,
-      exame,
-      alteracoes,
-      desenho,
-    };
-    const date = new Date().toISOString().slice(0, 10);
-    const time = new Date().toLocaleTimeString("pt-BR").slice(0, 5);
+    try {
+      if (canvasRef.current) {
+        desenho = await canvasRef.current.exportImage("png");
+      }
+      const dados = {
+        saudeBucal,
+        antecedentes,
+        exame,
+        alteracoes,
+        desenho,
+      };
+      const date = new Date().toISOString().slice(0, 10);
+      const time = new Date().toLocaleTimeString("pt-BR").slice(0, 5);
 
-    const res = await fetch("http://localhost:3001/api/prontuarios", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ cpf, date, time, dados }),
-    });
-    const registro = await res.json();
-    setToast({ type: "success", message: "Prontuário salvo e PDF gerado!" });
-    setRegistros((prev) => [...prev, registro]);
-    if (onAdd) onAdd(registro);
+      const res = await fetch("http://localhost:3001/api/prontuarios", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cpf, date, time, dados }),
+      });
+      if (!res.ok) throw new Error("Erro ao salvar prontuário.");
+      const registro = await res.json();
+      showToast("success", "Prontuário salvo e PDF gerado!");
+      setRegistros((prev) => [...prev, registro]);
+      if (onAdd) onAdd(registro);
+      if (canvasRef.current) canvasRef.current.clearCanvas();
+    } catch (err) {
+      setErro("Erro ao salvar prontuário.", err);
+      showToast("info", "Erro ao salvar prontuário.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -124,13 +152,18 @@ export default function TabProntuario({ prontuario, onAdd }) {
       <h2 className="text-2xl font-bold mb-6 text-[#045397] flex items-center gap-2 animate-slide-in">
         <FaNotesMedical className="text-[#7A97B6]" /> Prontuário Odontológico
       </h2>
+      {erro && (
+        <div className="bg-red-100 text-red-700 rounded p-4 mb-4 text-center font-semibold">
+          {erro}
+        </div>
+      )}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaSmile /> Saúde Bucal
         </div>
         <div className="grid md:grid-cols-2 gap-4 bg-[#f9fafb] rounded-lg p-4 border shadow">
           <div className="space-y-2">
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaUserMd /> Teve reação com anestesia dental?
               <select
                 name="anestesia"
@@ -143,7 +176,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaTooth /> Sente dor nos dentes ou gengiva?
               <select
                 name="dor"
@@ -156,7 +189,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaTooth /> Sangramento na gengiva?
               <select
                 name="sangramento"
@@ -176,7 +209,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
                 className="ml-2 rounded border px-2 py-1"
               />
             </label>
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaSmile /> Sente gosto ruim ou boca seca?
               <select
                 name="bocaSeca"
@@ -189,7 +222,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaSmile /> Costuma ranger os dentes?
               <select
                 name="ranger"
@@ -202,7 +235,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaSmile /> Dor no maxilar ou ouvido?
               <select
                 name="maxilar"
@@ -217,7 +250,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
             </label>
           </div>
           <div className="space-y-2">
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaUserMd /> Último tratamento dentário:
               <input
                 name="tratamento"
@@ -226,7 +259,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
                 className="ml-2 rounded border px-2 py-1"
               />
             </label>
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaUserMd /> Fumante?
               <select
                 name="fumante"
@@ -239,7 +272,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaTooth /> Escova os dentes quantas vezes ao dia?
               <input
                 name="escova"
@@ -248,7 +281,7 @@ export default function TabProntuario({ prontuario, onAdd }) {
                 className="ml-2 rounded border px-2 py-1"
               />
             </label>
-            <label className="block font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-[#045397] flex items-center gap-2">
               <FaTooth /> Utiliza fio dental?
               <select
                 name="fioDental"
@@ -468,15 +501,18 @@ export default function TabProntuario({ prontuario, onAdd }) {
           className="bg-green-600 text-white px-4 py-2 rounded font-bold flex items-center gap-2"
           onClick={handleSalvarProntuario}
           type="button"
+          disabled={loading}
         >
-          <FaSave /> Salvar/Exportar PDF
+          <FaSave /> {loading ? "Salvando..." : "Salvar/Exportar PDF"}
         </button>
       </div>
       <div>
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaCalendarAlt /> Registros do Prontuário:
         </div>
-        {registros.length === 0 ? (
+        {loading ? (
+          <p className="text-gray-500">Carregando registros...</p>
+        ) : registros.length === 0 ? (
           <p className="text-gray-500">Nenhum registro de prontuário.</p>
         ) : (
           <div className="space-y-4">

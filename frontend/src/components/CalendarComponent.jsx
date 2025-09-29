@@ -3,9 +3,18 @@ import Calendar from "react-calendar";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "react-calendar/dist/Calendar.css";
 
+
+//DATAS QUE SERÃO MARCADAS NO CALENDÁRIO, PODE SER PASSADO COMO PROP PARA ALTERAR DINAMICAMENTE
 const markedDates = [new Date(2025, 7, 21), new Date(2025, 7, 14)];
 
-export default function CalendarComponent({ value, onChange }) {
+export default function CalendarComponent({ value, onChange, marked = markedDates }) {
+  const selectedDate =
+    value && (Array.isArray(value) ? value[0] : value) instanceof Date
+      ? Array.isArray(value)
+        ? value[0]
+        : value
+      : null;
+
   return (
     <div className="bg-[#7A97B6] rounded-xl p-4 w-full max-w-xs mx-auto shadow">
       <Calendar
@@ -17,20 +26,16 @@ export default function CalendarComponent({ value, onChange }) {
         prevLabel={<FaChevronLeft aria-label="Mês anterior" />}
         next2Label={null}
         prev2Label={null}
-        tileContent={({ date, view }) =>
-          markedDates.some((d) => d.toDateString() === date.toDateString()) ? (
+        tileContent={({ date }) =>
+          marked.some((d) => d.toDateString() === date.toDateString()) ? (
             <div className="flex justify-center mt-1">
               <span className="w-2 h-2 rounded-full bg-green-400 inline-block"></span>
             </div>
           ) : null
         }
-        tileClassName={({ date, view }) => {
+        tileClassName={({ date }) => {
           const isSelected =
-            value &&
-            ((Array.isArray(value) &&
-              value.some((v) => v.toDateString() === date.toDateString())) ||
-              (!Array.isArray(value) &&
-                value.toDateString() === date.toDateString()));
+            selectedDate && date.toDateString() === selectedDate.toDateString();
           const isToday = date.toDateString() === new Date().toDateString();
           const isWeekend = date.getDay() === 0 || date.getDay() === 6;
           return [
@@ -46,13 +51,11 @@ export default function CalendarComponent({ value, onChange }) {
             "hover:!bg-[#F9A23B]/70 hover:!text-white",
           ].join(" ");
         }}
-        tileDisabled={({ date, view }) => false}
       />
       <div className="flex justify-between mt-2">
         <button
           className="text-xs text-white bg-[#045397] px-3 py-1 rounded hover:bg-[#F9A23B] transition"
           onClick={() => {
-            // Garante que a data seja apenas o dia, sem horas/minutos/segundos
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             onChange(today);
@@ -62,15 +65,13 @@ export default function CalendarComponent({ value, onChange }) {
           Hoje
         </button>
         <span className="text-white font-semibold text-sm">
-          {value &&
-            (Array.isArray(value) ? value[0] : value).toLocaleDateString(
-              "pt-BR",
-              {
+          {selectedDate
+            ? selectedDate.toLocaleDateString("pt-BR", {
                 day: "2-digit",
                 month: "long",
                 year: "numeric",
-              }
-            )}
+              })
+            : ""}
         </span>
       </div>
       <style>

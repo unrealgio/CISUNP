@@ -281,7 +281,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
   const [expanded, setExpanded] = useState(null);
   const itemsPerPage = 12;
 
-  // Filtra por nome do paciente
+  // FILTRO POR NOME DO PACIENTE
   const filteredConsultas = consultas.filter(c =>
     c.paciente.toLowerCase().includes(search.toLowerCase())
   );
@@ -377,7 +377,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
               <div className="flex items-center gap-2 text-gray-700">
                 <FaUserMd /> {c.equipe}
               </div>
-              {/* Detalhes expandido */}
+              {/* DETALHES EXPANDIDOS DAS CONSULTAS */}
               {expanded === c.id && (
                 <div className="mt-3 p-3 rounded bg-gray-50 border border-gray-200 text-gray-700 text-sm">
                   <strong>Detalhes:</strong> {c.detalhes}
@@ -388,7 +388,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
         )}
       </div>
 
-      {/* Paginação */}
+      {/* PAGINAÇÃO */}
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-8">
           <button
