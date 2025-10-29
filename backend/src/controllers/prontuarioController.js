@@ -4,6 +4,45 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const Jimp = require("jimp");
 
+// FUNÇÃO AUXILIAR PARA FORMATAR OS DADOS DO PRONTUÁRIO EM TEXTO LEGÍVEL
+function formatarDadosProntuario(dados) {
+  let texto = "";
+
+  if (dados.saudeBucal) {
+    texto += "Saúde Bucal:\n";
+    texto += `- Teve reação com anestesia dental? ${dados.saudeBucal.anestesia || "-"}\n`;
+    texto += `- Sente dor nos dentes ou gengiva? ${dados.saudeBucal.dor || "-"}\n`;
+    texto += `- Sangramento na gengiva? ${dados.saudeBucal.sangramento || "-"}\n`;
+    texto += `  Quando? ${dados.saudeBucal.sangramentoQuando || "-"}\n`;
+    texto += `- Sente gosto ruim ou boca seca? ${dados.saudeBucal.bocaSeca || "-"}\n`;
+    texto += `- Costuma ranger os dentes? ${dados.saudeBucal.ranger || "-"}\n`;
+    texto += `- Dor no maxilar ou ouvido? ${dados.saudeBucal.maxilar || "-"}\n`;
+    texto += `- Último tratamento dentário: ${dados.saudeBucal.tratamento || "-"}\n`;
+    texto += `- Fumante? ${dados.saudeBucal.fumante || "-"}\n`;
+    texto += `- Escova os dentes quantas vezes ao dia? ${dados.saudeBucal.escova || "-"}\n`;
+    texto += `- Utiliza fio dental? ${dados.saudeBucal.fioDental || "-"}\n\n`;
+  }
+
+  texto += `Antecedentes Familiares: ${dados.antecedentes || "-"}\n\n`;
+
+  if (dados.exame) {
+    texto += "Exame Clínico:\n";
+    texto += `- Higiene: ${dados.exame.higiene || "-"}\n`;
+    texto += `- Halitose: ${dados.exame.halitose || "-"}\n`;
+    texto += `- Tártaro: ${dados.exame.tartaro || "-"}\n`;
+    texto += `- Gengiva: ${dados.exame.gengiva || "-"}\n`;
+    texto += `- Mucosa: ${dados.exame.mucosa || "-"}\n`;
+    texto += `- Língua: ${dados.exame.lingua || "-"}\n`;
+    texto += `- Palato: ${dados.exame.palato || "-"}\n`;
+    texto += `- Assoalho Bucal: ${dados.exame.assolaobucal || "-"}\n`;
+    texto += `- Lábios: ${dados.exame.labios || "-"}\n\n`;
+  }
+
+  texto += `Alterações: ${dados.alteracoes || "-"}\n`;
+
+  return texto;
+}
+
 // LISTA OS PRONTUÁRIOS DE UM PACIENTE PELO CPF
 exports.listarPorCpf = async (req, res) => {
   try {
@@ -50,10 +89,8 @@ exports.adicionar = async (req, res) => {
     doc.fontSize(14).text("Dados do Prontuário:");
     const dadosSemDesenho = { ...dados };
     delete dadosSemDesenho.desenho;
-    doc.fontSize(12).text(JSON.stringify(dadosSemDesenho, null, 2));
+    doc.fontSize(12).text(formatarDadosProntuario(dadosSemDesenho), { lineGap: 2 });
     doc.moveDown();
-
-    let pdfCriado = false;
 
     // FAZ A MESCLA DO DESENHO COM A IMAGEM DA ARCADA DENTÁRIA
     if (
@@ -98,7 +135,6 @@ exports.adicionar = async (req, res) => {
           .text("Desenho da arcada dentária:", { align: "center" });
         doc.image(finalBuffer, 0, 40, { width: 900, height: 700 });
         doc.moveDown();
-        pdfCriado = true;
       } catch (imgErr) {
         doc.addPage();
         doc

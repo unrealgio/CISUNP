@@ -1,14 +1,14 @@
 # CIS - Sistema de Gestão Clínica
 
-Desenvolvido por **Giovanni Felipe Oliveira da Silva**  
-Email: [giovannifelipedev@gmail.com](mailto:giovannifelipedev@gmail.com)  
-GitHub: [https://github.com/unrealgio](https://github.com/unrealgio)
+Desenvolvido por *Giovanni Felipe Oliveira da Silva*
+Email: [giovannifelipedev@gmail.com]
+GitHub: [https://github.com/unrealgio]
 
 ---
 
 ## Sobre o Projeto
 
-O CIS é um sistema desenvolvido para a **faculdade UnP**, com o objetivo de automatizar os agendamentos e processos da clínica **CIS (Centro Integrado de Saúde)**.  
+O CIS é um sistema desenvolvido para a *faculdade UnP*, com o objetivo de automatizar os agendamentos e processos da clínica **CIS (Centro Integrado de Saúde)**.  
 Projetado para proporcionar maior eficiência, organização e segurança, o CIS facilita o gerenciamento de pacientes, consultas, prontuários odontológicos, prescrições e demais rotinas clínicas, atendendo às necessidades de alunos, profissionais e gestores da clínica.
 
 O sistema conta com uma arquitetura moderna e escalável, utilizando tecnologias de ponta como **Node.js**, **Express**, **Sequelize** e **PostgreSQL** no backend, além de **React**, **Vite** e **Tailwind CSS** no frontend.  

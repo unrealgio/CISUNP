@@ -49,7 +49,7 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center relative" style={{
-      backgroundImage: "url('https://lh3.googleusercontent.com/pw/AP1GczMLu294ue1TPyyB2fKyX0wSnU0dda95B84ZbYxZiPOQYXKFArWEAR8w__sGh2eIIBrkaqT0iTPPXWdv8xG_8aqTOfPB6SjojvKaTVxaM7kj_QRBbCqktBnM4fMqXsIQZELMctsh4kibugcFFcsyCQPJ=w1378-h919-s-no-gm?authuser=0')",
+      backgroundImage: "url('./img/bglogin.jpg')",
       backgroundSize: "cover",
       backgroundPosition: "center",
     }}>
