@@ -4,7 +4,7 @@ const path = require("path");
 const PDFDocument = require("pdfkit");
 const Jimp = require("jimp");
 
-// FUNÇÃO AUXILIAR PARA FORMATAR OS DADOS DO PRONTUÁRIO EM TEXTO LEGÍVEL
+// FUNÇÃO AUXILIAR PARA FORMATAR OS DADOS DO PRONTUÁRIO
 function formatarDadosProntuario(dados) {
   let texto = "";
 
@@ -34,7 +34,7 @@ function formatarDadosProntuario(dados) {
     texto += `- Mucosa: ${dados.exame.mucosa || "-"}\n`;
     texto += `- Língua: ${dados.exame.lingua || "-"}\n`;
     texto += `- Palato: ${dados.exame.palato || "-"}\n`;
-    texto += `- Assoalho Bucal: ${dados.exame.assolaobucal || "-"}\n`;
+    texto += `- Assoalho Bucal: ${dados.exame.assoalhoBucal || "-"}\n`;
     texto += `- Lábios: ${dados.exame.labios || "-"}\n\n`;
   }
 
@@ -53,6 +53,7 @@ exports.listarPorCpf = async (req, res) => {
     const registros = await Prontuario.findAll({ where: { cpf } });
     res.json(registros);
   } catch (err) {
+    console.error("Erro ao listar prontuários:", err);
     res.status(500).json({ error: "Erro ao listar prontuários." });
   }
 };
@@ -73,8 +74,9 @@ exports.adicionar = async (req, res) => {
     fs.mkdirSync(path.dirname(pdfPath), { recursive: true });
 
     const doc = new PDFDocument({
-      size: [900, 700], // Define o tamanho da página igual ao canvas do frontend
-      margin: 40
+      // DEFINE O TAMANHO DA PÁGINA IGUAL AO CANVAS DO FRONTEND
+      size: [900, 700],
+      margin: 40,
     });
     const stream = fs.createWriteStream(pdfPath);
     doc.pipe(stream);
@@ -89,7 +91,9 @@ exports.adicionar = async (req, res) => {
     doc.fontSize(14).text("Dados do Prontuário:");
     const dadosSemDesenho = { ...dados };
     delete dadosSemDesenho.desenho;
-    doc.fontSize(12).text(formatarDadosProntuario(dadosSemDesenho), { lineGap: 2 });
+    doc
+      .fontSize(12)
+      .text(formatarDadosProntuario(dadosSemDesenho), { lineGap: 2 });
     doc.moveDown();
 
     // FAZ A MESCLA DO DESENHO COM A IMAGEM DA ARCADA DENTÁRIA
@@ -101,7 +105,7 @@ exports.adicionar = async (req, res) => {
       try {
         const base64Data = dados.desenho.replace(
           /^data:image\/png;base64,/,
-          ""
+          "",
         );
         const desenhoBuffer = Buffer.from(base64Data, "base64");
 
@@ -112,7 +116,7 @@ exports.adicionar = async (req, res) => {
           "frontend",
           "public",
           "img",
-          "arcada.jpg"
+          "arcada.jpg",
         );
         const arcada = await Jimp.read(arcadaPath);
 
@@ -136,6 +140,7 @@ exports.adicionar = async (req, res) => {
         doc.image(finalBuffer, 0, 40, { width: 900, height: 700 });
         doc.moveDown();
       } catch (imgErr) {
+        console.error("Erro ao renderizar desenho do prontuário:", imgErr);
         doc.addPage();
         doc
           .fontSize(14)
@@ -162,6 +167,7 @@ exports.adicionar = async (req, res) => {
       });
       res.json(prontuario);
     } catch (dbErr) {
+      console.error("Erro ao salvar prontuário no banco de dados:", dbErr);
       // REMOVE O PDF SE HOUVER ERRO AO SALVAR NO BANCO
       if (fs.existsSync(pdfPath)) {
         fs.unlinkSync(pdfPath);
@@ -171,6 +177,7 @@ exports.adicionar = async (req, res) => {
         .json({ error: "Erro ao salvar prontuário no banco de dados." });
     }
   } catch (err) {
+    console.error("Erro ao adicionar prontuário:", err);
     res.status(500).json({ error: "Erro ao adicionar prontuário." });
   }
 };

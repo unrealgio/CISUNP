@@ -1,5 +1,14 @@
 import React, { useState } from "react";
-import { FaUserPlus, FaSave, FaUserMd, FaUsers, FaIdCard, FaPhone, FaHome } from "react-icons/fa";
+import {
+  FaUserPlus,
+  FaSave,
+  FaUserMd,
+  FaUsers,
+  FaIdCard,
+  FaPhone,
+  FaHome,
+} from "react-icons/fa";
+import { apiFetch } from "../api";
 
 export default function AddPaciente({ onAdd, onCancel }) {
   const [form, setForm] = useState({
@@ -15,19 +24,19 @@ export default function AddPaciente({ onAdd, onCancel }) {
   const [erro, setErro] = useState("");
 
   function handleChange(e) {
-  let value = e.target.value;
-  if (e.target.name === "cpf") {
-    value = value.replace(/\D/g, ""); // remove tudo que não for número
+    let value = e.target.value;
+    if (e.target.name === "cpf") {
+      value = value.replace(/\D/g, "");
+    }
+    setForm({ ...form, [e.target.name]: value });
   }
-  setForm({ ...form, [e.target.name]: value });
-}
 
   async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:3001/api/pacientes", {
+      const res = await apiFetch("/api/pacientes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -57,14 +66,14 @@ export default function AddPaciente({ onAdd, onCancel }) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow p-8 max-w-3xl mx-auto mt-8 animate-fade-in flex flex-col md:flex-row gap-8">
+    <div className="cis-panel p-5 md:p-7 max-w-5xl mx-auto mt-6 animate-fade-in flex flex-col md:flex-row gap-6">
       <div className="flex-1">
-        <h2 className="text-2xl font-bold mb-6 text-[#045397] flex items-center gap-2">
-          <FaUserPlus className="text-[#7A97B6]" /> Adicionar Paciente
+        <h2 className="text-2xl font-bold mb-6 text-[var(--cis-navy)] flex items-center gap-2">
+          <FaUserPlus className="text-[var(--cis-orange)]" /> Adicionar Paciente
         </h2>
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+        <form className="grid md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
+          <div className="space-y-1">
+            <label className="cis-label">
               <FaUsers /> Nome do paciente:
             </label>
             <input
@@ -73,12 +82,12 @@ export default function AddPaciente({ onAdd, onCancel }) {
               value={form.patient}
               onChange={handleChange}
               required
-              className="w-full rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] outline-none text-black font-medium"
+              className="cis-input"
               placeholder="Nome completo"
             />
           </div>
-          <div>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+          <div className="space-y-1">
+            <label className="cis-label">
               <FaIdCard /> CPF:
             </label>
             <input
@@ -87,12 +96,12 @@ export default function AddPaciente({ onAdd, onCancel }) {
               value={form.cpf}
               onChange={handleChange}
               required
-              className="w-full rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] outline-none text-black font-medium"
+              className="cis-input"
               placeholder="CPF"
             />
           </div>
-          <div>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+          <div className="space-y-1">
+            <label className="cis-label">
               <FaPhone /> Telefone:
             </label>
             <input
@@ -100,12 +109,12 @@ export default function AddPaciente({ onAdd, onCancel }) {
               name="phone"
               value={form.phone}
               onChange={handleChange}
-              className="w-full rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] outline-none text-black font-medium"
+              className="cis-input"
               placeholder="Telefone"
             />
           </div>
-          <div>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+          <div className="space-y-1">
+            <label className="cis-label">
               <FaUserMd /> Médico responsável:
             </label>
             <input
@@ -113,25 +122,27 @@ export default function AddPaciente({ onAdd, onCancel }) {
               name="medico"
               value={form.medico}
               onChange={handleChange}
-              className="w-full rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] outline-none text-black font-medium"
+              className="cis-input"
               placeholder="Médico"
             />
           </div>
-          <div>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+          <div className="space-y-1">
+            <label className="cis-label">
               <FaUserMd /> Idade:
             </label>
             <input
-              type="text"
+              type="number"
+              min={0}
+              max={150}
               name="idade"
               value={form.idade}
               onChange={handleChange}
-              className="w-full rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] outline-none text-black font-medium"
+              className="cis-input"
               placeholder="Idade"
             />
           </div>
-          <div>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+          <div className="space-y-1">
+            <label className="cis-label">
               <FaHome /> Endereço:
             </label>
             <input
@@ -139,30 +150,33 @@ export default function AddPaciente({ onAdd, onCancel }) {
               name="endereco"
               value={form.endereco}
               onChange={handleChange}
-              className="w-full rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] outline-none text-black font-medium"
+              className="cis-input"
               placeholder="Endereço"
             />
           </div>
-          <div>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
-              Observações:
-            </label>
+          <div className="md:col-span-2 space-y-1">
+            <label className="cis-label">Observações:</label>
             <textarea
               name="notes"
               value={form.notes}
               onChange={handleChange}
-              className="w-full rounded-lg px-3 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] outline-none text-black font-medium"
+              className="cis-input"
               placeholder="Observações"
               rows={2}
             />
           </div>
           {erro && (
-            <div className="text-red-600 text-sm text-center">{erro}</div>
+            <div
+              className="md:col-span-2 rounded-lg bg-red-50 border border-red-200 text-[var(--cis-danger)] text-sm px-3 py-2 text-center"
+              role="alert"
+            >
+              {erro}
+            </div>
           )}
-          <div className="flex gap-4 justify-end mt-6">
+          <div className="md:col-span-2 flex gap-3 justify-end mt-2">
             <button
               type="button"
-              className="bg-gray-300 text-[#045397] px-4 py-2 rounded font-bold hover:bg-gray-400"
+              className="cis-secondary-button"
               onClick={onCancel}
               disabled={loading}
             >
@@ -170,7 +184,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
             </button>
             <button
               type="submit"
-              className="bg-[#F9A23B] text-white px-6 py-2 rounded font-bold flex items-center gap-2 hover:bg-[#e68a1a] transition-all duration-200"
+              className="cis-primary-button flex items-center gap-2"
               disabled={loading}
             >
               <FaSave /> {loading ? "Salvando..." : "Salvar"}
@@ -178,14 +192,14 @@ export default function AddPaciente({ onAdd, onCancel }) {
           </div>
         </form>
       </div>
-      <div className="hidden md:flex flex-col justify-center items-center flex-1 bg-[#f9fafb] rounded-xl p-8">
+      <div className="hidden md:flex flex-col justify-center items-center w-64 bg-[var(--cis-blue-soft)] rounded-xl p-6">
         <img
           src="/img/Unp_Final_Logo.png"
           alt="Logo clínica"
-          className="w-40 mb-6"
+          className="w-28 mb-5"
         />
-        <p className="text-[#045397] text-lg font-semibold text-center">
-          Preencha todos os dados do paciente para cadastrá-lo na clínica.
+        <p className="text-[var(--cis-navy)] text-base font-semibold text-center leading-relaxed">
+          Preencha todos os dados do paciente para cadastrá-lo.
         </p>
       </div>
       <style>{`

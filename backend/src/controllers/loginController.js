@@ -1,8 +1,28 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
-const JWT_SECRET = process.env.JWT_SECRET;
+const { JWT_SECRET } = require("../../config/auth");
+const DEFAULT_PASSWORD = process.env.ADMIN_PASSWORD;
 
+// VALIDA A SESSÃO DO USUÁRIO A PARTIR DO TOKEN
+exports.session = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: ["id", "email"],
+    });
+
+    if (!user) {
+      return res.status(401).json({ error: "Sessão inválida." });
+    }
+
+    res.json({ user });
+  } catch (err) {
+    console.error("Erro ao validar sessão:", err);
+    res.status(500).json({ error: "Erro ao validar sessão." });
+  }
+};
+
+// AUTENTICA O USUÁRIO E GERA O TOKEN DE ACESSO
 exports.login = async (req, res) => {
   const { email, senha } = req.body;
   try {
@@ -13,17 +33,20 @@ exports.login = async (req, res) => {
     }
 
     let user = await User.findOne({ where: { email } });
-
-    // CRIAÇÃO USUARIO PADRÃO SE NÃO EXISTIR
     if (!user) {
-      const senhaHash = await bcrypt.hash("BemVindo", 10);
-      user = await User.create({ email, senha: senhaHash });
-      return res.status(201).json({
-        token: jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-          expiresIn: "2h",
-        }),
-        firstAccess: true,
+      if (senha !== DEFAULT_PASSWORD) {
+        return res.status(401).json({ error: "Usuário ou senha inválidos." });
+      }
+
+      user = await User.create({
+        email,
+        senha: await bcrypt.hash(DEFAULT_PASSWORD, 10),
       });
+
+      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
+        expiresIn: "2h",
+      });
+      return res.status(201).json({ token, firstAccess: true });
     }
 
     // VERIFICAÇÃO DE SENHA
@@ -33,13 +56,14 @@ exports.login = async (req, res) => {
     }
 
     // SE FOR PRIMEIRO ACESSO, SOLICITA TROCA DE SENHA
-    const firstAccess = await bcrypt.compare("BemVindo", user.senha);
+    const firstAccess = await bcrypt.compare(DEFAULT_PASSWORD, user.senha);
 
     const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
       expiresIn: "2h",
     });
     res.json({ token, firstAccess });
   } catch (err) {
+    console.error("Erro no login:", err);
     res.status(500).json({ error: "Erro no login." });
   }
 };
@@ -53,13 +77,18 @@ exports.changePassword = async (req, res) => {
         .status(400)
         .json({ error: "E-mail e nova senha são obrigatórios." });
     }
-    const user = await User.findOne({ where: { email } });
+    if (req.user.email !== email) {
+      return res.status(403).json({ error: "Usuário não autorizado" });
+    }
+
+    const user = await User.findByPk(req.user.id);
     if (!user) return res.status(404).json({ error: "Usuário não encontrado" });
 
     user.senha = await bcrypt.hash(novaSenha, 10);
     await user.save();
     res.json({ message: "Senha alterada com sucesso!" });
   } catch (err) {
+    console.error("Erro ao alterar senha:", err);
     res.status(500).json({ error: "Erro ao alterar senha." });
   }
 };

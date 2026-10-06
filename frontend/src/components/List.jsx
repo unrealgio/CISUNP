@@ -8,7 +8,7 @@ export default function List({
   onSelect,
   currentDate,
   onDelete,
-  onSavePatient
+  onSavePatient,
 }) {
   const [editingIndex, setEditingIndex] = useState(null);
   const [patientName, setPatientName] = useState("");
@@ -33,6 +33,10 @@ export default function List({
       setError("Digite o nome do paciente!");
       return;
     }
+    if (!item.id && !cpf.trim()) {
+      setError("Informe o CPF para cadastrar o paciente automaticamente.");
+      return;
+    }
     setError("");
     onSavePatient(
       item,
@@ -40,7 +44,7 @@ export default function List({
       medicoName.trim(),
       cpf,
       phone,
-      notes
+      notes,
     );
     setEditingIndex(null);
     setPatientName("");
@@ -80,7 +84,7 @@ export default function List({
 
   return (
     <div className="flex-1 overflow-x-auto">
-      <div className="grid grid-cols-4 rounded-t-xl bg-[#7A97B6] text-white font-bold text-lg px-4 md:px-6 py-2 min-w-[700px]">
+      <div className="grid grid-cols-4 rounded-t-xl bg-[var(--cis-navy)] text-white font-semibold text-sm md:text-base px-4 md:px-6 py-3 min-w-[700px]">
         <div className="text-left pl-4 md:pl-6">Horário</div>
         <div className="text-center">Paciente</div>
         <div className="text-center">Médico</div>
@@ -95,27 +99,35 @@ export default function List({
         </div>
       </div>
       {error && (
-        <div className="text-red-600 text-sm text-center mb-2">{error}</div>
+        <div className="text-[var(--cis-danger)] bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
+          {error}
+        </div>
       )}
-      <div className="flex flex-col gap-3 bg-gray-200 rounded-b-xl p-4 min-w-[700px]">
+      <div className="flex flex-col gap-3 bg-[var(--cis-background)] rounded-b-xl p-4 min-w-[700px]">
         {schedules.map((item, idx) => (
           <div
             key={item.time}
             className={`grid grid-cols-4 items-center rounded-lg px-4 py-2 shadow ${
               selected?.time === item.time
-                ? "bg-blue-200"
+                ? "bg-[var(--cis-orange-soft)] border border-[var(--cis-orange)]"
                 : item.patient
-                ? "bg-gray-100 hover:bg-blue-100"
-                : "bg-white hover:bg-blue-50"
-            } cursor-pointer`}
+                  ? "bg-[var(--cis-surface)] border border-[var(--cis-border)] hover:border-[var(--cis-blue)]"
+                  : "bg-[var(--cis-surface)] border border-dashed border-[var(--cis-border)] hover:border-[var(--cis-blue)]"
+            } cursor-pointer transition-colors`}
             onClick={() => onSelect && onSelect(item)}
           >
             <span className="text-left font-bold flex items-center gap-2 pl-4 md:pl-6">
               + {item.time}
               {item.patient ? (
-                <span className="inline-block w-2 h-2 rounded-full bg-green-500" title="Ocupado"></span>
+                <span
+                  className="inline-block w-2 h-2 rounded-full bg-green-500"
+                  title="Ocupado"
+                ></span>
               ) : (
-                <span className="inline-block w-2 h-2 rounded-full bg-gray-400" title="Livre"></span>
+                <span
+                  className="inline-block w-2 h-2 rounded-full bg-gray-400"
+                  title="Livre"
+                ></span>
               )}
             </span>
             <span className="text-center flex items-center justify-center gap-2">
@@ -123,33 +135,34 @@ export default function List({
                 <div className="flex flex-col gap-1 w-full">
                   <input
                     type="text"
-                    className="px-2 py-1 border border-gray-400 rounded w-full"
+                    className="cis-input"
                     placeholder="Nome do paciente"
                     value={patientName}
-                    onChange={e => setPatientName(e.target.value)}
-                    onKeyDown={e => handleKeyDown(e, idx, item)}
+                    onChange={(e) => setPatientName(e.target.value)}
+                    onKeyDown={(e) => handleKeyDown(e, idx, item)}
                     autoFocus
                   />
                   <input
                     type="text"
-                    className="px-2 py-1 border border-gray-400 rounded w-full"
-                    placeholder="CPF"
+                    className="cis-input"
+                    placeholder="CPF (somente números)"
+                    inputMode="numeric"
                     value={cpf}
-                    onChange={e => setCpf(e.target.value)}
+                    onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
                   />
                   <input
                     type="text"
-                    className="px-2 py-1 border border-gray-400 rounded w-full"
+                    className="cis-input"
                     placeholder="Telefone"
                     value={phone}
-                    onChange={e => setPhone(e.target.value)}
+                    onChange={(e) => setPhone(e.target.value)}
                   />
                   <input
                     type="text"
-                    className="px-2 py-1 border border-gray-400 rounded w-full"
+                    className="cis-input"
                     placeholder="Observações"
                     value={notes}
-                    onChange={e => setNotes(e.target.value)}
+                    onChange={(e) => setNotes(e.target.value)}
                   />
                 </div>
               ) : item.patient ? (
@@ -160,7 +173,7 @@ export default function List({
                   <button
                     className="p-1 rounded hover:bg-blue-100 text-blue-700 cursor-pointer"
                     aria-label="Adicionar paciente"
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       startEdit(
                         idx,
@@ -168,7 +181,7 @@ export default function List({
                         item.medico,
                         item.cpf,
                         item.phone,
-                        item.notes
+                        item.notes,
                       );
                     }}
                     title="Adicionar paciente"
@@ -182,21 +195,23 @@ export default function List({
               {editingIndex === idx ? (
                 <input
                   type="text"
-                  className="px-2 py-1 border border-gray-400 rounded focus:outline-[#045397] w-32"
+                  className="cis-input w-32"
                   placeholder="Nome do médico"
                   value={medicoName}
-                  onChange={e => setMedicoName(e.target.value)}
-                  onKeyDown={e => handleKeyDown(e, idx, item)}
+                  onChange={(e) => setMedicoName(e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(e, idx, item)}
                 />
               ) : item.medico ? (
-                <span className="font-semibold text-[#045397]">{item.medico}</span>
+                <span className="font-semibold text-[var(--cis-blue)]">
+                  {item.medico}
+                </span>
               ) : (
                 <>
                   <span className="text-gray-400 italic">Disponível</span>
                   <button
                     className="p-1 rounded hover:bg-blue-100 text-blue-700 cursor-pointer"
                     aria-label="Adicionar médico"
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       startEdit(
                         idx,
@@ -204,7 +219,7 @@ export default function List({
                         "",
                         item.cpf,
                         item.phone,
-                        item.notes
+                        item.notes,
                       );
                     }}
                     title="Adicionar médico"
@@ -247,7 +262,7 @@ export default function List({
                   <button
                     className="p-1 rounded hover:bg-blue-100 text-blue-700 cursor-pointer"
                     aria-label="Editar"
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       startEdit(
                         idx,
@@ -255,7 +270,7 @@ export default function List({
                         item.medico,
                         item.cpf,
                         item.phone,
-                        item.notes
+                        item.notes,
                       );
                     }}
                     title="Editar"
@@ -265,7 +280,7 @@ export default function List({
                   <button
                     className="p-1 rounded hover:bg-red-100 text-red-700 cursor-pointer"
                     aria-label="Excluir"
-                    onClick={e => {
+                    onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(idx, item);
                     }}

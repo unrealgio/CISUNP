@@ -1,14 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const pacienteController = require("../controllers/pacienteController");
+const authenticateToken = require("../middleware/middleware");
+const {
+  validateCpfParam,
+  validatePacienteBody,
+  validatePacienteUpdate,
+} = require("../middleware/validation");
 
-// ADICIONAR MIDDLEWARE DE AUTENTICAÇÃO CASO NECESSÁRIO, E IMPLEMENTA-LO EM TODAS AS ROTAS QUE NECESSITAM DE AUTENTICAÇÃO
-// const authenticateToken = require("../middleware/middleware");
+router.use(authenticateToken);
 
 router.get("/todos", pacienteController.listarTodos);
-router.get("/:cpf", pacienteController.buscarPorCpf);
-router.post("/", pacienteController.criarOuAtualizar);
-router.delete("/:cpf", pacienteController.excluir);
-router.put("/:cpf", pacienteController.atualizar);
+router.get("/:cpf", validateCpfParam, pacienteController.buscarPorCpf);
+router.post("/", validatePacienteBody, pacienteController.criar);
+router.delete("/:cpf", validateCpfParam, pacienteController.excluir);
+router.put("/:cpf", validatePacienteUpdate, pacienteController.atualizar);
 
 module.exports = router;

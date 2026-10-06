@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { FaPills, FaPlus } from "react-icons/fa";
+import { apiFetch } from "../api";
+import { ErrorMessage } from "./StatusMessage";
 
-export default function TabPrescricoes({ prescricoes, cpf, onAdd }) {
+export default function TabPrescricoes({
+  prescricoes,
+  cpf,
+  erroCarregamento,
+  onAdd,
+}) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     medicamento: "",
@@ -9,62 +16,115 @@ export default function TabPrescricoes({ prescricoes, cpf, onAdd }) {
     frequencia: "",
     observacao: "",
   });
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState("");
 
   function handleChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!form.medicamento.trim()) return;
-    fetch("http://localhost:3001/api/prescricoes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, cpf }),
-    })
-      .then(res => res.json())
-      .then(nova => {
-        onAdd && onAdd(nova);
-        setShowForm(false);
-        setForm({ medicamento: "", dose: "", frequencia: "", observacao: "" });
+    if (!form.medicamento.trim() || loading) return;
+
+    setErro("");
+    setLoading(true);
+    try {
+      const res = await apiFetch("/api/prescricoes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, cpf }),
       });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erro ao salvar prescrição.");
+
+      onAdd && onAdd(data);
+      setShowForm(false);
+      setForm({ medicamento: "", dose: "", frequencia: "", observacao: "" });
+    } catch (error) {
+      setErro(error.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
-    <div className="bg-white rounded-xl shadow p-6 mt-6 animate-fade-in">
-      <h2 className="text-xl font-bold mb-4 text-[#045397] flex items-center gap-2">
-        <FaPills className="text-[#F9A23B]" /> Prescrições
+    <div className="cis-panel p-6 mt-6 animate-fade-in">
+      <h2 className="text-xl font-bold mb-4 text-[var(--cis-navy)] flex items-center gap-2">
+        <FaPills className="text-[var(--cis-orange)]" /> Prescrições
         <button
-          className="ml-auto bg-[#F9A23B] text-white px-3 py-1 rounded flex items-center gap-1 hover:bg-[#e68a1a] transition"
-          onClick={() => setShowForm(v => !v)}
+          className="cis-primary-button ml-auto flex items-center gap-1"
+          onClick={() => setShowForm((v) => !v)}
+          disabled={loading}
         >
           <FaPlus /> Adicionar
         </button>
       </h2>
+      {erroCarregamento && <ErrorMessage>{erroCarregamento}</ErrorMessage>}
+      {erro && <ErrorMessage>{erro}</ErrorMessage>}
       {showForm && (
         <form className="mb-4 space-y-2" onSubmit={handleSubmit}>
-          <input name="medicamento" value={form.medicamento} onChange={handleChange} placeholder="Medicamento" className="border rounded px-2 py-1 w-full" required />
-          <input name="dose" value={form.dose} onChange={handleChange} placeholder="Dose" className="border rounded px-2 py-1 w-full" />
-          <input name="frequencia" value={form.frequencia} onChange={handleChange} placeholder="Frequência" className="border rounded px-2 py-1 w-full" />
-          <input name="observacao" value={form.observacao} onChange={handleChange} placeholder="Observação" className="border rounded px-2 py-1 w-full" />
-          <button type="submit" className="bg-[#045397] text-white px-4 py-2 rounded font-bold">Salvar</button>
+          <input
+            name="medicamento"
+            value={form.medicamento}
+            onChange={handleChange}
+            placeholder="Medicamento"
+            className="cis-input"
+            required
+          />
+          <input
+            name="dose"
+            value={form.dose}
+            onChange={handleChange}
+            placeholder="Dose"
+            className="cis-input"
+          />
+          <input
+            name="frequencia"
+            value={form.frequencia}
+            onChange={handleChange}
+            placeholder="Frequência"
+            className="cis-input"
+          />
+          <input
+            name="observacao"
+            value={form.observacao}
+            onChange={handleChange}
+            placeholder="Observação"
+            className="cis-input"
+          />
+          <button
+            type="submit"
+            className="cis-primary-button"
+            disabled={loading}
+          >
+            {loading ? "Salvando..." : "Salvar"}
+          </button>
         </form>
       )}
       {prescricoes.length === 0 ? (
         <p className="text-gray-500">Nenhuma prescrição cadastrada.</p>
       ) : (
         <div className="space-y-4">
-          {prescricoes.map(p => (
+          {prescricoes.map((p) => (
             <div
               key={p.id}
-              className="bg-gradient-to-r from-[#f9fafb] to-[#fef6e4] rounded-lg p-4 border-l-4 border-[#F9A23B] shadow transition hover:scale-[1.02] hover:shadow-lg flex gap-4 items-center"
+              className="rounded-lg border border-[var(--cis-border)] border-l-4 border-l-[var(--cis-orange)] bg-[var(--cis-orange-soft)] p-4 flex gap-4 items-center"
             >
-              <FaPills className="text-[#F9A23B] text-2xl mr-2" />
+              <FaPills className="text-[var(--cis-orange)] text-2xl mr-2" />
               <div>
-                <p><strong>Medicamento:</strong> {p.medicamento}</p>
-                <p><strong>Dose:</strong> {p.dose}</p>
-                <p><strong>Frequência:</strong> {p.frequencia}</p>
-                <p><strong>Observação:</strong> {p.observacao}</p>
+                <p>
+                  <strong>Medicamento:</strong> {p.medicamento}
+                </p>
+                <p>
+                  <strong>Dose:</strong> {p.dose}
+                </p>
+                <p>
+                  <strong>Frequência:</strong> {p.frequencia}
+                </p>
+                <p>
+                  <strong>Observação:</strong> {p.observacao}
+                </p>
               </div>
             </div>
           ))}

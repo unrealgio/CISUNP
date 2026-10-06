@@ -3,11 +3,13 @@ import Calendar from "react-calendar";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "react-calendar/dist/Calendar.css";
 
-
-//DATAS QUE SERÃO MARCADAS NO CALENDÁRIO, PODE SER PASSADO COMO PROP PARA ALTERAR DINAMICAMENTE
 const markedDates = [new Date(2025, 7, 21), new Date(2025, 7, 14)];
 
-export default function CalendarComponent({ value, onChange, marked = markedDates }) {
+export default function CalendarComponent({
+  value,
+  onChange,
+  marked = markedDates,
+}) {
   const selectedDate =
     value && (Array.isArray(value) ? value[0] : value) instanceof Date
       ? Array.isArray(value)

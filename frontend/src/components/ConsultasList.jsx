@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { FaUser, FaCalendarAlt, FaClock, FaUserMd, FaChevronLeft, FaChevronRight, FaSearch, FaChevronDown, FaChevronUp } from "react-icons/fa";
+import {
+  FaUser,
+  FaCalendarAlt,
+  FaClock,
+  FaUserMd,
+  FaChevronLeft,
+  FaChevronRight,
+  FaSearch,
+  FaChevronDown,
+  FaChevronUp,
+} from "react-icons/fa";
 
 const consultasExemplo = [
   {
@@ -7,25 +17,25 @@ const consultasExemplo = [
     paciente: "Ana Paula Silva",
     data: "10/09/2025",
     hora: "14:00",
-    equipe: "Cardiologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Consulta de rotina para avaliação cardíaca.",
+    detalhes: "Consulta de rotina e avaliação odontológica geral.",
   },
   {
     id: 2,
     paciente: "Bruno Costa",
     data: "11/09/2025",
     hora: "09:30",
-    equipe: "Pediatria",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Primeira consulta pediátrica do paciente.",
+    detalhes: "Primeira consulta odontológica do paciente.",
   },
   {
     id: 3,
     paciente: "Carla Mendes",
     data: "12/09/2025",
     hora: "16:00",
-    equipe: "Ortopedia",
+    equipe: "Odontologia",
     status: "Cancelada",
     detalhes: "Consulta cancelada pelo paciente.",
   },
@@ -34,61 +44,61 @@ const consultasExemplo = [
     paciente: "Daniela Rocha",
     data: "13/09/2025",
     hora: "10:00",
-    equipe: "Dermatologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Avaliação de lesão dermatológica.",
+    detalhes: "Avaliação de lesão na mucosa bucal.",
   },
   {
     id: 5,
     paciente: "Eduardo Martins",
     data: "14/09/2025",
     hora: "15:00",
-    equipe: "Neurologia",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Consulta para investigação de cefaleia.",
+    detalhes: "Investigação de dor na articulação temporomandibular (ATM).",
   },
   {
     id: 6,
     paciente: "Fernanda Lima",
     data: "15/09/2025",
     hora: "11:30",
-    equipe: "Ginecologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Retorno de exame preventivo.",
+    detalhes: "Retorno para avaliação de radiografia panorâmica.",
   },
   {
     id: 7,
     paciente: "Gabriel Souza",
     data: "16/09/2025",
     hora: "13:00",
-    equipe: "Oncologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Acompanhamento de tratamento oncológico.",
+    detalhes: "Acompanhamento de tratamento de canal.",
   },
   {
     id: 8,
     paciente: "Helena Castro",
     data: "17/09/2025",
     hora: "09:00",
-    equipe: "Psiquiatria",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Avaliação inicial psiquiátrica.",
+    detalhes: "Avaliação inicial para tratamento ortodôntico.",
   },
   {
     id: 9,
     paciente: "Igor Almeida",
     data: "18/09/2025",
     hora: "14:30",
-    equipe: "Urologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Consulta para avaliação de exames urológicos.",
+    detalhes: "Avaliação de sensibilidade dentária.",
   },
   {
     id: 10,
     paciente: "Juliana Pereira",
     data: "19/09/2025",
     hora: "16:30",
-    equipe: "Endocrinologia",
+    equipe: "Odontologia",
     status: "Cancelada",
     detalhes: "Consulta cancelada pelo médico.",
   },
@@ -97,80 +107,79 @@ const consultasExemplo = [
     paciente: "Kleber Nunes",
     data: "20/09/2025",
     hora: "08:30",
-    equipe: "Reumatologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Avaliação de dor articular.",
+    detalhes: "Avaliação de bruxismo e confecção de placa miorrelaxante.",
   },
   {
     id: 12,
     paciente: "Larissa Gomes",
     data: "21/09/2025",
     hora: "10:30",
-    equipe: "Oftalmologia",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Consulta para exame de vista.",
+    detalhes: "Limpeza e remoção de tártaro.",
   },
   {
     id: 13,
     paciente: "Marcos Tavares",
     data: "22/09/2025",
     hora: "12:00",
-    equipe: "Otorrinolaringologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Avaliação de sinusite crônica.",
+    detalhes: "Avaliação de dente do siso incluso.",
   },
   {
     id: 14,
     paciente: "Natália Fernandes",
     data: "23/09/2025",
     hora: "15:30",
-    equipe: "Gastroenterologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Consulta para investigação de dor abdominal.",
+    detalhes: "Restauração de cárie em molar.",
   },
   {
     id: 15,
-    paciente: "Otávio Barros",
+    paciente: "Edmilson Neves",
     data: "24/09/2025",
     hora: "09:45",
-    equipe: "Nefrologia",
+    equipe: "Odontologia",
     status: "Cancelada",
     detalhes: "Consulta cancelada pelo paciente.",
   },
-  // Exemplos adicionais
   {
     id: 16,
     paciente: "Patrícia Lopes",
     data: "25/09/2025",
     hora: "11:00",
-    equipe: "Hematologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Consulta para avaliação de anemia.",
+    detalhes: "Avaliação de sangramento gengival.",
   },
   {
     id: 17,
     paciente: "Renato Oliveira",
     data: "26/09/2025",
     hora: "13:30",
-    equipe: "Otorrinolaringologia",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Consulta para avaliação de alergia respiratória.",
+    detalhes: "Manutenção do aparelho ortodôntico.",
   },
   {
     id: 18,
     paciente: "Sofia Martins",
     data: "27/09/2025",
     hora: "15:00",
-    equipe: "Ginecologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Consulta para acompanhamento pré-natal.",
+    detalhes: "Acompanhamento odontológico de gestante.",
   },
   {
     id: 19,
     paciente: "Thiago Ribeiro",
     data: "28/09/2025",
     hora: "09:00",
-    equipe: "Ortopedia",
+    equipe: "Odontologia",
     status: "Cancelada",
     detalhes: "Consulta cancelada pelo paciente.",
   },
@@ -179,61 +188,61 @@ const consultasExemplo = [
     paciente: "Ursula Freitas",
     data: "29/09/2025",
     hora: "10:30",
-    equipe: "Dermatologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Avaliação de manchas na pele.",
+    detalhes: "Avaliação para clareamento dental.",
   },
   {
     id: 21,
     paciente: "Vinícius Cardoso",
     data: "30/09/2025",
     hora: "14:00",
-    equipe: "Cardiologia",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Consulta para investigação de palpitações.",
+    detalhes: "Investigação de dor de dente aguda.",
   },
   {
     id: 22,
     paciente: "Wesley Santos",
     data: "01/10/2025",
     hora: "16:00",
-    equipe: "Neurologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Avaliação de tontura recorrente.",
+    detalhes: "Avaliação de halitose.",
   },
   {
     id: 23,
     paciente: "Xuxa Menezes",
     data: "02/10/2025",
     hora: "08:30",
-    equipe: "Pediatria",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Consulta de rotina pediátrica.",
+    detalhes: "Consulta de rotina com aplicação de flúor.",
   },
   {
     id: 24,
     paciente: "Yasmin Duarte",
     data: "03/10/2025",
     hora: "10:00",
-    equipe: "Endocrinologia",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Consulta para controle de diabetes.",
+    detalhes: "Tratamento periodontal em paciente diabético.",
   },
   {
     id: 25,
     paciente: "Zeca Amaral",
     data: "04/10/2025",
     hora: "12:30",
-    equipe: "Urologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Avaliação de exames de próstata.",
+    detalhes: "Avaliação para implante dentário.",
   },
   {
     id: 26,
     paciente: "Amanda Figueiredo",
     data: "05/10/2025",
     hora: "15:30",
-    equipe: "Gastroenterologia",
+    equipe: "Odontologia",
     status: "Cancelada",
     detalhes: "Consulta cancelada pelo médico.",
   },
@@ -242,36 +251,36 @@ const consultasExemplo = [
     paciente: "Bruno Teixeira",
     data: "06/10/2025",
     hora: "09:45",
-    equipe: "Reumatologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Avaliação de artrite reumatoide.",
+    detalhes: "Ajuste de prótese dentária.",
   },
   {
     id: 28,
     paciente: "Camila Souza",
     data: "07/10/2025",
     hora: "11:15",
-    equipe: "Oftalmologia",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Consulta para troca de óculos.",
+    detalhes: "Troca de restauração antiga.",
   },
   {
     id: 29,
     paciente: "Diego Lima",
     data: "08/10/2025",
     hora: "13:00",
-    equipe: "Oncologia",
+    equipe: "Odontologia",
     status: "Confirmada",
-    detalhes: "Acompanhamento pós-quimioterapia.",
+    detalhes: "Retorno pós-extração dentária.",
   },
   {
     id: 30,
     paciente: "Elisa Torres",
     data: "09/10/2025",
     hora: "14:45",
-    equipe: "Psiquiatria",
+    equipe: "Odontologia",
     status: "Pendente",
-    detalhes: "Consulta para ajuste de medicação.",
+    detalhes: "Retorno para avaliação de cicatrização.",
   },
 ];
 
@@ -282,14 +291,14 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
   const itemsPerPage = 12;
 
   // FILTRO POR NOME DO PACIENTE
-  const filteredConsultas = consultas.filter(c =>
-    c.paciente.toLowerCase().includes(search.toLowerCase())
+  const filteredConsultas = consultas.filter((c) =>
+    c.paciente.toLowerCase().includes(search.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredConsultas.length / itemsPerPage);
   const paginatedConsultas = filteredConsultas.slice(
     (page - 1) * itemsPerPage,
-    page * itemsPerPage
+    page * itemsPerPage,
   );
 
   function handleSearch(e) {
@@ -303,9 +312,11 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
 
   return (
     <div className="w-full px-2 md:px-8 py-6">
-      <h2 className="text-2xl font-bold text-[#045397] mb-6">Minhas Consultas</h2>
+      <h2 className="text-2xl font-bold text-[#045397] mb-6">
+        Minhas Consultas
+      </h2>
 
-      {/* Filtro de pesquisa */}
+      {/* FILTRO DE PESQUISA */}
       <div className="flex items-center gap-2 mb-6 max-w-md">
         <div className="relative w-full">
           <input
@@ -320,7 +331,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
         </div>
       </div>
 
-      {/* Cards de consultas */}
+      {/* CARDS DE CONSULTAS */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {paginatedConsultas.length === 0 ? (
           <div className="col-span-full text-center text-gray-500 py-12">
@@ -336,8 +347,8 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
                   c.status === "Confirmada"
                     ? "#4ade80"
                     : c.status === "Cancelada"
-                    ? "#f87171"
-                    : "#fbbf24",
+                      ? "#f87171"
+                      : "#fbbf24",
               }}
               onClick={() => handleExpand(c.id)}
               tabIndex={0}
@@ -346,7 +357,9 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
             >
               <div className="flex items-center gap-2 mb-2">
                 <FaUser className="text-[#045397]" />
-                <span className="font-bold text-lg text-[#045397]">{c.paciente}</span>
+                <span className="font-bold text-lg text-[#045397]">
+                  {c.paciente}
+                </span>
                 <span
                   className="ml-auto px-2 py-1 rounded text-xs font-semibold"
                   style={{
@@ -354,14 +367,14 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
                       c.status === "Confirmada"
                         ? "#dcfce7"
                         : c.status === "Cancelada"
-                        ? "#fee2e2"
-                        : "#fef9c3",
+                          ? "#fee2e2"
+                          : "#fef9c3",
                     color:
                       c.status === "Confirmada"
                         ? "#166534"
                         : c.status === "Cancelada"
-                        ? "#991b1b"
-                        : "#92400e",
+                          ? "#991b1b"
+                          : "#92400e",
                   }}
                 >
                   {c.status}

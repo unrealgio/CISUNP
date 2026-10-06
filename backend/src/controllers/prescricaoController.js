@@ -1,5 +1,6 @@
 const Prescricao = require("../models/Prescricao");
 
+// LISTA AS PRESCRIÇÕES DE UM PACIENTE PELO CPF
 exports.listarPorCpf = async (req, res) => {
   try {
     const { cpf } = req.query;
@@ -11,10 +12,17 @@ exports.listarPorCpf = async (req, res) => {
   }
 };
 
+// ADICIONA UMA NOVA PRESCRIÇÃO
 exports.adicionar = async (req, res) => {
   try {
     const { cpf, medicamento, dose, frequencia, observacao } = req.body;
-    const prescricao = await Prescricao.create({ cpf, medicamento, dose, frequencia, observacao });
+    const prescricao = await Prescricao.create({
+      cpf,
+      medicamento,
+      dose,
+      frequencia,
+      observacao,
+    });
     res.json(prescricao);
   } catch (err) {
     console.error("Erro ao adicionar prescrição:", err);

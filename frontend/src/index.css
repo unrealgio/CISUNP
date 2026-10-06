@@ -1,1 +1,44 @@
 @import "tailwindcss";
+
+:root {
+  --cis-navy: #12304a;
+  --cis-blue: #1f5f82;
+  --cis-blue-soft: #e8f1f5;
+  --cis-orange: #e58b35;
+  --cis-orange-soft: #fff2df;
+  --cis-ink: #243746;
+  --cis-muted: #667784;
+  --cis-surface: #ffffff;
+  --cis-background: #f3f6f7;
+  --cis-border: #d6e0e5;
+  --cis-danger: #b53b3b;
+  --cis-shadow: 0 10px 30px rgba(18, 48, 74, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--cis-background);
+  color: var(--cis-ink);
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 3px solid rgba(229, 139, 53, 0.45);
+  outline-offset: 2px;
+}

@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-require("dotenv").config();
+const bcrypt = require("bcrypt");
+require("dotenv").config({ path: path.join(__dirname, ".env") });
 
 const sequelize = require("./config/database");
 const User = require("./src/models/User");
@@ -21,25 +22,33 @@ app.use("/api/agendamentos", agendamentosRoutes);
 app.use("/api/pacientes", pacienteRoutes);
 app.use("/api/prescricoes", prescricaoRoutes);
 app.use("/api/prontuarios", prontuarioRoutes);
-app.use("/uploads/prontuarios",express.static(path.join(__dirname, "uploads/prontuarios"))
+app.use(
+  "/uploads/prontuarios",
+  express.static(path.join(__dirname, "uploads/prontuarios")),
 );
 
 app.get("/", (req, res) => {
-  res.send("RUNING BACKEND");
+  res.send("RUNNING BACKEND");
 });
 
-//SINCRONIZANDO BANCO E INICIANDO SERVIDOR
+// SINCRONIZANDO BANCO E INICIANDO SERVIDOR
 sequelize
-  .sync({ alter: true })
+  .sync({ force: false })
   .then(async () => {
     console.log("Banco sincronizado e tabelas criadas!");
 
-    //CRIANDO USUÁRIO ADMIN PADRÃO
+    // CRIANDO USUÁRIO ADMIN PADRÃO
+    const adminPassword = process.env.ADMIN_PASSWORD;
+    const adminPasswordHash = await bcrypt.hash(adminPassword, 10);
     const [user, created] = await User.findOrCreate({
       where: { email: "admin@cis.com" },
-      defaults: { senha: "BemVindo" },
+      defaults: { senha: adminPasswordHash },
     });
-    const PORT = process.env.PORT || 3001;
+    if (!created && user.senha === adminPassword) {
+      user.senha = adminPasswordHash;
+      await user.save();
+    }
+    const PORT = process.env.PORT;
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);
     });

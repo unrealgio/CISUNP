@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { apiFetch } from "../api";
 
 export default function PassChange({ email, onSenhaAlterada }) {
   const [novaSenha, setNovaSenha] = useState("");
@@ -12,9 +13,12 @@ export default function PassChange({ email, onSenhaAlterada }) {
     setErro("");
     setMensagem("");
     try {
-      const res = await fetch("http://localhost:3001/api/change-password", {
+      const res = await apiFetch("/api/change-password", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
         body: JSON.stringify({ email, novaSenha }),
       });
       const data = await res.json();
@@ -22,7 +26,7 @@ export default function PassChange({ email, onSenhaAlterada }) {
         setMensagem("Senha alterada com sucesso!");
         setTimeout(() => {
           onSenhaAlterada();
-        }, 1500); // redireciona após mostrar mensagem
+        }, 1500); // TEMPO PARA MOSTRAR A MENSAGEM ANTES DE REDIRECIONAR
       } else {
         setErro(data.error || "Erro ao trocar senha.");
       }
@@ -42,14 +46,16 @@ export default function PassChange({ email, onSenhaAlterada }) {
       }}
     >
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm flex flex-col items-center">
-        <h3 className="text-lg font-semibold mb-4 text-[#045397]">Troque sua senha para acessar o sistema</h3>
+        <h3 className="text-lg font-semibold mb-4 text-[#045397]">
+          Troque sua senha para acessar o sistema
+        </h3>
         <form className="w-full" onSubmit={handleSubmit}>
           <input
             type="password"
             placeholder="Nova senha"
             className="w-full px-4 py-2 border border-gray-400 rounded-lg mb-3"
             value={novaSenha}
-            onChange={e => setNovaSenha(e.target.value)}
+            onChange={(e) => setNovaSenha(e.target.value)}
             required
           />
           <button
@@ -61,7 +67,9 @@ export default function PassChange({ email, onSenhaAlterada }) {
           </button>
         </form>
         {mensagem && (
-          <div className="text-green-600 text-sm mt-2 text-center">{mensagem}</div>
+          <div className="text-green-600 text-sm mt-2 text-center">
+            {mensagem}
+          </div>
         )}
         {erro && (
           <div className="text-red-600 text-sm mt-2 text-center">{erro}</div>

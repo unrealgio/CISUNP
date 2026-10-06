@@ -1,10 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const agendamentosController = require("../controllers/agendamentosController");
+const authenticateToken = require("../middleware/middleware");
+const {
+  validateAgendamentoQuery,
+  validateAgendamentoBody,
+  validateCpfQuery,
+  validateIdParam,
+} = require("../middleware/validation");
 
-router.get("/", agendamentosController.buscarPorData);
-router.post("/", agendamentosController.criarOuAtualizar);
-router.post("/excluir", agendamentosController.excluir);
-router.get("/futuros", agendamentosController.futurosPorPaciente);
+router.use(authenticateToken);
+
+router.get("/", validateAgendamentoQuery, agendamentosController.buscarPorData);
+router.post("/", validateAgendamentoBody, agendamentosController.criar);
+router.put(
+  "/:id",
+  validateIdParam,
+  validateAgendamentoBody,
+  agendamentosController.atualizar,
+);
+router.delete("/:id", validateIdParam, agendamentosController.excluir);
+router.get(
+  "/futuros",
+  validateCpfQuery,
+  agendamentosController.futurosPorPaciente,
+);
 
 module.exports = router;

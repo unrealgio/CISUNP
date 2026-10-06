@@ -1,0 +1,72 @@
+.cis-panel {
+  background: var(--cis-surface);
+  border: 1px solid var(--cis-border);
+  border-radius: 0.9rem;
+  box-shadow: var(--cis-shadow);
+}
+
+.cis-label {
+  color: var(--cis-navy);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+}
+
+.cis-input {
+  width: 100%;
+  border: 1px solid var(--cis-border);
+  border-radius: 0.55rem;
+  background: var(--cis-surface);
+  color: var(--cis-ink);
+  padding: 0.6rem 0.8rem;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.cis-input::placeholder {
+  color: var(--cis-muted);
+}
+
+.cis-input:focus {
+  border-color: var(--cis-orange);
+  box-shadow: 0 0 0 3px rgba(229, 139, 53, 0.16);
+  outline: none;
+}
+
+.cis-primary-button,
+.cis-secondary-button {
+  border-radius: 0.55rem;
+  font-weight: 700;
+  padding: 0.6rem 1rem;
+  transition:
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.cis-primary-button {
+  background: var(--cis-orange);
+  color: white;
+}
+
+.cis-primary-button:hover {
+  background: #c97022;
+  transform: translateY(-1px);
+}
+
+.cis-secondary-button {
+  background: var(--cis-blue-soft);
+  color: var(--cis-navy);
+}
+
+.cis-secondary-button:hover {
+  background: #d5e6ed;
+}
+
+.cis-primary-button:disabled,
+.cis-secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+}

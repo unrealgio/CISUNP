@@ -8,8 +8,22 @@ import {
   FaPhone,
   FaCheck,
   FaTimes,
-  FaUserMd
+  FaUserMd,
 } from "react-icons/fa";
+import { apiFetch } from "../api";
+import { ErrorMessage } from "./StatusMessage";
+
+// MONTA O FORMULÁRIO DE EDIÇÃO COM OS DADOS ATUAIS DO PACIENTE
+function formDoPaciente(paciente) {
+  return {
+    patient: paciente.patient || "",
+    idade: paciente.idade ?? "",
+    medico: paciente.medico || "",
+    phone: paciente.phone || "",
+    endereco: paciente.endereco || "",
+    notes: paciente.notes || "",
+  };
+}
 
 export default function PacienteInfoCard({
   paciente,
@@ -17,23 +31,23 @@ export default function PacienteInfoCard({
   onPacienteExcluido,
 }) {
   const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({
-    endereco: paciente.endereco || "",
-    notes: paciente.notes || "",
-    phone: paciente.phone || "",
-  });
+  const [form, setForm] = useState(() => formDoPaciente(paciente));
   const [loading, setLoading] = useState(false);
+  const [operationError, setOperationError] = useState("");
   const [agendamentos, setAgendamentos] = useState([]);
 
   useEffect(() => {
     if (paciente && paciente.cpf) {
-      fetch(
-        `http://localhost:3001/api/agendamentos/futuros?cpf=${encodeURIComponent(
-          paciente.cpf
-        )}`
+      apiFetch(
+        `/api/agendamentos/futuros?cpf=${encodeURIComponent(paciente.cpf)}`,
       )
-        .then((res) => res.json())
-        .then((data) => setAgendamentos(data));
+        .then(async (res) => {
+          const data = await res.json();
+          if (!res.ok)
+            throw new Error(data.error || "Erro ao carregar agendamentos.");
+          setAgendamentos(Array.isArray(data) ? data : []);
+        })
+        .catch(() => setAgendamentos([]));
     }
   }, [paciente]);
 
@@ -43,70 +57,132 @@ export default function PacienteInfoCard({
 
   async function handleEditSubmit(e) {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
-    await fetch(`http://localhost:3001/api/pacientes/${paciente.cpf}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...paciente,
-        endereco: form.endereco,
-        notes: form.notes,
-        phone: form.phone,
-      }),
-    });
-    setLoading(false);
-    setEditing(false);
-    onPacienteAtualizado && onPacienteAtualizado();
+    setOperationError("");
+    try {
+      const res = await apiFetch(`/api/pacientes/${paciente.cpf}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(
+          data.details?.join(" ") || data.error || "Erro ao atualizar paciente.",
+        );
+
+      setEditing(false);
+      onPacienteAtualizado && onPacienteAtualizado();
+    } catch (error) {
+      setOperationError(error.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function handleDelete() {
     if (!window.confirm("Tem certeza que deseja excluir este paciente?"))
       return;
+    if (loading) return;
     setLoading(true);
-    await fetch(`http://localhost:3001/api/pacientes/${paciente.cpf}`, {
-      method: "DELETE",
-    });
-    setLoading(false);
-    onPacienteExcluido && onPacienteExcluido();
+    setOperationError("");
+    try {
+      const res = await apiFetch(`/api/pacientes/${paciente.cpf}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erro ao excluir paciente.");
+      onPacienteExcluido && onPacienteExcluido();
+    } catch (error) {
+      setOperationError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleStartEdit() {
+    setForm(formDoPaciente(paciente));
+    setOperationError("");
+    setEditing(true);
   }
 
   function handleCancelEdit() {
-    setForm({
-      endereco: paciente.endereco || "",
-      notes: paciente.notes || "",
-      phone: paciente.phone || "",
-    });
+    setOperationError("");
     setEditing(false);
   }
 
   return (
-    <div className="bg-[#e6ecf3] rounded-2xl p-6 flex flex-col md:flex-row gap-6 items-start shadow mb-4 transition-all duration-200 hover:shadow-lg hover:scale-[1.01]">
+    <div className="cis-panel p-6 flex flex-col md:flex-row gap-6 items-start mb-4">
+      {operationError && <ErrorMessage>{operationError}</ErrorMessage>}
       <div className="flex flex-col items-center min-w-[120px]">
         <FaUserCircle
-          className="text-[#5A6A8E] bg-white rounded-full"
+          className="text-[var(--cis-blue)] bg-[var(--cis-blue-soft)] rounded-full"
           size={72}
         />
         <div className="mt-2 text-gray-700 text-center">
-          <div className="font-bold text-lg">{paciente.patient}</div>
-          <div className="text-sm">{paciente.idade} anos</div>
+          <div className="font-bold text-lg text-[var(--cis-navy)]">
+            {editing ? (
+              <input
+                type="text"
+                name="patient"
+                className="cis-input w-44 text-sm"
+                value={form.patient}
+                onChange={handleEditChange}
+                placeholder="Nome do paciente"
+                autoFocus
+              />
+            ) : (
+              paciente.patient
+            )}
+          </div>
+          <div className="text-sm text-[var(--cis-muted)]">
+            {editing ? (
+              <input
+                type="number"
+                name="idade"
+                min={0}
+                max={150}
+                className="cis-input w-28 text-sm"
+                value={form.idade}
+                onChange={handleEditChange}
+                placeholder="Idade"
+              />
+            ) : paciente.idade != null ? (
+              `${paciente.idade} anos`
+            ) : (
+              "Idade não informada"
+            )}
+          </div>
           <div className="flex items-center justify-center gap-1 text-sm">
             <FaPhone className="text-gray-500" />{" "}
             {editing ? (
               <input
                 type="text"
                 name="phone"
-                className="border-b border-gray-300 px-1 py-0.5 bg-transparent w-28 text-sm focus:outline-none"
+                className="cis-input w-28 text-sm"
                 value={form.phone}
                 onChange={handleEditChange}
                 placeholder="Telefone"
-                autoFocus
               />
             ) : (
               paciente.phone
             )}
           </div>
           <div className="flex items-center justify-center gap-1 text-sm">
-            <FaUserMd className="text-gray-500" /> {paciente.medico}
+            <FaUserMd className="text-gray-500" />{" "}
+            {editing ? (
+              <input
+                type="text"
+                name="medico"
+                className="cis-input w-28 text-sm"
+                value={form.medico}
+                onChange={handleEditChange}
+                placeholder="Médico"
+              />
+            ) : (
+              paciente.medico
+            )}
           </div>
         </div>
       </div>
@@ -118,7 +194,7 @@ export default function PacienteInfoCard({
               {agendamentos.length > 0 ? (
                 agendamentos.map((ag, idx) => (
                   <li key={idx} className="text-sm">
-                    <span className="text-blue-500">Consulta</span>
+                    <span className="text-[var(--cis-blue)]">Consulta</span>
                     {" com "}
                     <span className="font-semibold">{ag.medico}</span>
                     {" dia "}
@@ -137,17 +213,17 @@ export default function PacienteInfoCard({
           <div className="font-bold mb-1">Informações pessoais:</div>
           <div className="text-sm flex flex-col gap-2">
             <span className="flex items-center gap-2">
-              <FaIdCard className="text-gray-500" /> <span>CPF:</span>{" "}
+              <FaIdCard className="text-[var(--cis-muted)]" /> <span>CPF:</span>{" "}
               <span className="font-semibold">{paciente.cpf}</span>
             </span>
             <span className="flex items-center gap-2">
-              <FaMapMarkerAlt className="text-gray-500" />{" "}
+              <FaMapMarkerAlt className="text-[var(--cis-muted)]" />{" "}
               <span>Endereço:</span>{" "}
               {editing ? (
                 <input
                   type="text"
                   name="endereco"
-                  className="border-b border-gray-300 px-1 py-0.5 bg-transparent w-40 text-sm focus:outline-none"
+                  className="cis-input w-40 text-sm"
                   value={form.endereco}
                   onChange={handleEditChange}
                   placeholder="Endereço"
@@ -162,7 +238,7 @@ export default function PacienteInfoCard({
             {editing ? (
               <textarea
                 name="notes"
-                className="border border-gray-300 rounded px-2 py-1 w-full text-sm focus:outline-none"
+                className="cis-input text-sm"
                 value={form.notes}
                 onChange={handleEditChange}
                 placeholder="Observações"
@@ -179,15 +255,16 @@ export default function PacienteInfoCard({
           {editing ? (
             <div className="flex gap-2">
               <button
-                className="flex items-center gap-1 bg-green-100 hover:bg-green-200 text-green-900 font-semibold px-3 py-1 rounded transition-all duration-200 hover:scale-105 active:scale-95 shadow border border-green-300"
+                className="cis-primary-button flex items-center gap-1"
                 onClick={handleEditSubmit}
                 disabled={loading}
                 title="Salvar"
               >
-                <FaCheck className="text-lg" /> Salvar
+                <FaCheck className="text-lg" />{" "}
+                {loading ? "Salvando..." : "Salvar"}
               </button>
               <button
-                className="flex items-center gap-1 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold px-3 py-1 rounded transition-all duration-200 hover:scale-105 active:scale-95 shadow border border-gray-300"
+                className="cis-secondary-button flex items-center gap-1"
                 onClick={handleCancelEdit}
                 disabled={loading}
                 title="Cancelar"
@@ -198,20 +275,21 @@ export default function PacienteInfoCard({
           ) : (
             <>
               <button
-                className="flex items-center gap-1 bg-transparent hover:bg-blue-100 text-blue-900 font-semibold px-3 py-1 rounded transition-all duration-200 hover:scale-105 active:scale-95 border border-blue-200"
-                onClick={() => setEditing(true)}
+                className="cis-secondary-button flex items-center gap-1"
+                onClick={handleStartEdit}
                 title="Editar"
                 disabled={loading}
               >
                 <FaEdit className="text-lg" /> Editar
               </button>
               <button
-                className="flex items-center gap-1 bg-transparent hover:bg-red-100 text-red-900 font-semibold px-3 py-1 rounded transition-all duration-200 hover:scale-105 active:scale-95 border border-red-200"
+                className="rounded-[0.55rem] border border-red-200 bg-red-50 px-3 py-1 font-semibold text-red-900 transition hover:bg-red-100 flex items-center gap-1"
                 onClick={handleDelete}
                 title="Excluir paciente"
                 disabled={loading}
               >
-                <FaTrash className="text-lg" /> Excluir
+                <FaTrash className="text-lg" />{" "}
+                {loading ? "Excluindo" : "Excluir"}
               </button>
             </>
           )}

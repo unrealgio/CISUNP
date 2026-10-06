@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
 import PacienteTabs from "../components/PacienteTabs";
@@ -8,6 +8,8 @@ import PacienteResumoCards from "../components/PacienteResumoCards";
 import TabPrescricoes from "../components/TabPrescricoes";
 import TabProntuario from "../components/TabProntuario";
 import TabArquivos from "../components/TabArquivos";
+import { apiFetch } from "../api";
+import { ErrorMessage, LoadingMessage } from "../components/StatusMessage";
 
 const resumoPadrao = { consultas: 0, procedimentos: 0, exames: 0, faltas: 0 };
 
@@ -18,31 +20,52 @@ export default function PacientePage() {
   const [arquivos, setArquivos] = useState([]);
   const [prescricoes, setPrescricoes] = useState([]);
   const [prontuario, setProntuario] = useState([]);
+  const [erro, setErro] = useState("");
+  const [erroPrescricoes, setErroPrescricoes] = useState("");
+  // INCREMENTAR FORÇA RECARREGAR O PACIENTE (EX.: APÓS EDITAR)
+  const [recarregar, setRecarregar] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://localhost:3001/api/pacientes/${encodeURIComponent(cpf)}`)
-      .then((res) => res.json())
-      .then((data) => {
+    setProntuario([]);
+    setArquivos([]);
+  }, [cpf]);
+
+  useEffect(() => {
+    setErro("");
+    apiFetch(`/api/pacientes/${encodeURIComponent(cpf)}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          if (res.status === 404) return setPaciente(null);
+          throw new Error(data.error || "Erro ao carregar paciente.");
+        }
+
         if (data && data.patient) {
-          // Garante que o campo resumo sempre existe
           setPaciente({ ...data, resumo: data.resumo || resumoPadrao });
-          setProntuario([]);
-          setArquivos([]);
         } else {
           setPaciente(null);
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        setErro(error.message);
         setPaciente(null);
       });
-  }, [cpf]);
+  }, [cpf, recarregar]);
 
   useEffect(() => {
-    fetch(
-      `http://localhost:3001/api/prescricoes?cpf=${encodeURIComponent(cpf)}`
-    )
-      .then((res) => res.json())
-      .then(setPrescricoes);
+    setErroPrescricoes("");
+    apiFetch(`/api/prescricoes?cpf=${encodeURIComponent(cpf)}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok || !Array.isArray(data))
+          throw new Error(data.error || "Erro ao carregar prescrições.");
+        setPrescricoes(data);
+      })
+      .catch((error) => {
+        setPrescricoes([]);
+        setErroPrescricoes(error.message);
+      });
   }, [cpf]);
 
   function handleAddPrescricao(nova) {
@@ -54,7 +77,7 @@ export default function PacientePage() {
       <>
         <Header />
         <Menu active="pacientes" />
-        <div className="p-6">Carregando...</div>
+        <LoadingMessage>Carregando paciente</LoadingMessage>
       </>
     );
   }
@@ -64,7 +87,13 @@ export default function PacientePage() {
       <>
         <Header />
         <Menu active="pacientes" />
-        <div className="p-6 text-red-600">Paciente não encontrado!</div>
+        <div className="p-6">
+          {erro ? (
+            <ErrorMessage>{erro}</ErrorMessage>
+          ) : (
+            "Paciente não encontrado!"
+          )}
+        </div>
       </>
     );
   }
@@ -76,13 +105,20 @@ export default function PacientePage() {
       <div className="bg-gradient-to-br from-[#e3eaf6] to-[#f9fafb] min-h-screen px-2 md:px-8 py-6">
         <PacienteTabs active={activeTab} onTabChange={setActiveTab} />
         <div className="mt-4">
-          <PacienteInfoCard paciente={paciente} />
+          <PacienteInfoCard
+            paciente={paciente}
+            onPacienteAtualizado={() => setRecarregar((n) => n + 1)}
+            onPacienteExcluido={() =>
+              navigate("/buscar-paciente", { replace: true })
+            }
+          />
           <PacienteResumoCards resumo={paciente.resumo} />
         </div>
         {activeTab === "prescricoes" && (
           <TabPrescricoes
             prescricoes={prescricoes}
             cpf={cpf}
+            erroCarregamento={erroPrescricoes}
             onAdd={handleAddPrescricao}
           />
         )}

@@ -14,10 +14,14 @@ import {
 } from "react-icons/fa";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import { useParams } from "react-router-dom";
+import { apiFetch, apiUrl } from "../api";
+import { dataLocalISO } from "../utils/date";
 
-export default function TabProntuario({  onAdd }) {
+export default function TabProntuario({ onAdd }) {
   const canvasRef = useRef();
   const { cpf } = useParams();
+
+  // RESPOSTAS DO QUESTIONÁRIO DE SAÚDE BUCAL
   const [saudeBucal, setSaudeBucal] = useState({
     anestesia: "",
     dor: "",
@@ -32,6 +36,8 @@ export default function TabProntuario({  onAdd }) {
     fioDental: "",
   });
   const [antecedentes, setAntecedentes] = useState("");
+
+  // EXAME CLÍNICO (OS SELECTS JÁ INICIAM COM O VALOR MAIS COMUM)
   const [exame, setExame] = useState({
     higiene: "normal",
     halitose: "ausente",
@@ -40,22 +46,22 @@ export default function TabProntuario({  onAdd }) {
     mucosa: "normal",
     lingua: "",
     palato: "",
-    assolaobucal: "",
+    assoalhoBucal: "",
     labios: "",
   });
   const [alteracoes, setAlteracoes] = useState("");
+
+  // ESTADO DA TELA: AVISOS, HISTÓRICO, CARREGAMENTO E ERROS
   const [toast, setToast] = useState(null);
   const [registros, setRegistros] = useState([]);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState(null);
 
-  // BUSCAR REGISTROS DO PRONTUÁRIO AO CARREGAR O COMPONENTE OU QUANDO UM NOVO REGISTRO FOR ADICIONADO
+  // CARREGA O HISTÓRICO DE PRONTUÁRIOS DO PACIENTE
   useEffect(() => {
     setLoading(true);
     setErro(null);
-    fetch(
-      `http://localhost:3001/api/prontuarios?cpf=${encodeURIComponent(cpf)}`
-    )
+    apiFetch(`/api/prontuarios?cpf=${encodeURIComponent(cpf)}`)
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setRegistros(data);
@@ -65,6 +71,7 @@ export default function TabProntuario({  onAdd }) {
       .finally(() => setLoading(false));
   }, [cpf, onAdd]);
 
+  // AÇÕES DO DESENHO NA ARCADA
   function handleClearCanvas() {
     if (canvasRef.current) {
       canvasRef.current.clearCanvas();
@@ -78,6 +85,7 @@ export default function TabProntuario({  onAdd }) {
     }
   }
 
+  // ATUALIZA O CAMPO ALTERADO PELO ATRIBUTO NAME DO INPUT
   function handleSaudeBucalChange(e) {
     setSaudeBucal({ ...saudeBucal, [e.target.name]: e.target.value });
   }
@@ -89,6 +97,7 @@ export default function TabProntuario({  onAdd }) {
     setToast({ type, message });
   }
 
+  // ESCONDE O AVISO APÓS 2 SEGUNDOS
   useEffect(() => {
     if (toast) {
       const timer = setTimeout(() => setToast(null), 2000);
@@ -96,6 +105,7 @@ export default function TabProntuario({  onAdd }) {
     }
   }, [toast]);
 
+  // ENVIA O PRONTUÁRIO COM O DESENHO EM PNG PARA O BACKEND GERAR O PDF
   async function handleSalvarProntuario() {
     setLoading(true);
     setErro(null);
@@ -111,10 +121,10 @@ export default function TabProntuario({  onAdd }) {
         alteracoes,
         desenho,
       };
-      const date = new Date().toISOString().slice(0, 10);
+      const date = dataLocalISO();
       const time = new Date().toLocaleTimeString("pt-BR").slice(0, 5);
 
-      const res = await fetch("http://localhost:3001/api/prontuarios", {
+      const res = await apiFetch("/api/prontuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cpf, date, time, dados }),
@@ -134,7 +144,8 @@ export default function TabProntuario({  onAdd }) {
   }
 
   return (
-    <div className="bg-white rounded-xl shadow p-8 mt-6 animate-fade-in">
+    <div className="cis-panel p-6 md:p-8 mt-6 animate-fade-in">
+      {/* AVISO FLUTUANTE */}
       {toast && (
         <div
           className={`fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg flex items-center gap-2
@@ -153,10 +164,11 @@ export default function TabProntuario({  onAdd }) {
         <FaNotesMedical className="text-[#7A97B6]" /> Prontuário Odontológico
       </h2>
       {erro && (
-        <div className="bg-red-100 text-red-700 rounded p-4 mb-4 text-center font-semibold">
+        <div className="bg-red-50 border border-red-200 text-[var(--cis-danger)] rounded-lg p-4 mb-4 text-center font-semibold">
           {erro}
         </div>
       )}
+      {/* SAÚDE BUCAL */}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaSmile /> Saúde Bucal
@@ -297,6 +309,7 @@ export default function TabProntuario({  onAdd }) {
           </div>
         </div>
       </div>
+      {/* ANTECEDENTES FAMILIARES */}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaUserMd /> Antecedentes Familiares
@@ -309,6 +322,7 @@ export default function TabProntuario({  onAdd }) {
           onChange={(e) => setAntecedentes(e.target.value)}
         />
       </div>
+      {/* EXAME CLÍNICO */}
       <div className="mb-6">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg">
           Exame Clínico
@@ -406,8 +420,8 @@ export default function TabProntuario({  onAdd }) {
                 Assoalho Bucal:
               </label>
               <input
-                name="assolaobucal"
-                value={exame.assolaobucal}
+                name="assoalhoBucal"
+                value={exame.assoalhoBucal}
                 onChange={handleExameChange}
                 className="ml-2 rounded border px-2 py-1"
               />
@@ -424,6 +438,7 @@ export default function TabProntuario({  onAdd }) {
           </div>
         </div>
       </div>
+      {/* DESENHO NA ARCADA DENTÁRIA (900x700, MESMO TAMANHO USADO NO PDF) */}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaPencilAlt /> Marque os procedimentos na arcada dentária:
@@ -449,7 +464,7 @@ export default function TabProntuario({  onAdd }) {
               ref={canvasRef}
               width="900px"
               height="700px"
-              backgroundImage="http://localhost:5173/img/arcada.jpg"
+              backgroundImage="/img/arcada.jpg"
               strokeWidth={3}
               strokeColor="#FF5733"
               canvasColor="transparent"
@@ -484,6 +499,7 @@ export default function TabProntuario({  onAdd }) {
           </div>
         </div>
       </div>
+      {/* ALTERAÇÕES ENCONTRADAS */}
       <div className="mb-6 animate-fade-in">
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaSmile /> Alterações
@@ -506,12 +522,13 @@ export default function TabProntuario({  onAdd }) {
           <FaSave /> {loading ? "Salvando..." : "Salvar/Exportar PDF"}
         </button>
       </div>
+      {/* HISTÓRICO DE PRONTUÁRIOS COM LINK PARA O PDF */}
       <div>
         <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
           <FaCalendarAlt /> Registros do Prontuário:
         </div>
         {loading ? (
-          <p className="text-gray-500">Carregando registros...</p>
+          <p className="text-gray-500">Carregando registros</p>
         ) : registros.length === 0 ? (
           <p className="text-gray-500">Nenhum registro de prontuário.</p>
         ) : (
@@ -530,7 +547,7 @@ export default function TabProntuario({  onAdd }) {
                     <strong>Hora:</strong> {registro.time}
                   </p>
                   <a
-                    href={`http://localhost:3001/uploads/prontuarios/${registro.pdf}`}
+                    href={apiUrl(`/uploads/prontuarios/${registro.pdf}`)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-700 underline flex items-center gap-1 mt-2"
@@ -543,6 +560,7 @@ export default function TabProntuario({  onAdd }) {
           </div>
         )}
       </div>
+      {/* ANIMAÇÕES DO COMPONENTE */}
       <style>{`
         .animate-fade-in {
           animation: fadeIn .5s;

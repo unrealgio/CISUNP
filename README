@@ -2,30 +2,34 @@
 
 > Sistema web desenvolvido para digitalizar e centralizar os processos de atendimento do Centro Integrado de Saúde da UNP.
 
-##  Sobre o projeto
+Desenvolvido por Giovanni Felipe Oliveira da Silva
 
-O CIS UNP é uma aplicação web desenvolvida para substituir processos manuais e planilhas utilizados no gerenciamento dos atendimentos clínicos.
+- E-mail: [giovannifelipedev@gmail.com](mailto:giovannifelipedev@gmail.com)
+- GitHub: [unrealgio](https://github.com/unrealgio)
 
-O sistema centraliza informações de pacientes, profissionais e consultas, proporcionando uma solução mais organizada, segura e eficiente para o gerenciamento das atividades da clínica.
+## Sobre o projeto
 
-##  Funcionalidades
+O CIS UNP é uma aplicação web, de caráter didático, desenvolvida para substituir processos manuais e planilhas utilizados no gerenciamento dos atendimentos odontológicos da clínica.
 
-- Autenticação de usuários
-- Gerenciamento de pacientes
-- Agendamento e gerenciamento de consultas
-- Prontuário eletrônico
-- Odontograma interativo
-- Prescrições e documentos
-- Upload e gerenciamento de arquivos
-- Geração de documentos em PDF
-- Dashboard para acompanhamento dos atendimentos
-- Controle de acesso por usuário
+O sistema centraliza informações de pacientes, agenda, prescrições e prontuários, proporcionando uma solução mais organizada, segura e eficiente para o gerenciamento das atividades da clínica.
+
+## Funcionalidades
+
+- Autenticação JWT e alteração de senha no primeiro acesso.
+- Cadastro, busca, edição e exclusão de pacientes.
+- Agenda de consultas com prevenção de horários duplicados.
+- Prontuário odontológico com desenho da arcada e geração de PDF.
+- Cadastro e consulta de prescrições.
+- Rotas clínicas protegidas por autenticação.
+- Validação de e-mails, senhas, CPF, datas, horários e campos obrigatórios.
+
+> A aba de arquivos ainda é uma simulação local do frontend. O fluxo persistente de arquivos não está implementado.
 
 ## Tecnologias
 
 ### Frontend
 
-- React
+- React 19
 - Vite
 - Tailwind CSS
 - JavaScript
@@ -50,3 +54,117 @@ O sistema centraliza informações de pacientes, profissionais e consultas, prop
 CISUNP/
 ├── backend/
 └── frontend/
+```
+
+O backend está organizado em rotas, controllers, models e middlewares:
+
+- [`backend/src/routes`](backend/src/routes): endpoints HTTP.
+- [`backend/src/controllers`](backend/src/controllers): regras dos endpoints.
+- [`backend/src/models`](backend/src/models): models Sequelize.
+- [`backend/src/middleware`](backend/src/middleware): autenticação e validação.
+- [`backend/config`](backend/config): conexão com banco e configuração JWT.
+
+## Pré-requisitos
+
+- Node.js 18 ou superior.
+- PostgreSQL em execução.
+- Um banco PostgreSQL criado para o projeto.
+
+## Configuração do backend
+
+Crie ou ajuste `backend/.env`:
+
+```env
+DB_NAME=cisunp
+DB_USER=postgres
+DB_PASS=sua-senha
+DB_HOST=localhost
+DB_PORT=5432
+JWT_SECRET=uma-chave-local-longa-e-aleatoria
+ADMIN_PASSWORD=sua-senha-inicial
+PORT=3001
+```
+
+Todas as variáveis acima são obrigatórias. `ADMIN_PASSWORD` define a senha inicial do usuário administrador, que deve ser alterada no primeiro acesso, e `PORT` define a porta do backend.
+
+O arquivo `.env` contém credenciais locais e não deve ser versionado.
+
+## Instalação e execução
+
+### Backend
+
+```bash
+cd backend
+npm install
+node index.js
+```
+
+Ou, a partir da raiz do projeto:
+
+```bash
+node backend/index.js
+```
+
+O backend inicia na porta definida em `PORT` (no exemplo acima, `http://localhost:3001`).
+
+O Sequelize utiliza `sync()` para manter as tabelas durante o desenvolvimento. O projeto ainda não utiliza migrations.
+
+### Frontend
+
+Crie `frontend/.env` com o endereço do backend, usando a mesma porta definida em `PORT`:
+
+```env
+VITE_API_URL=http://localhost:3001
+```
+
+A variável é obrigatória. O Vite só lê o `.env` ao iniciar, então reinicie o `npm run dev` após alterá-lo.
+
+Em outro terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+O frontend fica disponível em `http://localhost:5173`.
+
+## Acesso inicial
+
+- E-mail: `admin@cis.com`
+- Senha: o valor definido em `ADMIN_PASSWORD`.
+
+Após o primeiro login, a aplicação solicita a troca da senha.
+
+## Comandos de validação
+
+Executar na pasta `frontend`:
+
+```bash
+npm run lint
+npm run build
+```
+
+Para verificar a sintaxe do backend a partir da raiz no PowerShell:
+
+```powershell
+Get-ChildItem .\backend -Recurse -Filter *.js |
+  Where-Object { $_.FullName -notmatch '\\node_modules\\' } |
+  ForEach-Object { node --check $_.FullName }
+```
+
+## API principal
+
+- `POST /api/login`
+- `GET /api/session`
+- `POST /api/change-password`
+- `GET|POST|PUT|DELETE /api/pacientes`
+- `GET|POST|PUT|DELETE /api/agendamentos`
+- `GET|POST /api/prescricoes`
+- `GET|POST /api/prontuarios`
+
+As rotas clínicas exigem `Authorization: Bearer <token>`.
+
+## Licença
+
+Este projeto está licenciado sob os termos da licença MIT. Consulte [LICENSE](LICENSE).

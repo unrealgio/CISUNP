@@ -6,6 +6,7 @@ exports.listarTodos = async (req, res) => {
     const pacientes = await Paciente.findAll({ order: [["patient", "ASC"]] });
     res.json(pacientes);
   } catch (err) {
+    console.error("Erro ao listar pacientes:", err);
     res.status(500).json({ error: "Erro ao listar pacientes." });
   }
 };
@@ -19,56 +20,62 @@ exports.buscarPorCpf = async (req, res) => {
       return res.status(404).json({ error: "Paciente não encontrado." });
     res.json(paciente);
   } catch (err) {
+    console.error("Erro ao buscar paciente:", err);
     res.status(500).json({ error: "Erro ao buscar paciente." });
   }
 };
 
-// CRIA OU ATUALIZA UM PACIENTE
-exports.criarOuAtualizar = async (req, res) => {
-  const { patient, cpf, phone, medico, idade, endereco, notes } = req.body;
-  if (!patient || !cpf)
-    return res.status(400).json({ error: "Campos obrigatórios ausentes." });
+// EXTRAI OS CAMPOS EDITÁVEIS DO PACIENTE A PARTIR DO CORPO DA REQUISIÇÃO
+function camposDoPaciente(body) {
+  const { patient, phone, medico, endereco, notes } = body;
+  // IDADE VAZIA VIRA NULL, PQ O POSTGRES NÃO ACEITA CAMPO VAZIO
+  const idade =
+    body.idade === "" || body.idade == null ? null : Number(body.idade);
+  return { patient: patient.trim(), phone, medico, idade, endereco, notes };
+}
+
+// CRIA UM PACIENTE (O CPF NÃO PODE ESTAR CADASTRADO)
+exports.criar = async (req, res) => {
   try {
-    const [paciente, created] = await Paciente.findOrCreate({
-      where: { cpf },
-      defaults: { patient, phone, medico, idade, endereco, notes },
+    const paciente = await Paciente.create({
+      cpf: req.body.cpf,
+      ...camposDoPaciente(req.body),
     });
-    if (!created) {
-      await paciente.update({ patient, phone, medico, idade, endereco, notes });
-    }
-    res.json(paciente);
+    res.status(201).json(paciente);
   } catch (err) {
     if (err.name === "SequelizeUniqueConstraintError") {
       return res
         .status(409)
         .json({ error: "Já existe um paciente com este CPF." });
     }
+    console.error("Erro ao salvar paciente:", err);
     res.status(500).json({ error: "Erro ao salvar paciente." });
   }
 };
 
-// EXCLUI UM PACIENTE PELO CPF
+// EXCLUI UM PACIENTE
 exports.excluir = async (req, res) => {
   const { cpf } = req.params;
   try {
     await Paciente.destroy({ where: { cpf } });
     res.json({ success: true });
   } catch (err) {
+    console.error("Erro ao excluir paciente:", err);
     res.status(500).json({ error: "Erro ao excluir paciente." });
   }
 };
 
-// ATUALIZA INFORMAÇÕES ESPECÍFICAS DE UM PACIENTE
+// ATUALIZA OS DADOS DE UM PACIENTE (CPF NÃO PODE SER ALTERADO)
 exports.atualizar = async (req, res) => {
   const { cpf } = req.params;
-  const { endereco, notes, phone } = req.body;
   try {
     const paciente = await Paciente.findOne({ where: { cpf } });
     if (!paciente)
       return res.status(404).json({ error: "Paciente não encontrado." });
-    await paciente.update({ endereco, notes, phone });
+    await paciente.update(camposDoPaciente(req.body));
     res.json(paciente);
   } catch (err) {
+    console.error("Erro ao atualizar paciente:", err);
     res.status(500).json({ error: "Erro ao atualizar paciente." });
   }
 };

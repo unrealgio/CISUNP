@@ -1,7 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { MdEdit, MdDelete, MdSave, MdCancel } from "react-icons/md";
 
-export default function Details({ schedule, onSave, onDelete, editField, setEditField }) {
+export default function Details({
+  schedule,
+  onSave,
+  onDelete,
+  editField,
+  setEditField,
+}) {
   const [editMode, setEditMode] = useState(false);
   const [patient, setPatient] = useState(schedule?.patient || "");
   const [cpf, setCpf] = useState(schedule?.cpf || "");
@@ -35,7 +41,7 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
 
   if (!schedule || (!schedule.patient && !editMode)) {
     return (
-      <div className="bg-gray-200 rounded-xl p-4 mt-4 w-full text-center text-gray-500">
+      <div className="cis-panel p-4 mt-4 w-full text-center text-[var(--cis-muted)]">
         Selecione um paciente para ver os detalhes.
       </div>
     );
@@ -80,9 +86,11 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
   }
 
   return (
-    <div className="bg-gray-200 rounded-xl p-4 mt-4 w-full relative">
+    <div className="cis-panel p-4 mt-4 w-full relative">
       {error && (
-        <div className="text-red-600 text-sm text-center mb-2">{error}</div>
+        <div className="text-[var(--cis-danger)] bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
+          {error}
+        </div>
       )}
       <div className="mb-2">
         <span className="font-bold">Paciente:</span>{" "}
@@ -90,9 +98,9 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
           <input
             ref={patientRef}
             type="text"
-            className="border rounded px-2 py-1"
+            className="cis-input max-w-full"
             value={patient}
-            onChange={e => setPatient(e.target.value)}
+            onChange={(e) => setPatient(e.target.value)}
             onKeyDown={handleKeyDown}
           />
         ) : (
@@ -104,30 +112,34 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
         {editMode && !editField ? (
           <input
             type="text"
-            className="border rounded px-2 py-1"
+            className="cis-input max-w-full"
+            inputMode="numeric"
             value={cpf}
-            onChange={e => setCpf(e.target.value)}
+            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
           />
         ) : (
           schedule.cpf || <span className="text-gray-400">Não informado</span>
         )}
       </div>
       <div className="mb-2">
-        <span className="font-bold">Horário:</span> {schedule.time} - {schedule.date}
+        <span className="font-bold">Horário:</span> {schedule.time} -{" "}
+        {schedule.date}
       </div>
       <div className="mb-2">
         <span className="font-bold">Médico:</span>{" "}
-        {editMode && editField === "medico" ? (
+        {editMode && (editField === "medico" || !editField) ? (
           <input
             ref={medicoRef}
             type="text"
-            className="border rounded px-2 py-1"
+            className="cis-input max-w-full"
             value={medico}
-            onChange={e => setMedico(e.target.value)}
+            onChange={(e) => setMedico(e.target.value)}
             onKeyDown={handleKeyDown}
           />
         ) : (
-          schedule.medico || <span className="text-gray-400 italic">Disponível</span>
+          schedule.medico || (
+            <span className="text-gray-400 italic">Disponível</span>
+          )
         )}
       </div>
       <div className="mb-2">
@@ -137,7 +149,7 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
             type="text"
             className="border rounded px-2 py-1"
             value={phone}
-            onChange={e => setPhone(e.target.value)}
+            onChange={(e) => setPhone(e.target.value)}
           />
         ) : (
           schedule.phone || <span className="text-gray-400">Não informado</span>
@@ -147,9 +159,9 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
         <span className="font-bold">Observações:</span>{" "}
         {editMode && !editField ? (
           <textarea
-            className="border rounded px-2 py-1 w-full"
+            className="cis-input"
             value={notes}
-            onChange={e => setNotes(e.target.value)}
+            onChange={(e) => setNotes(e.target.value)}
           />
         ) : (
           schedule.notes || <span className="text-gray-400">Nenhuma</span>
@@ -159,13 +171,13 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
         {editMode ? (
           <>
             <button
-              className="bg-green-600 text-white px-4 py-2 rounded font-bold flex items-center gap-1 hover:bg-green-700 transition"
+              className="cis-primary-button flex items-center gap-1"
               onClick={handleSave}
             >
               <MdSave /> Salvar
             </button>
             <button
-              className="bg-gray-400 text-white px-4 py-2 rounded font-bold flex items-center gap-1 hover:bg-gray-500 transition"
+              className="cis-secondary-button flex items-center gap-1"
               onClick={handleCancel}
             >
               <MdCancel /> Cancelar
@@ -173,7 +185,7 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
           </>
         ) : (
           <button
-            className="bg-blue-700 text-white px-4 py-2 rounded font-bold flex items-center gap-1 hover:bg-blue-800 transition"
+            className="cis-primary-button flex items-center gap-1"
             onClick={() => {
               setEditMode(true);
               setEditField("");
@@ -183,7 +195,7 @@ export default function Details({ schedule, onSave, onDelete, editField, setEdit
           </button>
         )}
         <button
-          className="bg-red-600 text-white px-4 py-2 rounded font-bold flex items-center gap-1 hover:bg-red-700 transition"
+          className="rounded-[0.55rem] bg-[var(--cis-danger)] px-4 py-2 font-bold text-white transition hover:bg-red-800 flex items-center gap-1"
           onClick={handleDelete}
         >
           <MdDelete /> Excluir
