@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
 import { MdPersonAdd, MdMedicalServices } from "react-icons/md";
+import { ErrorMessage } from "./StatusMessage";
 
 export default function List({
   schedules,
@@ -92,9 +93,9 @@ export default function List({
         </div>
       </div>
       {error && (
-        <div className="text-(--cis-danger) bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
+        <ErrorMessage compacto className="mb-2">
           {error}
-        </div>
+        </ErrorMessage>
       )}
       <div className="flex flex-col gap-3 bg-(--cis-background) rounded-b-xl p-4 min-w-175">
         {schedules.map((item, idx) => (
@@ -165,7 +166,7 @@ export default function List({
                 <>
                   <span className="text-gray-400 italic">Disponível</span>
                   <button
-                    className="p-1 rounded hover:bg-blue-100 text-blue-700 cursor-pointer"
+                    className="cis-icon-button hover:bg-blue-100 text-blue-700"
                     aria-label="Adicionar paciente"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -203,7 +204,7 @@ export default function List({
                 <>
                   <span className="text-gray-400 italic">Disponível</span>
                   <button
-                    className="p-1 rounded hover:bg-blue-100 text-blue-700 cursor-pointer"
+                    className="cis-icon-button hover:bg-blue-100 text-blue-700"
                     aria-label="Adicionar médico"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -227,7 +228,7 @@ export default function List({
               {editingIndex === idx ? (
                 <>
                   <button
-                    className="p-1 rounded hover:bg-green-100 text-green-700 cursor-pointer"
+                    className="cis-icon-button hover:bg-green-100 text-green-700"
                     aria-label="Salvar"
                     onClick={() => handleSave(item)}
                     title="Salvar"
@@ -235,7 +236,7 @@ export default function List({
                     <FaCheck />
                   </button>
                   <button
-                    className="p-1 rounded hover:bg-gray-100 text-gray-700 cursor-pointer"
+                    className="cis-icon-button hover:bg-gray-100 text-gray-700"
                     aria-label="Cancelar"
                     onClick={limparEdicao}
                     title="Cancelar"
@@ -246,7 +247,7 @@ export default function List({
               ) : (
                 <>
                   <button
-                    className="p-1 rounded hover:bg-blue-100 text-blue-700 cursor-pointer"
+                    className="cis-icon-button hover:bg-blue-100 text-blue-700"
                     aria-label="Editar"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -264,7 +265,7 @@ export default function List({
                     <FaEdit />
                   </button>
                   <button
-                    className="p-1 rounded hover:bg-red-100 text-red-700 cursor-pointer"
+                    className="cis-icon-button hover:bg-red-100 text-red-700"
                     aria-label="Excluir"
                     onClick={(e) => {
                       e.stopPropagation();

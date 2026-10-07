@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { MdEdit, MdDelete, MdSave, MdClose } from "react-icons/md";
+import { ErrorMessage } from "./StatusMessage";
 
 export default function Details({
   schedule,
@@ -105,9 +106,9 @@ export default function Details({
         </div>
       )}
       {error && (
-        <div className="text-(--cis-danger) bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
+        <ErrorMessage compacto className="mb-2">
           {error}
-        </div>
+        </ErrorMessage>
       )}
       <div className="mb-2">
         <span className="font-bold">Paciente:</span>{" "}
@@ -165,7 +166,7 @@ export default function Details({
         {editMode && !editField ? (
           <input
             type="text"
-            className="border rounded px-2 py-1"
+            className="cis-campo-compacto"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
           />
@@ -204,7 +205,7 @@ export default function Details({
           </button>
         )}
         <button
-          className="rounded-[0.55rem] bg-(--cis-danger) px-4 py-2 font-bold text-white transition hover:bg-red-800 flex items-center gap-1"
+          className="cis-danger-button flex items-center gap-1"
           onClick={handleDelete}
         >
           <MdDelete /> Excluir

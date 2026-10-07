@@ -9,6 +9,7 @@ import {
   FaHome,
 } from "react-icons/fa";
 import { apiFetch, mensagemDeErro } from "../api";
+import { ErrorMessage } from "./StatusMessage";
 
 export default function AddPaciente({ onAdd, onCancel }) {
   const [form, setForm] = useState({
@@ -176,12 +177,9 @@ export default function AddPaciente({ onAdd, onCancel }) {
             />
           </div>
           {erro && (
-            <div
-              className="md:col-span-2 rounded-lg bg-red-50 border border-red-200 text-(--cis-danger) text-sm px-3 py-2 text-center"
-              role="alert"
-            >
+            <ErrorMessage compacto className="md:col-span-2">
               {erro}
-            </div>
+            </ErrorMessage>
           )}
           <div className="md:col-span-2 flex gap-3 justify-end mt-2">
             <button

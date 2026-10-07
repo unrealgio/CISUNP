@@ -1,7 +1,8 @@
 import { useState } from "react";
 import PassChange from "./PassChange";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
-import { apiUrl } from "../api";
+import { apiUrl, mensagemDeErro } from "../api";
+import { ErrorMessage } from "./StatusMessage";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,7 +35,7 @@ export default function Login() {
           window.location.href = "/agenda";
         }
       } else {
-        setError(data.error || "Usuário ou senha inválidos.");
+        setError(mensagemDeErro(data, "Usuário ou senha inválidos."));
       }
     } catch {
       setError("Erro de conexão com o servidor.");
@@ -81,7 +82,7 @@ export default function Login() {
                 id="usuario"
                 type="email"
                 placeholder="usuario@unp.com.br"
-                className="w-full px-4 py-2.5 pr-10 border border-(--cis-border) rounded-lg shadow-sm focus:border-(--cis-orange) bg-white text-(--cis-ink) placeholder-(--cis-muted) text-base transition"
+                className="cis-login-input"
                 required
                 aria-label="Usuário"
               />
@@ -103,7 +104,7 @@ export default function Login() {
                 id="senha"
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
-                className="w-full px-4 py-2.5 pr-10 border border-(--cis-border) rounded-lg shadow-sm focus:border-(--cis-orange) bg-white text-(--cis-ink) placeholder-(--cis-muted) text-base transition"
+                className="cis-login-input"
                 required
                 aria-label="Senha"
               />
@@ -120,12 +121,9 @@ export default function Login() {
           </div>
           {/* MENSAGEM DE ERRO */}
           {error && (
-            <div
-              className="w-full rounded-lg bg-red-50 border border-red-200 text-(--cis-danger) text-sm mb-3 px-3 py-2 text-center"
-              role="alert"
-            >
+            <ErrorMessage compacto className="w-full mb-3">
               {error}
-            </div>
+            </ErrorMessage>
           )}
           {/* BOTÃO DE LOGIN */}
           <button

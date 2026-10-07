@@ -82,7 +82,8 @@ export default function PacienteInfoCard({
         method: "DELETE",
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro ao excluir paciente.");
+      if (!res.ok)
+        throw new Error(mensagemDeErro(data, "Erro ao excluir paciente."));
       onPacienteExcluido && onPacienteExcluido();
     } catch (error) {
       setOperationError(error.message);
@@ -273,7 +274,7 @@ export default function PacienteInfoCard({
                 <FaEdit className="text-lg" /> Editar
               </button>
               <button
-                className="rounded-[0.55rem] border border-red-200 bg-red-50 px-3 py-1 font-semibold text-red-900 transition hover:bg-red-100 flex items-center gap-1"
+                className="cis-danger-soft-button flex items-center gap-1"
                 onClick={handleDelete}
                 title="Excluir paciente"
                 disabled={loading}

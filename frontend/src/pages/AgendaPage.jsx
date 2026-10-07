@@ -160,7 +160,7 @@ export default function AgendaPage() {
       .then(async (res) => {
         const data = await res.json();
         if (!res.ok)
-          throw new Error(data.error || "Erro ao excluir agendamento.");
+          throw new Error(mensagemDeErro(data, "Erro ao excluir agendamento."));
         agendamentos.recarregar();
         setVersaoAgenda((v) => v + 1);
         setSelectedTime(null);

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { FaPills, FaPlus } from "react-icons/fa";
-import { apiFetch } from "../api";
+import { apiFetch, mensagemDeErro } from "../api";
 import { ErrorMessage } from "./StatusMessage";
 import { formatarDataHora } from "../utils/date";
 
@@ -37,7 +37,8 @@ export default function TabPrescricoes({
         body: JSON.stringify({ ...form, cpf }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Erro ao salvar prescrição.");
+      if (!res.ok)
+        throw new Error(mensagemDeErro(data, "Erro ao salvar prescrição."));
 
       onAdd && onAdd(data);
       setShowForm(false);

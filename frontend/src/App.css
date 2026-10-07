@@ -1,3 +1,6 @@
+/* PERMITE USAR AS CLASSES DO TAILWIND (@apply) NESTE ARQUIVO, SEM DUPLICAR O CSS */
+@reference "./index.css";
+
 .cis-panel {
   background: var(--cis-surface);
   border: 1px solid var(--cis-border);
@@ -69,6 +72,52 @@
   cursor: not-allowed;
   opacity: 0.6;
   transform: none;
+}
+
+@layer components {
+  /* CAMPOS */
+  .cis-campo-compacto {
+    @apply rounded border px-2 py-1;
+  }
+
+  .cis-textarea-simples {
+    @apply w-full rounded-lg border p-3;
+  }
+
+  .cis-login-input {
+    @apply w-full px-4 py-2.5 pr-10 border border-(--cis-border) rounded-lg shadow-sm focus:border-(--cis-orange) bg-white text-(--cis-ink) placeholder-(--cis-muted) text-base transition;
+  }
+
+  /* BOTÕES DO PRONTUÁRIO */
+  .cis-unp-button {
+    @apply bg-(--cis-unp-orange) text-white px-4 py-2 rounded shadow hover:bg-(--cis-unp-orange-hover) font-semibold;
+  }
+
+  .cis-steel-button {
+    @apply bg-(--cis-unp-steel) text-white px-4 py-2 rounded shadow hover:bg-(--cis-unp-blue) font-semibold;
+  }
+
+  .cis-success-button {
+    @apply bg-green-600 text-white px-4 py-2 rounded font-bold;
+  }
+
+  /* BOTÕES DE ÍCONE */
+  .cis-icon-button {
+    @apply p-1 rounded cursor-pointer;
+  }
+
+  .cis-page-button {
+    @apply p-2 rounded bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50;
+  }
+
+  /* BOTÕES DE EXCLUSÃO */
+  .cis-danger-button {
+    @apply rounded-[0.55rem] bg-(--cis-danger) px-4 py-2 font-bold text-white transition hover:bg-red-800;
+  }
+
+  .cis-danger-soft-button {
+    @apply rounded-[0.55rem] border border-red-200 bg-red-50 px-3 py-1 font-semibold text-red-900 transition hover:bg-red-100;
+  }
 }
 
 /* CALENDÁRIO DA AGENDA  */

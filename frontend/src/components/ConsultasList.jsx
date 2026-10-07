@@ -403,7 +403,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-2 mt-8">
           <button
-            className="p-2 rounded bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50"
+            className="cis-page-button"
             onClick={() => setPage(page - 1)}
             disabled={page === 1}
             aria-label="Página anterior"
@@ -414,7 +414,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
             Página {page} de {totalPages}
           </span>
           <button
-            className="p-2 rounded bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50"
+            className="cis-page-button"
             onClick={() => setPage(page + 1)}
             disabled={page === totalPages}
             aria-label="Próxima página"

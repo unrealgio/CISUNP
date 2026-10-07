@@ -13,7 +13,7 @@ import {
   FaSave,
 } from "react-icons/fa";
 import { ReactSketchCanvas } from "react-sketch-canvas";
-import { apiFetch, apiUrl } from "../api";
+import { apiFetch, apiUrl, mensagemDeErro } from "../api";
 import { dataLocalISO, formatarDataISO } from "../utils/date";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 
@@ -121,14 +121,20 @@ export default function TabProntuario({ cpf }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cpf, date, time, dados }),
       });
-      if (!res.ok) throw new Error("Erro ao salvar prontuário.");
-      const registro = await res.json();
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const mensagem = mensagemDeErro(data, "Erro ao salvar prontuário.");
+        setErroSalvar(mensagem);
+        showToast("info", mensagem);
+        return;
+      }
       showToast("success", "Prontuário salvo e PDF gerado!");
-      historico.alterarDados((prev) => [registro, ...(prev || [])]);
+      historico.alterarDados((prev) => [data, ...(prev || [])]);
       if (canvasRef.current) canvasRef.current.clearCanvas();
     } catch {
-      setErroSalvar("Erro ao salvar prontuário.");
-      showToast("info", "Erro ao salvar prontuário.");
+      setErroSalvar("Erro de conexão com o servidor.");
+      showToast("info", "Erro de conexão com o servidor.");
     } finally {
       setSalvando(false);
     }
@@ -173,7 +179,7 @@ export default function TabProntuario({ cpf }) {
                 name="anestesia"
                 value={saudeBucal.anestesia}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="">Selecione</option>
                 <option value="sim">Sim</option>
@@ -186,7 +192,7 @@ export default function TabProntuario({ cpf }) {
                 name="dor"
                 value={saudeBucal.dor}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="">Selecione</option>
                 <option value="sim">Sim</option>
@@ -199,7 +205,7 @@ export default function TabProntuario({ cpf }) {
                 name="sangramento"
                 value={saudeBucal.sangramento}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="">Selecione</option>
                 <option value="sim">Sim</option>
@@ -210,7 +216,7 @@ export default function TabProntuario({ cpf }) {
                 value={saudeBucal.sangramentoQuando}
                 onChange={handleSaudeBucalChange}
                 placeholder="Quando?"
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               />
             </label>
             <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
@@ -219,7 +225,7 @@ export default function TabProntuario({ cpf }) {
                 name="bocaSeca"
                 value={saudeBucal.bocaSeca}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="">Selecione</option>
                 <option value="sim">Sim</option>
@@ -232,7 +238,7 @@ export default function TabProntuario({ cpf }) {
                 name="ranger"
                 value={saudeBucal.ranger}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="">Selecione</option>
                 <option value="sim">Sim</option>
@@ -245,7 +251,7 @@ export default function TabProntuario({ cpf }) {
                 name="maxilar"
                 value={saudeBucal.maxilar}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="">Selecione</option>
                 <option value="sim">Sim</option>
@@ -260,7 +266,7 @@ export default function TabProntuario({ cpf }) {
                 name="tratamento"
                 value={saudeBucal.tratamento}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               />
             </label>
             <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
@@ -269,7 +275,7 @@ export default function TabProntuario({ cpf }) {
                 name="fumante"
                 value={saudeBucal.fumante}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="">Selecione</option>
                 <option value="sim">Sim</option>
@@ -282,7 +288,7 @@ export default function TabProntuario({ cpf }) {
                 name="escova"
                 value={saudeBucal.escova}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               />
             </label>
             <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
@@ -291,7 +297,7 @@ export default function TabProntuario({ cpf }) {
                 name="fioDental"
                 value={saudeBucal.fioDental}
                 onChange={handleSaudeBucalChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="">Selecione</option>
                 <option value="sim">Sim</option>
@@ -307,7 +313,7 @@ export default function TabProntuario({ cpf }) {
           <FaUserMd /> Antecedentes Familiares
         </div>
         <textarea
-          className="w-full rounded-lg border p-3"
+          className="cis-textarea-simples"
           rows={2}
           placeholder="Descreva antecedentes familiares relevantes..."
           value={antecedentes}
@@ -329,7 +335,7 @@ export default function TabProntuario({ cpf }) {
                 name="higiene"
                 value={exame.higiene}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="normal">Normal</option>
                 <option value="regular">Regular</option>
@@ -344,7 +350,7 @@ export default function TabProntuario({ cpf }) {
                 name="halitose"
                 value={exame.halitose}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="ausente">Ausente</option>
                 <option value="moderada">Moderada</option>
@@ -359,7 +365,7 @@ export default function TabProntuario({ cpf }) {
                 name="tartaro"
                 value={exame.tartaro}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="ausente">Ausente</option>
                 <option value="pouco">Pouco</option>
@@ -376,7 +382,7 @@ export default function TabProntuario({ cpf }) {
                 name="gengiva"
                 value={exame.gengiva}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="normal">Normal</option>
                 <option value="gengivite">Gengivite</option>
@@ -391,7 +397,7 @@ export default function TabProntuario({ cpf }) {
                 name="mucosa"
                 value={exame.mucosa}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               >
                 <option value="normal">Normal</option>
                 <option value="alterada">Alterada</option>
@@ -407,7 +413,7 @@ export default function TabProntuario({ cpf }) {
                 name="lingua"
                 value={exame.lingua}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               />
             </div>
             <div>
@@ -418,7 +424,7 @@ export default function TabProntuario({ cpf }) {
                 name="palato"
                 value={exame.palato}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               />
             </div>
             <div>
@@ -429,7 +435,7 @@ export default function TabProntuario({ cpf }) {
                 name="assoalhoBucal"
                 value={exame.assoalhoBucal}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               />
             </div>
             <div>
@@ -440,7 +446,7 @@ export default function TabProntuario({ cpf }) {
                 name="labios"
                 value={exame.labios}
                 onChange={handleExameChange}
-                className="ml-2 rounded border px-2 py-1"
+                className="ml-2 cis-campo-compacto"
               />
             </div>
           </div>
@@ -491,14 +497,14 @@ export default function TabProntuario({ cpf }) {
           </div>
           <div className="flex flex-row gap-2">
             <button
-              className="bg-(--cis-unp-orange) text-white px-4 py-2 rounded shadow button-animate hover:bg-(--cis-unp-orange-hover) font-semibold flex items-center gap-2"
+              className="cis-unp-button button-animate flex items-center gap-2"
               onClick={handleUndoCanvas}
               type="button"
             >
               <FaUndo /> Desfazer
             </button>
             <button
-              className="bg-(--cis-unp-steel) text-white px-4 py-2 rounded shadow button-animate hover:bg-(--cis-unp-blue) font-semibold flex items-center gap-2"
+              className="cis-steel-button button-animate flex items-center gap-2"
               onClick={handleClearCanvas}
               type="button"
             >
@@ -513,7 +519,7 @@ export default function TabProntuario({ cpf }) {
           <FaSmile /> Alterações
         </div>
         <textarea
-          className="w-full rounded-lg border p-3"
+          className="cis-textarea-simples"
           rows={5}
           placeholder="Descreva as alterações encontradas..."
           value={alteracoes}
@@ -522,7 +528,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       <div className="mb-8 flex justify-end">
         <button
-          className="bg-green-600 text-white px-4 py-2 rounded font-bold flex items-center gap-2"
+          className="cis-success-button flex items-center gap-2"
           onClick={handleSalvarProntuario}
           type="button"
           disabled={salvando}
