@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   FaUserCircle,
   FaEdit,
@@ -13,6 +13,7 @@ import {
 import { apiFetch, mensagemDeErro } from "../api";
 import { ErrorMessage } from "./StatusMessage";
 import { formatarDataISO } from "../utils/date";
+import { useBuscarDados } from "../hooks/useBuscarDados";
 
 // MONTA O FORMULÁRIO DE EDIÇÃO COM OS DADOS ATUAIS DO PACIENTE
 function formDoPaciente(paciente) {
@@ -35,22 +36,12 @@ export default function PacienteInfoCard({
   const [form, setForm] = useState(() => formDoPaciente(paciente));
   const [loading, setLoading] = useState(false);
   const [operationError, setOperationError] = useState("");
-  const [agendamentos, setAgendamentos] = useState([]);
-
-  useEffect(() => {
-    if (paciente && paciente.cpf) {
-      apiFetch(
-        `/api/agendamentos/futuros?cpf=${encodeURIComponent(paciente.cpf)}`,
-      )
-        .then(async (res) => {
-          const data = await res.json();
-          if (!res.ok)
-            throw new Error(data.error || "Erro ao carregar agendamentos.");
-          setAgendamentos(Array.isArray(data) ? data : []);
-        })
-        .catch(() => setAgendamentos([]));
-    }
-  }, [paciente]);
+  // AGENDAMENTOS FUTUROS (SÓ BUSCA DE NOVO SE O CPF MUDAR)
+  const futuros = useBuscarDados(
+    `/api/agendamentos/futuros?cpf=${encodeURIComponent(paciente.cpf)}`,
+    "Erro ao carregar agendamentos.",
+  );
+  const agendamentos = Array.isArray(futuros.dados) ? futuros.dados : [];
 
   function handleEditChange(e) {
     setForm({ ...form, [e.target.name]: e.target.value });

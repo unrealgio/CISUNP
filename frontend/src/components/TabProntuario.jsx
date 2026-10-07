@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   FaNotesMedical,
   FaCalendarAlt,
@@ -13,13 +13,12 @@ import {
   FaSave,
 } from "react-icons/fa";
 import { ReactSketchCanvas } from "react-sketch-canvas";
-import { useParams } from "react-router-dom";
 import { apiFetch, apiUrl } from "../api";
 import { dataLocalISO, formatarDataISO } from "../utils/date";
+import { useBuscarDados } from "../hooks/useBuscarDados";
 
-export default function TabProntuario() {
+export default function TabProntuario({ cpf }) {
   const canvasRef = useRef();
-  const { cpf } = useParams();
 
   // RESPOSTAS DO QUESTIONÁRIO DE SAÚDE BUCAL
   const [saudeBucal, setSaudeBucal] = useState({
@@ -37,7 +36,7 @@ export default function TabProntuario() {
   });
   const [antecedentes, setAntecedentes] = useState("");
 
-  // EXAME CLÍNICO (OS SELECTS JÁ INICIAM COM O VALOR MAIS COMUM)
+  // EXAME CLÍNICO
   const [exame, setExame] = useState({
     higiene: "normal",
     halitose: "ausente",
@@ -51,25 +50,18 @@ export default function TabProntuario() {
   });
   const [alteracoes, setAlteracoes] = useState("");
 
-  // ESTADO DA TELA: AVISOS, HISTÓRICO, CARREGAMENTO E ERROS
+  // AVISOS, HISTÓRICO, CARREGAMENTO E ERROS
   const [toast, setToast] = useState(null);
-  const [registros, setRegistros] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [erro, setErro] = useState(null);
+  const [salvando, setSalvando] = useState(false);
+  const [erroSalvar, setErroSalvar] = useState("");
 
   // CARREGA O HISTÓRICO DE PRONTUÁRIOS DO PACIENTE
-  useEffect(() => {
-    setLoading(true);
-    setErro(null);
-    apiFetch(`/api/prontuarios?cpf=${encodeURIComponent(cpf)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) setRegistros(data);
-        else setRegistros([]);
-      })
-      .catch(() => setErro("Erro ao carregar registros do prontuário."))
-      .finally(() => setLoading(false));
-  }, [cpf]);
+  const historico = useBuscarDados(
+    `/api/prontuarios?cpf=${encodeURIComponent(cpf)}`,
+    "Erro ao carregar registros do prontuário.",
+  );
+  const registros = Array.isArray(historico.dados) ? historico.dados : [];
+  const erro = erroSalvar || historico.erro;
 
   // AÇÕES DO DESENHO NA ARCADA
   function handleClearCanvas() {
@@ -107,8 +99,8 @@ export default function TabProntuario() {
 
   // ENVIA O PRONTUÁRIO COM O DESENHO EM PNG PARA O BACKEND GERAR O PDF
   async function handleSalvarProntuario() {
-    setLoading(true);
-    setErro(null);
+    setSalvando(true);
+    setErroSalvar("");
     let desenho = "";
     try {
       if (canvasRef.current) {
@@ -132,13 +124,13 @@ export default function TabProntuario() {
       if (!res.ok) throw new Error("Erro ao salvar prontuário.");
       const registro = await res.json();
       showToast("success", "Prontuário salvo e PDF gerado!");
-      setRegistros((prev) => [registro, ...prev]);
+      historico.alterarDados((prev) => [registro, ...(prev || [])]);
       if (canvasRef.current) canvasRef.current.clearCanvas();
     } catch {
-      setErro("Erro ao salvar prontuário.");
+      setErroSalvar("Erro ao salvar prontuário.");
       showToast("info", "Erro ao salvar prontuário.");
     } finally {
-      setLoading(false);
+      setSalvando(false);
     }
   }
 
@@ -533,9 +525,9 @@ export default function TabProntuario() {
           className="bg-green-600 text-white px-4 py-2 rounded font-bold flex items-center gap-2"
           onClick={handleSalvarProntuario}
           type="button"
-          disabled={loading}
+          disabled={salvando}
         >
-          <FaSave /> {loading ? "Salvando..." : "Salvar/Exportar PDF"}
+          <FaSave /> {salvando ? "Salvando..." : "Salvar/Exportar PDF"}
         </button>
       </div>
       {/* HISTÓRICO DE PRONTUÁRIOS COM LINK PARA O PDF */}
@@ -543,7 +535,7 @@ export default function TabProntuario() {
         <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
           <FaCalendarAlt /> Registros do Prontuário:
         </div>
-        {loading ? (
+        {historico.carregando ? (
           <p className="text-gray-500">Carregando registros</p>
         ) : registros.length === 0 ? (
           <p className="text-gray-500">Nenhum registro de prontuário.</p>

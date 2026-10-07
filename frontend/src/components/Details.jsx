@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { MdEdit, MdDelete, MdSave, MdCancel } from "react-icons/md";
+import { useState, useEffect, useRef } from "react";
+import { MdEdit, MdDelete, MdSave, MdClose } from "react-icons/md";
 
 export default function Details({
   schedule,
@@ -8,7 +8,7 @@ export default function Details({
   editField,
   setEditField,
 }) {
-  const [editMode, setEditMode] = useState(false);
+  const [editMode, setEditMode] = useState(Boolean(editField));
   const [patient, setPatient] = useState(schedule?.patient || "");
   const [cpf, setCpf] = useState(schedule?.cpf || "");
   const [phone, setPhone] = useState(schedule?.phone || "");
@@ -19,16 +19,16 @@ export default function Details({
   const patientRef = useRef(null);
   const medicoRef = useRef(null);
 
-  useEffect(() => {
+  function iniciarEdicao() {
     setPatient(schedule?.patient || "");
     setCpf(schedule?.cpf || "");
     setPhone(schedule?.phone || "");
     setNotes(schedule?.notes || "");
     setMedico(schedule?.medico || "");
     setError("");
-    if (editField) setEditMode(true);
-    else setEditMode(false);
-  }, [schedule, editField]);
+    setEditMode(true);
+    setEditField("");
+  }
 
   useEffect(() => {
     if (editMode && editField === "patient" && patientRef.current) {
@@ -62,7 +62,6 @@ export default function Details({
       return;
     }
     setError("");
-    // SÓ SAI DO MODO EDIÇÃO SE SALVOU; EM CASO DE ERRO, MANTÉM O QUE FOI DIGITADO
     const salvou =
       onSave &&
       (await onSave({
@@ -91,6 +90,20 @@ export default function Details({
 
   return (
     <div className="cis-panel p-4 mt-4 w-full relative">
+      {/* BOTÃO DE FECHAR A EDIÇÃO */}
+      {editMode && (
+        <div className="flex justify-end -mt-1 -mr-1 mb-1">
+          <button
+            type="button"
+            className="p-1 rounded-lg text-(--cis-muted) hover:text-(--cis-navy) hover:bg-(--cis-blue-soft) transition"
+            onClick={handleCancel}
+            aria-label="Fechar edição"
+            title="Fechar edição"
+          >
+            <MdClose size={20} />
+          </button>
+        </div>
+      )}
       {error && (
         <div className="text-(--cis-danger) bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
           {error}
@@ -98,7 +111,7 @@ export default function Details({
       )}
       <div className="mb-2">
         <span className="font-bold">Paciente:</span>{" "}
-        {editMode && editField === "patient" ? (
+        {editMode && (editField === "patient" || !editField) ? (
           <input
             ref={patientRef}
             type="text"
@@ -181,20 +194,11 @@ export default function Details({
             >
               <MdSave /> Salvar
             </button>
-            <button
-              className="cis-secondary-button flex items-center gap-1"
-              onClick={handleCancel}
-            >
-              <MdCancel /> Cancelar
-            </button>
           </>
         ) : (
           <button
             className="cis-primary-button flex items-center gap-1"
-            onClick={() => {
-              setEditMode(true);
-              setEditField("");
-            }}
+            onClick={iniciarEdicao}
           >
             <MdEdit /> Editar
           </button>

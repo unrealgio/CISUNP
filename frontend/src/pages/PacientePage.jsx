@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
@@ -8,66 +8,48 @@ import PacienteResumoCards from "../components/PacienteResumoCards";
 import TabPrescricoes from "../components/TabPrescricoes";
 import TabProntuario from "../components/TabProntuario";
 import TabArquivos from "../components/TabArquivos";
-import { apiFetch } from "../api";
+import { useBuscarDados } from "../hooks/useBuscarDados";
 import { ErrorMessage, LoadingMessage } from "../components/StatusMessage";
 
 const resumoPadrao = { consultas: 0, procedimentos: 0, exames: 0, faltas: 0 };
 
+// RECRIA A PÁGINA DO ZERO QUANDO O CPF DA URL MUDA
 export default function PacientePage() {
   const { cpf } = useParams();
+  return <ConteudoPaciente key={cpf} cpf={cpf} />;
+}
+
+function ConteudoPaciente({ cpf }) {
   const [activeTab, setActiveTab] = useState("info");
-  const [paciente, setPaciente] = useState(undefined);
   const [arquivos, setArquivos] = useState([]);
-  const [prescricoes, setPrescricoes] = useState([]);
-  const [erro, setErro] = useState("");
-  const [erroPrescricoes, setErroPrescricoes] = useState("");
-  // INCREMENTAR FORÇA RECARREGAR O PACIENTE (EX.: APÓS EDITAR)
-  const [recarregar, setRecarregar] = useState(0);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setArquivos([]);
-  }, [cpf]);
+  const buscaPaciente = useBuscarDados(
+    `/api/pacientes/${encodeURIComponent(cpf)}`,
+    "Erro ao carregar paciente.",
+  );
+  const erro = buscaPaciente.status === 404 ? "" : buscaPaciente.erro;
+  const paciente =
+    buscaPaciente.carregando && !buscaPaciente.dados
+      ? undefined
+      : buscaPaciente.dados?.patient
+        ? {
+            ...buscaPaciente.dados,
+            resumo: buscaPaciente.dados.resumo || resumoPadrao,
+          }
+        : null;
 
-  useEffect(() => {
-    setErro("");
-    apiFetch(`/api/pacientes/${encodeURIComponent(cpf)}`)
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) {
-          if (res.status === 404) return setPaciente(null);
-          throw new Error(data.error || "Erro ao carregar paciente.");
-        }
-
-        if (data && data.patient) {
-          setPaciente({ ...data, resumo: data.resumo || resumoPadrao });
-        } else {
-          setPaciente(null);
-        }
-      })
-      .catch((error) => {
-        setErro(error.message);
-        setPaciente(null);
-      });
-  }, [cpf, recarregar]);
-
-  useEffect(() => {
-    setErroPrescricoes("");
-    apiFetch(`/api/prescricoes?cpf=${encodeURIComponent(cpf)}`)
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok || !Array.isArray(data))
-          throw new Error(data.error || "Erro ao carregar prescrições.");
-        setPrescricoes(data);
-      })
-      .catch((error) => {
-        setPrescricoes([]);
-        setErroPrescricoes(error.message);
-      });
-  }, [cpf]);
+  const buscaPrescricoes = useBuscarDados(
+    `/api/prescricoes?cpf=${encodeURIComponent(cpf)}`,
+    "Erro ao carregar prescrições.",
+  );
+  const prescricoes = Array.isArray(buscaPrescricoes.dados)
+    ? buscaPrescricoes.dados
+    : [];
+  const erroPrescricoes = buscaPrescricoes.erro;
 
   function handleAddPrescricao(nova) {
-    setPrescricoes((prev) => [nova, ...prev]);
+    buscaPrescricoes.alterarDados((prev) => [nova, ...(prev || [])]);
   }
 
   if (paciente === undefined) {
@@ -105,7 +87,7 @@ export default function PacientePage() {
         <div className="mt-4">
           <PacienteInfoCard
             paciente={paciente}
-            onPacienteAtualizado={() => setRecarregar((n) => n + 1)}
+            onPacienteAtualizado={buscaPaciente.recarregar}
             onPacienteExcluido={() =>
               navigate("/buscar-paciente", { replace: true })
             }
@@ -120,7 +102,7 @@ export default function PacientePage() {
             onAdd={handleAddPrescricao}
           />
         )}
-        {activeTab === "prontuario" && <TabProntuario />}
+        {activeTab === "prontuario" && <TabProntuario cpf={cpf} />}
         {activeTab === "arquivos" && (
           <TabArquivos arquivos={arquivos} setArquivos={setArquivos} />
         )}

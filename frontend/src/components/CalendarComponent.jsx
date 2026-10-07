@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import Calendar from "react-calendar";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "react-calendar/dist/Calendar.css";
-import { apiFetch } from "../api";
+import { useBuscarDados } from "../hooks/useBuscarDados";
 import { dataLocalISO } from "../utils/date";
 
-// O MÊS VISÍVEL É GUARDADO COMO TEXTO ("AAAA-MM-01") PARA NÃO REPETIR BUSCAS
 function chaveDoMes(date) {
   return dataLocalISO(new Date(date.getFullYear(), date.getMonth(), 1));
 }
@@ -38,37 +37,31 @@ export default function CalendarComponent({
   const [mesVisivel, setMesVisivel] = useState(() =>
     chaveDoMes(value || new Date()),
   );
-  const [diasMarcados, setDiasMarcados] = useState(new Set());
 
   // ACOMPANHA O MÊS DA DATA SELECIONADA
   const mesSelecionado = value ? chaveDoMes(value) : null;
-  useEffect(() => {
+  const [mesSelecionadoAnterior, setMesSelecionadoAnterior] =
+    useState(mesSelecionado);
+  if (mesSelecionado !== mesSelecionadoAnterior) {
+    setMesSelecionadoAnterior(mesSelecionado);
     if (mesSelecionado) setMesVisivel(mesSelecionado);
-  }, [mesSelecionado]);
+  }
 
   // BUSCA OS DIAS COM AGENDAMENTO DO MÊS VISÍVEL
-  useEffect(() => {
-    let cancelado = false;
-    const primeiroDia = dataDaChave(mesVisivel);
-    const ano = primeiroDia.getFullYear();
-    const mes = primeiroDia.getMonth();
-    const inicio = dataLocalISO(new Date(ano, mes, -6));
-    const fim = dataLocalISO(new Date(ano, mes + 1, 14));
-
-    apiFetch(`/api/agendamentos/dias?inicio=${inicio}&fim=${fim}`)
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok || !Array.isArray(data)) throw new Error();
-        if (!cancelado) setDiasMarcados(new Set(data));
-      })
-      .catch(() => {
-        if (!cancelado) setDiasMarcados(new Set());
-      });
-
-    return () => {
-      cancelado = true;
-    };
-  }, [mesVisivel, atualizacao]);
+  const primeiroDia = dataDaChave(mesVisivel);
+  const ano = primeiroDia.getFullYear();
+  const mes = primeiroDia.getMonth();
+  const inicio = dataLocalISO(new Date(ano, mes, -6));
+  const fim = dataLocalISO(new Date(ano, mes + 1, 14));
+  const dias = useBuscarDados(
+    `/api/agendamentos/dias?inicio=${inicio}&fim=${fim}`,
+    "Erro ao carregar dias com agendamento.",
+    atualizacao,
+  );
+  const diasMarcados = useMemo(
+    () => new Set(Array.isArray(dias.dados) ? dias.dados : []),
+    [dias.dados],
+  );
 
   function irParaHoje() {
     const hoje = new Date();

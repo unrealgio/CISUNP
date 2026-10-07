@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import PassChange from "./PassChange";
 import { FaUser, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { apiUrl } from "../api";

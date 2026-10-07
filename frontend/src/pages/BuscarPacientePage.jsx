@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   FaSearch,
   FaUserMd,
@@ -10,7 +10,7 @@ import {
   FaPhone,
 } from "react-icons/fa";
 import Header from "../components/Header";
-import { apiFetch } from "../api";
+import { useBuscarDados } from "../hooks/useBuscarDados";
 import Menu from "../components/Menu";
 import AddPaciente from "../components/AddPaciente";
 import { ErrorMessage, LoadingMessage } from "../components/StatusMessage";
@@ -23,67 +23,48 @@ const filtros = [
   { key: "medico", label: "Médico", icon: <FaUserMd /> },
 ];
 
+// FILTRA OS PACIENTES PELOS CAMPOS DE BUSCA PREENCHIDOS
+function filtrarPacientes(pacientes, filtro) {
+  return pacientes.filter((p) =>
+    Object.entries(filtro).every(
+      ([k, v]) => !v || (p[k] && p[k].toLowerCase().includes(v.toLowerCase())),
+    ),
+  );
+}
+
 export default function BuscarPacientePage() {
   const [busca, setBusca] = useState({});
-  const [todosPacientes, setTodosPacientes] = useState([]);
-  const [resultados, setResultados] = useState([]);
+  // BUSCA APLICADA NO ÚLTIMO CLIQUE EM "BUSCAR"
+  const [filtroAplicado, setFiltroAplicado] = useState({});
   const [page, setPage] = useState(1);
   const [showAdd, setShowAdd] = useState(false);
-  const [erro, setErro] = useState(null);
-  const [loading, setLoading] = useState(true);
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setLoading(true);
-    apiFetch("/api/pacientes/todos")
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok)
-          throw new Error(data.error || "Erro ao carregar pacientes.");
+  const pacientes = useBuscarDados(
+    "/api/pacientes/todos",
+    "Erro ao carregar pacientes.",
+  );
+  const todosPacientes = Array.isArray(pacientes.dados) ? pacientes.dados : [];
+  const loading = pacientes.carregando;
+  const erro = pacientes.erro;
 
-        if (Array.isArray(data)) {
-          setTodosPacientes(data);
-          setResultados(data);
-        } else {
-          throw new Error("Resposta inválida ao carregar pacientes.");
-        }
-      })
-      .catch((error) => {
-        setTodosPacientes([]);
-        setResultados([]);
-        setErro(error.message);
-      })
-      .finally(() => setLoading(false));
-  }, []);
+  const resultados = filtrarPacientes(todosPacientes, filtroAplicado);
 
   function handleChange(e, key) {
-    setBusca({ ...busca, [key]: e.target.value });
+    const novaBusca = { ...busca, [key]: e.target.value };
+    setBusca(novaBusca);
+    if (!Object.values(novaBusca).some((v) => v)) setFiltroAplicado({});
   }
 
   function handleBuscar(e) {
     e.preventDefault();
-    let filtrados = todosPacientes.filter((p) =>
-      Object.entries(busca).every(
-        ([k, v]) =>
-          !v || (p[k] && p[k].toLowerCase().includes(v.toLowerCase())),
-      ),
-    );
-    setResultados(filtrados);
+    setFiltroAplicado(busca);
     setPage(1);
   }
 
-  // VOLTA A MOSTRAR TODOS OS PACIENTES SE TODOS OS CAMPOS DE BUSCA FOREM LIMPOS
-  useEffect(() => {
-    const algumCampoPreenchido = Object.values(busca).some((v) => v);
-    if (!algumCampoPreenchido) {
-      setResultados(todosPacientes);
-    }
-  }, [busca, todosPacientes]);
-
   function handleAddPaciente(paciente) {
-    setTodosPacientes((prev) => [...prev, paciente]);
-    setResultados((prev) => [...prev, paciente]);
+    pacientes.alterarDados((prev) => [...(prev || []), paciente]);
     setShowAdd(false);
   }
 

@@ -4,14 +4,14 @@ import { apiUrl } from "../api";
 import { LoadingMessage } from "./StatusMessage";
 
 export default function ProtectedRoute({ children }) {
-  const [authorized, setAuthorized] = useState(null);
+  // SEM TOKEN, JÁ COMEÇA COMO NÃO AUTORIZADO, COM TOKEN, AGUARDA A VALIDAÇÃO
+  const [authorized, setAuthorized] = useState(() =>
+    localStorage.getItem("token") ? null : false,
+  );
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setAuthorized(false);
-      return;
-    }
+    if (!token) return;
 
     let cancelled = false;
     fetch(apiUrl("/api/session"), {

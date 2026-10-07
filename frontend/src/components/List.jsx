@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
 import { MdPersonAdd, MdMedicalServices } from "react-icons/md";
 
@@ -39,7 +39,7 @@ export default function List({
     setError("");
   }
 
-  async function handleSave(idx, item) {
+  async function handleSave(item) {
     if (!patientName.trim()) {
       setError("Digite o nome do paciente!");
       return;
@@ -61,9 +61,9 @@ export default function List({
     if (salvou) limparEdicao();
   }
 
-  function handleKeyDown(e, idx, item) {
+  function handleKeyDown(e, item) {
     if (e.key === "Enter") {
-      handleSave(idx, item);
+      handleSave(item);
     }
     if (e.key === "Escape") {
       limparEdicao();
@@ -132,7 +132,7 @@ export default function List({
                     placeholder="Nome do paciente"
                     value={patientName}
                     onChange={(e) => setPatientName(e.target.value)}
-                    onKeyDown={(e) => handleKeyDown(e, idx, item)}
+                    onKeyDown={(e) => handleKeyDown(e, item)}
                     autoFocus
                   />
                   <input
@@ -193,7 +193,7 @@ export default function List({
                   placeholder="Nome do médico"
                   value={medicoName}
                   onChange={(e) => setMedicoName(e.target.value)}
-                  onKeyDown={(e) => handleKeyDown(e, idx, item)}
+                  onKeyDown={(e) => handleKeyDown(e, item)}
                 />
               ) : item.medico ? (
                 <span className="font-semibold text-(--cis-blue)">
@@ -229,7 +229,7 @@ export default function List({
                   <button
                     className="p-1 rounded hover:bg-green-100 text-green-700 cursor-pointer"
                     aria-label="Salvar"
-                    onClick={() => handleSave(idx, item)}
+                    onClick={() => handleSave(item)}
                     title="Salvar"
                   >
                     <FaCheck />

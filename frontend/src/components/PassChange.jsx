@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { apiFetch, mensagemDeErro } from "../api";
 
 export default function PassChange({ email, onSenhaAlterada }) {

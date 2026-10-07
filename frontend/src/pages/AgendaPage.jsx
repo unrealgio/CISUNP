@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useMemo } from "react";
 import Header from "../components/Header";
 import Menu from "../components/Menu";
 import CalendarComponent from "../components/CalendarComponent";
@@ -7,6 +7,7 @@ import Details from "../components/Details";
 import { apiFetch, mensagemDeErro } from "../api";
 import { LoadingMessage } from "../components/StatusMessage";
 import { dataLocalISO } from "../utils/date";
+import { useBuscarDados } from "../hooks/useBuscarDados";
 
 const fixedTimes = [
   "12:30",
@@ -25,68 +26,57 @@ const fixedTimes = [
 
 export default function AgendaPage() {
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedSchedule, setSelectedSchedule] = useState(null);
+  const [selectedTime, setSelectedTime] = useState(null);
   const [editField, setEditField] = useState("");
-  const [patients, setPatients] = useState({});
   const [agendaError, setAgendaError] = useState("");
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  // INCREMENTAR FAZ O CALENDÁRIO RECARREGAR OS DIAS COM AGENDAMENTO
   const [versaoAgenda, setVersaoAgenda] = useState(0);
 
+  const agendamentos = useBuscarDados(
+    "/api/agendamentos?date=" + dataLocalISO(selectedDate),
+    "Erro ao carregar agenda.",
+  );
+  const loading = agendamentos.carregando;
+
+  // ORGANIZA OS AGENDAMENTOS DO DIA POR HORÁRIO
+  const patients = useMemo(() => {
+    const map = {};
+    (agendamentos.dados || []).forEach((item) => {
+      map[item.time] = {
+        id: item.id,
+        patient: item.patient || "",
+        cpf: item.cpf || "",
+        phone: item.phone || "",
+        notes: item.notes || "",
+        medico: item.medico || "",
+      };
+    });
+    return map;
+  }, [agendamentos.dados]);
+
   // MONTA OS DADOS DE UM HORÁRIO DA LISTA A PARTIR DOS AGENDAMENTOS CARREGADOS
-  const montarHorario = useCallback(
-    (time, map) => ({
+  function montarHorario(time) {
+    return {
       time,
-      id: map[time]?.id,
-      patient: map[time]?.patient || "",
-      cpf: map[time]?.cpf || "",
-      phone: map[time]?.phone || "",
-      notes: map[time]?.notes || "",
-      medico: map[time]?.medico || "",
+      id: patients[time]?.id,
+      patient: patients[time]?.patient || "",
+      cpf: patients[time]?.cpf || "",
+      phone: patients[time]?.phone || "",
+      notes: patients[time]?.notes || "",
+      medico: patients[time]?.medico || "",
       date: selectedDate.toLocaleDateString("pt-BR"),
-    }),
-    [selectedDate],
-  );
+    };
+  }
 
-  // manterSelecao: APÓS SALVAR, MANTÉM O HORÁRIO SELECIONADO COM OS DADOS ATUALIZADOS
-  const fetchAgendamentos = useCallback(
-    ({ manterSelecao = false } = {}) => {
-      setAgendaError("");
-      setLoading(true);
-      apiFetch("/api/agendamentos?date=" + dataLocalISO(selectedDate))
-        .then(async (res) => {
-          const data = await res.json();
-          if (!res.ok)
-            throw new Error(data.error || "Erro ao carregar agenda.");
+  const schedules = fixedTimes.map(montarHorario);
+  const selectedSchedule =
+    schedules.find((item) => item.time === selectedTime) || null;
 
-          const map = {};
-          data.forEach((item) => {
-            map[item.time] = {
-              id: item.id,
-              patient: item.patient || "",
-              cpf: item.cpf || "",
-              phone: item.phone || "",
-              notes: item.notes || "",
-              medico: item.medico || "",
-            };
-          });
-          setPatients(map);
-          setSelectedSchedule((atual) =>
-            manterSelecao && atual ? montarHorario(atual.time, map) : null,
-          );
-          setEditField("");
-        })
-        .catch((error) => setAgendaError(error.message))
-        .finally(() => setLoading(false));
-    },
-    [selectedDate, montarHorario],
-  );
-
-  // RECARREGA A AGENDA SEMPRE QUE A DATA SELECIONADA MUDA
-  useEffect(() => {
-    fetchAgendamentos();
-  }, [fetchAgendamentos]);
+  function handleChangeDate(date) {
+    setSelectedDate(date);
+    setSelectedTime(null);
+    setEditField("");
+  }
 
   // HORÁRIO COM ID JÁ EXISTE (PUT); SEM ID É UM NOVO AGENDAMENTO (POST)
   // RETORNA TRUE SE SALVOU, PARA O FORMULÁRIO SÓ SER LIMPO EM CASO DE SUCESSO
@@ -117,7 +107,7 @@ export default function AgendaPage() {
       const data = await res.json();
       if (!res.ok)
         throw new Error(mensagemDeErro(data, "Erro ao salvar agendamento."));
-      fetchAgendamentos({ manterSelecao: true });
+      agendamentos.recarregar();
       setVersaoAgenda((v) => v + 1);
       onSuccess && onSuccess();
       return true;
@@ -171,9 +161,9 @@ export default function AgendaPage() {
         const data = await res.json();
         if (!res.ok)
           throw new Error(data.error || "Erro ao excluir agendamento.");
-        fetchAgendamentos();
+        agendamentos.recarregar();
         setVersaoAgenda((v) => v + 1);
-        setSelectedSchedule(null);
+        setSelectedTime(null);
         setEditField("");
       })
       .catch((error) => setAgendaError(error.message))
@@ -181,19 +171,19 @@ export default function AgendaPage() {
   }
 
   function handleSelect(item, field = "") {
-    setSelectedSchedule(item);
+    setSelectedTime(item.time);
     setEditField(field);
   }
 
-  const schedules = fixedTimes.map((time) => montarHorario(time, patients));
+  const erroExibido = agendaError || agendamentos.erro;
 
   return (
     <>
       <Header />
       <Menu active="agenda" />
-      {agendaError && (
+      {erroExibido && (
         <div className="mx-6 mt-4 rounded-lg bg-red-100 px-4 py-3 text-center text-red-700">
-          {agendaError}
+          {erroExibido}
         </div>
       )}
       {(loading || saving) && (
@@ -215,10 +205,11 @@ export default function AgendaPage() {
         <div className="flex flex-col gap-4 w-85">
           <CalendarComponent
             value={selectedDate}
-            onChange={setSelectedDate}
+            onChange={handleChangeDate}
             atualizacao={versaoAgenda}
           />
           <Details
+            key={`${selectedTime}|${editField}`}
             schedule={selectedSchedule}
             onSave={handleSaveDetails}
             onDelete={handleDeleteAgendamento}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { FaPills, FaPlus } from "react-icons/fa";
 import { apiFetch } from "../api";
 import { ErrorMessage } from "./StatusMessage";

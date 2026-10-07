@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   FaUser,
   FaCalendarAlt,
@@ -315,8 +315,6 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
       <h2 className="text-2xl font-bold text-(--cis-unp-blue) mb-6">
         Minhas Consultas
       </h2>
-
-      {/* FILTRO DE PESQUISA */}
       <div className="flex items-center gap-2 mb-6 max-w-md">
         <div className="relative w-full">
           <input
