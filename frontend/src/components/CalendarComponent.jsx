@@ -40,13 +40,13 @@ export default function CalendarComponent({
   );
   const [diasMarcados, setDiasMarcados] = useState(new Set());
 
-  // ACOMPANHA O MÊS DA DATA SELECIONADA (EX.: BOTÃO "HOJE" OU CLIQUE EM DIA DE OUTRO MÊS)
+  // ACOMPANHA O MÊS DA DATA SELECIONADA
   const mesSelecionado = value ? chaveDoMes(value) : null;
   useEffect(() => {
     if (mesSelecionado) setMesVisivel(mesSelecionado);
   }, [mesSelecionado]);
 
-  // BUSCA OS DIAS COM AGENDAMENTO DO MÊS VISÍVEL (INCLUI OS DIAS VIZINHOS EXIBIDOS)
+  // BUSCA OS DIAS COM AGENDAMENTO DO MÊS VISÍVEL
   useEffect(() => {
     let cancelado = false;
     const primeiroDia = dataDaChave(mesVisivel);
