@@ -2,7 +2,7 @@ const Prontuario = require("../models/Prontuario");
 const fs = require("fs");
 const path = require("path");
 const PDFDocument = require("pdfkit");
-const Jimp = require("jimp");
+const { Jimp } = require("jimp");
 
 // FUNÇÃO AUXILIAR PARA FORMATAR OS DADOS DO PRONTUÁRIO
 function formatarDadosProntuario(dados) {
@@ -127,14 +127,14 @@ exports.adicionar = async (req, res) => {
         const desenho = await Jimp.read(desenhoBuffer);
 
         // REDIMENSIONA AMBAS AS IMAGENS PARA 900x700
-        arcada.resize(900, 700);
-        desenho.resize(900, 700);
+        arcada.resize({ w: 900, h: 700 });
+        desenho.resize({ w: 900, h: 700 });
 
         // MESCLA O DESENHO COM A IMAGEM DA ARCADA
         arcada.composite(desenho, 0, 0);
 
         // CONVERTE A IMAGEM FINAL PARA BUFFER
-        const finalBuffer = await arcada.getBufferAsync(Jimp.MIME_PNG);
+        const finalBuffer = await arcada.getBuffer("image/png");
 
         doc.addPage({ size: [900, 700], margin: 40 });
         doc

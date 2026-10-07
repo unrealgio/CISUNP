@@ -31,19 +31,20 @@ O sistema centraliza informações de pacientes, agenda, prescrições e prontu�
 ### Frontend
 
 - React 19
-- Vite
-- Tailwind CSS
+- Vite 8
+- Tailwind CSS 4
+- ESLint 10
 - JavaScript
 
 ### Backend
 
-- Node.js
-- Express
-- Sequelize
+- Node.js 20.19+
+- Express 5
+- Sequelize 6
 - JWT
 - Bcrypt
-- PDFKit
-- Jimp
+- PDFKit 0.20
+- Jimp 1
 
 ### Banco de dados
 
@@ -67,7 +68,7 @@ O backend está organizado em rotas, controllers, models e middlewares:
 
 ## Pré-requisitos
 
-- Node.js 18 ou superior.
+- Node.js 20.19 ou superior (exigido pelo Vite 8 e pelo ESLint 10).
 - PostgreSQL em execução.
 - Um banco PostgreSQL criado para o projeto.
 
