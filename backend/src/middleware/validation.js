@@ -122,6 +122,16 @@ function validateAgendamentoQuery(req, res, next) {
     : fail(res, ["Data deve estar no formato AAAA-MM-DD."]);
 }
 
+function validateIntervaloQuery(req, res, next) {
+  const { inicio, fim } = req.query;
+  if (!isDate(inicio) || !isDate(fim)) {
+    return fail(res, ["Início e fim devem estar no formato AAAA-MM-DD."]);
+  }
+  return inicio <= fim
+    ? next()
+    : fail(res, ["A data de início deve ser anterior à data de fim."]);
+}
+
 function validateAgendamentoBody(req, res, next) {
   const { time, date, patient } = req.body || {};
   const errors = [];
@@ -167,6 +177,7 @@ module.exports = {
   validatePacienteBody,
   validatePacienteUpdate,
   validateAgendamentoQuery,
+  validateIntervaloQuery,
   validateAgendamentoBody,
   validatePrescricaoBody,
 };

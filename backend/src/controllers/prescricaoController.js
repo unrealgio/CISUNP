@@ -4,7 +4,10 @@ const Prescricao = require("../models/Prescricao");
 exports.listarPorCpf = async (req, res) => {
   try {
     const { cpf } = req.query;
-    const lista = await Prescricao.findAll({ where: { cpf } });
+    const lista = await Prescricao.findAll({
+      where: { cpf },
+      order: [["createdAt", "DESC"]],
+    });
     res.json(lista);
   } catch (err) {
     console.error("Erro ao listar prescrições:", err);

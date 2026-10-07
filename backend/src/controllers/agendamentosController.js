@@ -18,6 +18,23 @@ exports.buscarPorData = async (req, res) => {
   }
 };
 
+// LISTA OS DIAS DE UM INTERVALO QUE POSSUEM AGENDAMENTOS (USADO NO CALENDÁRIO)
+exports.diasComAgendamento = async (req, res) => {
+  const { inicio, fim } = req.query;
+  try {
+    const dias = await Agendamentos.findAll({
+      attributes: ["date"],
+      where: { date: { [Op.between]: [inicio, fim] } },
+      group: ["date"],
+      raw: true,
+    });
+    res.json(dias.map((dia) => dia.date));
+  } catch (err) {
+    console.error("Erro ao listar dias com agendamentos:", err);
+    res.status(500).json({ error: "Erro ao listar dias com agendamentos." });
+  }
+};
+
 // DATA FORMATADA
 function hojeLocal() {
   const agora = new Date();

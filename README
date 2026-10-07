@@ -97,14 +97,10 @@ O arquivo `.env` contém credenciais locais e não deve ser versionado.
 ```bash
 cd backend
 npm install
-node index.js
+npm run dev
 ```
 
-Ou, a partir da raiz do projeto:
-
-```bash
-node backend/index.js
-```
+`npm run dev` reinicia o servidor automaticamente a cada alteração salva. Para executar sem reinício automático, use `npm start`.
 
 O backend inicia na porta definida em `PORT` (no exemplo acima, `http://localhost:3001`).
 

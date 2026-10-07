@@ -50,7 +50,10 @@ exports.listarPorCpf = async (req, res) => {
     if (!cpf) {
       return res.status(400).json({ error: "CPF não informado." });
     }
-    const registros = await Prontuario.findAll({ where: { cpf } });
+    const registros = await Prontuario.findAll({
+      where: { cpf },
+      order: [["createdAt", "DESC"]],
+    });
     res.json(registros);
   } catch (err) {
     console.error("Erro ao listar prontuários:", err);

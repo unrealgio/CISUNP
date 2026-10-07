@@ -4,6 +4,7 @@ const agendamentosController = require("../controllers/agendamentosController");
 const authenticateToken = require("../middleware/middleware");
 const {
   validateAgendamentoQuery,
+  validateIntervaloQuery,
   validateAgendamentoBody,
   validateCpfQuery,
   validateIdParam,
@@ -12,6 +13,11 @@ const {
 router.use(authenticateToken);
 
 router.get("/", validateAgendamentoQuery, agendamentosController.buscarPorData);
+router.get(
+  "/dias",
+  validateIntervaloQuery,
+  agendamentosController.diasComAgendamento,
+);
 router.post("/", validateAgendamentoBody, agendamentosController.criar);
 router.put(
   "/:id",

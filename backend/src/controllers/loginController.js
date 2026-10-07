@@ -52,7 +52,7 @@ exports.login = async (req, res) => {
     // VERIFICAÇÃO DE SENHA
     const senhaCorreta = await bcrypt.compare(senha, user.senha);
     if (!senhaCorreta) {
-      return res.status(401).json({ error: "Senha incorreta" });
+      return res.status(401).json({ error: "Usuário ou senha inválidos." });
     }
 
     // SE FOR PRIMEIRO ACESSO, SOLICITA TROCA DE SENHA
