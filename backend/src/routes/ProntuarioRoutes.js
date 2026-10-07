@@ -2,11 +2,14 @@ const express = require("express");
 const router = express.Router();
 const prontuarioController = require("../controllers/prontuarioController");
 const authenticateToken = require("../middleware/middleware");
-const { validateCpfQuery } = require("../middleware/validation");
+const {
+  validateCpfQuery,
+  validateProntuarioBody,
+} = require("../middleware/validation");
 
 router.use(authenticateToken);
 
 router.get("/", validateCpfQuery, prontuarioController.listarPorCpf);
-router.post("/", prontuarioController.adicionar);
+router.post("/", validateProntuarioBody, prontuarioController.adicionar);
 
 module.exports = router;

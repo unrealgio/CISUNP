@@ -136,7 +136,9 @@ exports.excluir = async (req, res) => {
   const { id } = req.params;
   try {
     const deleted = await Agendamentos.destroy({ where: { id } });
-    res.json({ success: deleted > 0 });
+    if (!deleted)
+      return res.status(404).json({ error: "Agendamento não encontrado." });
+    res.json({ success: true });
   } catch (err) {
     console.error("Erro ao excluir agendamento:", err);
     res.status(500).json({ error: "Erro ao excluir agendamento." });

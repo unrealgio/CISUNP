@@ -57,7 +57,9 @@ exports.criar = async (req, res) => {
 exports.excluir = async (req, res) => {
   const { cpf } = req.params;
   try {
-    await Paciente.destroy({ where: { cpf } });
+    const deleted = await Paciente.destroy({ where: { cpf } });
+    if (!deleted)
+      return res.status(404).json({ error: "Paciente não encontrado." });
     res.json({ success: true });
   } catch (err) {
     console.error("Erro ao excluir paciente:", err);

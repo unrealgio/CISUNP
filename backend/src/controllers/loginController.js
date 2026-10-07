@@ -26,12 +26,6 @@ exports.session = async (req, res) => {
 exports.login = async (req, res) => {
   const { email, senha } = req.body;
   try {
-    if (!email || !senha) {
-      return res
-        .status(400)
-        .json({ error: "E-mail e senha são obrigatórios." });
-    }
-
     let user = await User.findOne({ where: { email } });
     if (!user) {
       if (senha !== DEFAULT_PASSWORD) {
@@ -72,11 +66,6 @@ exports.login = async (req, res) => {
 exports.changePassword = async (req, res) => {
   const { email, novaSenha } = req.body;
   try {
-    if (!email || !novaSenha) {
-      return res
-        .status(400)
-        .json({ error: "E-mail e nova senha são obrigatórios." });
-    }
     if (req.user.email !== email) {
       return res.status(403).json({ error: "Usuário não autorizado" });
     }

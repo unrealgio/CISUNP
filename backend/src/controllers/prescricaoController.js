@@ -26,7 +26,7 @@ exports.adicionar = async (req, res) => {
       frequencia,
       observacao,
     });
-    res.json(prescricao);
+    res.status(201).json(prescricao);
   } catch (err) {
     console.error("Erro ao adicionar prescrição:", err);
     res.status(500).json({ error: "Erro ao adicionar prescrição." });

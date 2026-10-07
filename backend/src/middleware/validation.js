@@ -168,6 +168,23 @@ function validatePrescricaoBody(req, res, next) {
   return errors.length ? fail(res, errors) : next();
 }
 
+function validateProntuarioBody(req, res, next) {
+  const { cpf, date, time, dados } = req.body || {};
+  const errors = [];
+
+  // O CPF É USADO NO NOME DO ARQUIVO DO PDF, POR ISSO SÓ ACEITA 11 NÚMEROS
+  if (!isCpf(cpf)) errors.push("CPF deve conter 11 números.");
+  if (!isDate(date)) errors.push("Data deve estar no formato AAAA-MM-DD.");
+  if (!isTime(time)) errors.push("Horário deve estar no formato HH:MM.");
+  if (typeof dados !== "object" || dados === null || Array.isArray(dados)) {
+    errors.push("Dados do prontuário inválidos.");
+  } else if (dados.desenho != null && typeof dados.desenho !== "string") {
+    errors.push("Desenho do prontuário inválido.");
+  }
+
+  return errors.length ? fail(res, errors) : next();
+}
+
 module.exports = {
   validateLogin,
   validateChangePassword,
@@ -180,4 +197,5 @@ module.exports = {
   validateIntervaloQuery,
   validateAgendamentoBody,
   validatePrescricaoBody,
+  validateProntuarioBody,
 };

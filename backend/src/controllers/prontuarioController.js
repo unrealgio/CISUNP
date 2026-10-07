@@ -47,9 +47,6 @@ function formatarDadosProntuario(dados) {
 exports.listarPorCpf = async (req, res) => {
   try {
     const { cpf } = req.query;
-    if (!cpf) {
-      return res.status(400).json({ error: "CPF não informado." });
-    }
     const registros = await Prontuario.findAll({
       where: { cpf },
       order: [["createdAt", "DESC"]],
@@ -65,11 +62,6 @@ exports.listarPorCpf = async (req, res) => {
 exports.adicionar = async (req, res) => {
   try {
     const { cpf, date, time, dados } = req.body;
-    if (!cpf || !date || !time || !dados) {
-      return res
-        .status(400)
-        .json({ error: "CPF, data, hora e dados são obrigatórios." });
-    }
 
     const pdfName = `prontuario_${cpf}_${Date.now()}.pdf`;
     const pdfPath = path.join(__dirname, "../../uploads/prontuarios", pdfName);
@@ -168,7 +160,7 @@ exports.adicionar = async (req, res) => {
         dados,
         pdf: pdfName,
       });
-      res.json(prontuario);
+      res.status(201).json(prontuario);
     } catch (dbErr) {
       console.error("Erro ao salvar prontuário no banco de dados:", dbErr);
       // REMOVE O PDF SE HOUVER ERRO AO SALVAR NO BANCO
