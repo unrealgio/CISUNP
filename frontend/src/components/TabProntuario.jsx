@@ -15,9 +15,9 @@ import {
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import { useParams } from "react-router-dom";
 import { apiFetch, apiUrl } from "../api";
-import { dataLocalISO } from "../utils/date";
+import { dataLocalISO, formatarDataISO } from "../utils/date";
 
-export default function TabProntuario({ onAdd }) {
+export default function TabProntuario() {
   const canvasRef = useRef();
   const { cpf } = useParams();
 
@@ -69,7 +69,7 @@ export default function TabProntuario({ onAdd }) {
       })
       .catch(() => setErro("Erro ao carregar registros do prontuário."))
       .finally(() => setLoading(false));
-  }, [cpf, onAdd]);
+  }, [cpf]);
 
   // AÇÕES DO DESENHO NA ARCADA
   function handleClearCanvas() {
@@ -132,11 +132,10 @@ export default function TabProntuario({ onAdd }) {
       if (!res.ok) throw new Error("Erro ao salvar prontuário.");
       const registro = await res.json();
       showToast("success", "Prontuário salvo e PDF gerado!");
-      setRegistros((prev) => [...prev, registro]);
-      if (onAdd) onAdd(registro);
+      setRegistros((prev) => [registro, ...prev]);
       if (canvasRef.current) canvasRef.current.clearCanvas();
-    } catch (err) {
-      setErro("Erro ao salvar prontuário.", err);
+    } catch {
+      setErro("Erro ao salvar prontuário.");
       showToast("info", "Erro ao salvar prontuário.");
     } finally {
       setLoading(false);
@@ -151,7 +150,7 @@ export default function TabProntuario({ onAdd }) {
           className={`fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg flex items-center gap-2
             ${
               toast.type === "info"
-                ? "bg-[#F9A23B] text-white"
+                ? "bg-(--cis-unp-orange) text-white"
                 : "bg-green-500 text-white"
             }
             animate-toast`}
@@ -160,22 +159,23 @@ export default function TabProntuario({ onAdd }) {
           <span>{toast.message}</span>
         </div>
       )}
-      <h2 className="text-2xl font-bold mb-6 text-[#045397] flex items-center gap-2 animate-slide-in">
-        <FaNotesMedical className="text-[#7A97B6]" /> Prontuário Odontológico
+      <h2 className="text-2xl font-bold mb-6 text-(--cis-unp-blue) flex items-center gap-2 animate-slide-in">
+        <FaNotesMedical className="text-(--cis-unp-steel)" /> Prontuário
+        Odontológico
       </h2>
       {erro && (
-        <div className="bg-red-50 border border-red-200 text-[var(--cis-danger)] rounded-lg p-4 mb-4 text-center font-semibold">
+        <div className="bg-red-50 border border-red-200 text-(--cis-danger) rounded-lg p-4 mb-4 text-center font-semibold">
           {erro}
         </div>
       )}
       {/* SAÚDE BUCAL */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
           <FaSmile /> Saúde Bucal
         </div>
-        <div className="grid md:grid-cols-2 gap-4 bg-[#f9fafb] rounded-lg p-4 border shadow">
+        <div className="grid md:grid-cols-2 gap-4 bg-(--cis-soft-gray) rounded-lg p-4 border shadow">
           <div className="space-y-2">
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaUserMd /> Teve reação com anestesia dental?
               <select
                 name="anestesia"
@@ -188,7 +188,7 @@ export default function TabProntuario({ onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaTooth /> Sente dor nos dentes ou gengiva?
               <select
                 name="dor"
@@ -201,7 +201,7 @@ export default function TabProntuario({ onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaTooth /> Sangramento na gengiva?
               <select
                 name="sangramento"
@@ -221,7 +221,7 @@ export default function TabProntuario({ onAdd }) {
                 className="ml-2 rounded border px-2 py-1"
               />
             </label>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaSmile /> Sente gosto ruim ou boca seca?
               <select
                 name="bocaSeca"
@@ -234,7 +234,7 @@ export default function TabProntuario({ onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaSmile /> Costuma ranger os dentes?
               <select
                 name="ranger"
@@ -247,7 +247,7 @@ export default function TabProntuario({ onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaSmile /> Dor no maxilar ou ouvido?
               <select
                 name="maxilar"
@@ -262,7 +262,7 @@ export default function TabProntuario({ onAdd }) {
             </label>
           </div>
           <div className="space-y-2">
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaUserMd /> Último tratamento dentário:
               <input
                 name="tratamento"
@@ -271,7 +271,7 @@ export default function TabProntuario({ onAdd }) {
                 className="ml-2 rounded border px-2 py-1"
               />
             </label>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaUserMd /> Fumante?
               <select
                 name="fumante"
@@ -284,7 +284,7 @@ export default function TabProntuario({ onAdd }) {
                 <option value="nao">Não</option>
               </select>
             </label>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaTooth /> Escova os dentes quantas vezes ao dia?
               <input
                 name="escova"
@@ -293,7 +293,7 @@ export default function TabProntuario({ onAdd }) {
                 className="ml-2 rounded border px-2 py-1"
               />
             </label>
-            <label className="font-semibold text-[#045397] flex items-center gap-2">
+            <label className="font-semibold text-(--cis-unp-blue) flex items-center gap-2">
               <FaTooth /> Utiliza fio dental?
               <select
                 name="fioDental"
@@ -311,7 +311,7 @@ export default function TabProntuario({ onAdd }) {
       </div>
       {/* ANTECEDENTES FAMILIARES */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
           <FaUserMd /> Antecedentes Familiares
         </div>
         <textarea
@@ -324,13 +324,15 @@ export default function TabProntuario({ onAdd }) {
       </div>
       {/* EXAME CLÍNICO */}
       <div className="mb-6">
-        <div className="font-semibold mb-2 text-[#F9A23B] text-lg">
+        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg">
           Exame Clínico
         </div>
-        <div className="bg-[#f9fafb] rounded-lg p-4 border shadow mb-4 space-y-2">
+        <div className="bg-(--cis-soft-gray) rounded-lg p-4 border shadow mb-4 space-y-2">
           <div className="flex gap-4 flex-wrap">
             <div>
-              <label className="font-semibold text-[#045397]">Higiene:</label>
+              <label className="font-semibold text-(--cis-unp-blue)">
+                Higiene:
+              </label>
               <select
                 name="higiene"
                 value={exame.higiene}
@@ -343,7 +345,9 @@ export default function TabProntuario({ onAdd }) {
               </select>
             </div>
             <div>
-              <label className="font-semibold text-[#045397]">Halitose:</label>
+              <label className="font-semibold text-(--cis-unp-blue)">
+                Halitose:
+              </label>
               <select
                 name="halitose"
                 value={exame.halitose}
@@ -356,7 +360,9 @@ export default function TabProntuario({ onAdd }) {
               </select>
             </div>
             <div>
-              <label className="font-semibold text-[#045397]">Tártaro:</label>
+              <label className="font-semibold text-(--cis-unp-blue)">
+                Tártaro:
+              </label>
               <select
                 name="tartaro"
                 value={exame.tartaro}
@@ -371,7 +377,9 @@ export default function TabProntuario({ onAdd }) {
           </div>
           <div className="flex gap-4 flex-wrap">
             <div>
-              <label className="font-semibold text-[#045397]">Gengiva:</label>
+              <label className="font-semibold text-(--cis-unp-blue)">
+                Gengiva:
+              </label>
               <select
                 name="gengiva"
                 value={exame.gengiva}
@@ -384,7 +392,9 @@ export default function TabProntuario({ onAdd }) {
               </select>
             </div>
             <div>
-              <label className="font-semibold text-[#045397]">Mucosa:</label>
+              <label className="font-semibold text-(--cis-unp-blue)">
+                Mucosa:
+              </label>
               <select
                 name="mucosa"
                 value={exame.mucosa}
@@ -398,7 +408,9 @@ export default function TabProntuario({ onAdd }) {
           </div>
           <div className="flex gap-4 flex-wrap">
             <div>
-              <label className="font-semibold text-[#045397]">Língua:</label>
+              <label className="font-semibold text-(--cis-unp-blue)">
+                Língua:
+              </label>
               <input
                 name="lingua"
                 value={exame.lingua}
@@ -407,7 +419,9 @@ export default function TabProntuario({ onAdd }) {
               />
             </div>
             <div>
-              <label className="font-semibold text-[#045397]">Palato:</label>
+              <label className="font-semibold text-(--cis-unp-blue)">
+                Palato:
+              </label>
               <input
                 name="palato"
                 value={exame.palato}
@@ -416,7 +430,7 @@ export default function TabProntuario({ onAdd }) {
               />
             </div>
             <div>
-              <label className="font-semibold text-[#045397]">
+              <label className="font-semibold text-(--cis-unp-blue)">
                 Assoalho Bucal:
               </label>
               <input
@@ -427,7 +441,9 @@ export default function TabProntuario({ onAdd }) {
               />
             </div>
             <div>
-              <label className="font-semibold text-[#045397]">Lábios:</label>
+              <label className="font-semibold text-(--cis-unp-blue)">
+                Lábios:
+              </label>
               <input
                 name="labios"
                 value={exame.labios}
@@ -440,7 +456,7 @@ export default function TabProntuario({ onAdd }) {
       </div>
       {/* DESENHO NA ARCADA DENTÁRIA (900x700, MESMO TAMANHO USADO NO PDF) */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
           <FaPencilAlt /> Marque os procedimentos na arcada dentária:
         </div>
         <div className="flex flex-col items-center w-full">
@@ -451,9 +467,9 @@ export default function TabProntuario({ onAdd }) {
               height: "700px",
               borderRadius: "0.75rem",
               boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-              border: "1px solid #e5e7eb",
+              border: "1px solid var(--cis-line)",
               marginBottom: "1rem",
-              background: "#fff",
+              background: "var(--cis-surface)",
               overflow: "hidden",
               display: "grid",
               position: "relative",
@@ -473,9 +489,9 @@ export default function TabProntuario({ onAdd }) {
                 height: "100%",
                 borderRadius: "0.75rem",
                 boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-                border: "1px solid #e5e7eb",
+                border: "1px solid var(--cis-line)",
                 marginBottom: "1rem",
-                background: "#fff",
+                background: "var(--cis-surface)",
                 overflow: "hidden",
                 display: "block",
               }}
@@ -483,14 +499,14 @@ export default function TabProntuario({ onAdd }) {
           </div>
           <div className="flex flex-row gap-2">
             <button
-              className="bg-[#F9A23B] text-white px-4 py-2 rounded shadow button-animate hover:bg-[#e68a1a] font-semibold flex items-center gap-2"
+              className="bg-(--cis-unp-orange) text-white px-4 py-2 rounded shadow button-animate hover:bg-(--cis-unp-orange-hover) font-semibold flex items-center gap-2"
               onClick={handleUndoCanvas}
               type="button"
             >
               <FaUndo /> Desfazer
             </button>
             <button
-              className="bg-[#7A97B6] text-white px-4 py-2 rounded shadow button-animate hover:bg-[#045397] font-semibold flex items-center gap-2"
+              className="bg-(--cis-unp-steel) text-white px-4 py-2 rounded shadow button-animate hover:bg-(--cis-unp-blue) font-semibold flex items-center gap-2"
               onClick={handleClearCanvas}
               type="button"
             >
@@ -501,7 +517,7 @@ export default function TabProntuario({ onAdd }) {
       </div>
       {/* ALTERAÇÕES ENCONTRADAS */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
           <FaSmile /> Alterações
         </div>
         <textarea
@@ -524,7 +540,7 @@ export default function TabProntuario({ onAdd }) {
       </div>
       {/* HISTÓRICO DE PRONTUÁRIOS COM LINK PARA O PDF */}
       <div>
-        <div className="font-semibold mb-2 text-[#F9A23B] text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
           <FaCalendarAlt /> Registros do Prontuário:
         </div>
         {loading ? (
@@ -536,12 +552,12 @@ export default function TabProntuario({ onAdd }) {
             {registros.map((registro) => (
               <div
                 key={registro.id}
-                className="bg-gradient-to-r from-[#f9fafb] to-[#e3eaf6] rounded-lg p-4 border-l-4 border-[#7A97B6] shadow transition hover:scale-[1.02] hover:shadow-lg flex gap-4 items-center animate-slide-in"
+                className="bg-linear-to-r from-(--cis-soft-gray) to-(--cis-soft-blue) rounded-lg p-4 border-l-4 border-(--cis-unp-steel) shadow transition hover:scale-[1.02] hover:shadow-lg flex gap-4 items-center animate-slide-in"
               >
-                <FaCalendarAlt className="text-[#7A97B6] text-2xl mr-2" />
+                <FaCalendarAlt className="text-(--cis-unp-steel) text-2xl mr-2" />
                 <div>
                   <p>
-                    <strong>Data:</strong> {registro.date}
+                    <strong>Data:</strong> {formatarDataISO(registro.date)}
                   </p>
                   <p>
                     <strong>Hora:</strong> {registro.time}
@@ -560,44 +576,6 @@ export default function TabProntuario({ onAdd }) {
           </div>
         )}
       </div>
-      {/* ANIMAÇÕES DO COMPONENTE */}
-      <style>{`
-        .animate-fade-in {
-          animation: fadeIn .5s;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px);}
-          to { opacity: 1; transform: translateY(0);}
-        }
-        .animate-slide-in {
-          animation: slideIn .5s;
-        }
-        @keyframes slideIn {
-          from { opacity: 0; transform: translateX(-20px);}
-          to { opacity: 1; transform: translateX(0);}
-        }
-        .button-animate {
-          transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .button-animate:hover {
-          transform: scale(1.05);
-          box-shadow: 0 4px 16px rgba(249,162,59,0.2);
-        }
-        .animate-canvas {
-          animation: fadeInCanvas .7s;
-        }
-        @keyframes fadeInCanvas {
-          from { opacity: 0; transform: scale(0.98);}
-          to { opacity: 1; transform: scale(1);}
-        }
-        .animate-toast {
-          animation: toastIn .3s;
-        }
-        @keyframes toastIn {
-          from { opacity: 0; transform: translateY(-10px);}
-          to { opacity: 1; transform: translateY(0);}
-        }
-      `}</style>
     </div>
   );
 }

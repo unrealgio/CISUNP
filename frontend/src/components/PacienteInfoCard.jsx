@@ -10,8 +10,9 @@ import {
   FaTimes,
   FaUserMd,
 } from "react-icons/fa";
-import { apiFetch } from "../api";
+import { apiFetch, mensagemDeErro } from "../api";
 import { ErrorMessage } from "./StatusMessage";
+import { formatarDataISO } from "../utils/date";
 
 // MONTA O FORMULÁRIO DE EDIÇÃO COM OS DADOS ATUAIS DO PACIENTE
 function formDoPaciente(paciente) {
@@ -68,9 +69,7 @@ export default function PacienteInfoCard({
       });
       const data = await res.json();
       if (!res.ok)
-        throw new Error(
-          data.details?.join(" ") || data.error || "Erro ao atualizar paciente.",
-        );
+        throw new Error(mensagemDeErro(data, "Erro ao atualizar paciente."));
 
       setEditing(false);
       onPacienteAtualizado && onPacienteAtualizado();
@@ -115,13 +114,13 @@ export default function PacienteInfoCard({
   return (
     <div className="cis-panel p-6 flex flex-col md:flex-row gap-6 items-start mb-4">
       {operationError && <ErrorMessage>{operationError}</ErrorMessage>}
-      <div className="flex flex-col items-center min-w-[120px]">
+      <div className="flex flex-col items-center min-w-30">
         <FaUserCircle
-          className="text-[var(--cis-blue)] bg-[var(--cis-blue-soft)] rounded-full"
+          className="text-(--cis-blue) bg-(--cis-blue-soft) rounded-full"
           size={72}
         />
         <div className="mt-2 text-gray-700 text-center">
-          <div className="font-bold text-lg text-[var(--cis-navy)]">
+          <div className="font-bold text-lg text-(--cis-navy)">
             {editing ? (
               <input
                 type="text"
@@ -136,7 +135,7 @@ export default function PacienteInfoCard({
               paciente.patient
             )}
           </div>
-          <div className="text-sm text-[var(--cis-muted)]">
+          <div className="text-sm text-(--cis-muted)">
             {editing ? (
               <input
                 type="number"
@@ -192,13 +191,13 @@ export default function PacienteInfoCard({
             <span className="font-bold">Futuros agendamentos:</span>
             <ul className="ml-2 mt-1">
               {agendamentos.length > 0 ? (
-                agendamentos.map((ag, idx) => (
-                  <li key={idx} className="text-sm">
-                    <span className="text-[var(--cis-blue)]">Consulta</span>
+                agendamentos.map((ag) => (
+                  <li key={ag.id} className="text-sm">
+                    <span className="text-(--cis-blue)">Consulta</span>
                     {" com "}
                     <span className="font-semibold">{ag.medico}</span>
                     {" dia "}
-                    {ag.date} {" às "} {ag.time}
+                    {formatarDataISO(ag.date)} {" às "} {ag.time}
                   </li>
                 ))
               ) : (
@@ -213,11 +212,11 @@ export default function PacienteInfoCard({
           <div className="font-bold mb-1">Informações pessoais:</div>
           <div className="text-sm flex flex-col gap-2">
             <span className="flex items-center gap-2">
-              <FaIdCard className="text-[var(--cis-muted)]" /> <span>CPF:</span>{" "}
+              <FaIdCard className="text-(--cis-muted)" /> <span>CPF:</span>{" "}
               <span className="font-semibold">{paciente.cpf}</span>
             </span>
             <span className="flex items-center gap-2">
-              <FaMapMarkerAlt className="text-[var(--cis-muted)]" />{" "}
+              <FaMapMarkerAlt className="text-(--cis-muted)" />{" "}
               <span>Endereço:</span>{" "}
               {editing ? (
                 <input

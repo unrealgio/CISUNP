@@ -8,7 +8,7 @@ import {
   FaPhone,
   FaHome,
 } from "react-icons/fa";
-import { apiFetch } from "../api";
+import { apiFetch, mensagemDeErro } from "../api";
 
 export default function AddPaciente({ onAdd, onCancel }) {
   const [form, setForm] = useState({
@@ -41,14 +41,21 @@ export default function AddPaciente({ onAdd, onCancel }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
+      const data = await res.json();
       if (res.status === 409) {
         setErro("Já existe um paciente com este CPF.");
-        setLoading(false);
         return;
       }
-      if (!res.ok) throw new Error("Erro ao cadastrar paciente");
-      const paciente = await res.json();
-      if (onAdd) onAdd(paciente);
+      if (!res.ok) {
+        setErro(
+          mensagemDeErro(
+            data,
+            "Erro ao cadastrar paciente. Verifique os dados.",
+          ),
+        );
+        return;
+      }
+      if (onAdd) onAdd(data);
       setForm({
         patient: "",
         cpf: "",
@@ -60,16 +67,17 @@ export default function AddPaciente({ onAdd, onCancel }) {
       });
       if (onCancel) onCancel();
     } catch {
-      setErro("Erro ao cadastrar paciente. Verifique os dados.");
+      setErro("Erro de conexão com o servidor.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   return (
     <div className="cis-panel p-5 md:p-7 max-w-5xl mx-auto mt-6 animate-fade-in flex flex-col md:flex-row gap-6">
       <div className="flex-1">
-        <h2 className="text-2xl font-bold mb-6 text-[var(--cis-navy)] flex items-center gap-2">
-          <FaUserPlus className="text-[var(--cis-orange)]" /> Adicionar Paciente
+        <h2 className="text-2xl font-bold mb-6 text-(--cis-navy) flex items-center gap-2">
+          <FaUserPlus className="text-(--cis-orange)" /> Adicionar Paciente
         </h2>
         <form className="grid md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
           <div className="space-y-1">
@@ -96,6 +104,8 @@ export default function AddPaciente({ onAdd, onCancel }) {
               value={form.cpf}
               onChange={handleChange}
               required
+              maxLength={11}
+              inputMode="numeric"
               className="cis-input"
               placeholder="CPF"
             />
@@ -167,7 +177,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
           </div>
           {erro && (
             <div
-              className="md:col-span-2 rounded-lg bg-red-50 border border-red-200 text-[var(--cis-danger)] text-sm px-3 py-2 text-center"
+              className="md:col-span-2 rounded-lg bg-red-50 border border-red-200 text-(--cis-danger) text-sm px-3 py-2 text-center"
               role="alert"
             >
               {erro}
@@ -192,25 +202,16 @@ export default function AddPaciente({ onAdd, onCancel }) {
           </div>
         </form>
       </div>
-      <div className="hidden md:flex flex-col justify-center items-center w-64 bg-[var(--cis-blue-soft)] rounded-xl p-6">
+      <div className="hidden md:flex flex-col justify-center items-center w-64 bg-(--cis-blue-soft) rounded-xl p-6">
         <img
           src="/img/Unp_Final_Logo.png"
           alt="Logo clínica"
           className="w-28 mb-5"
         />
-        <p className="text-[var(--cis-navy)] text-base font-semibold text-center leading-relaxed">
+        <p className="text-(--cis-navy) text-base font-semibold text-center leading-relaxed">
           Preencha todos os dados do paciente para cadastrá-lo.
         </p>
       </div>
-      <style>{`
-        .animate-fade-in {
-          animation: fadeIn .5s;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px);}
-          to { opacity: 1; transform: translateY(0);}
-        }
-      `}</style>
     </div>
   );
 }

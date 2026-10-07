@@ -13,7 +13,7 @@ export default function TabArquivos({ arquivos, setArquivos }) {
   function getFileIcon(tipo) {
     if (tipo === "PDF") return <FaFilePdf className="text-red-500" />;
     if (tipo === "Imagem") return <FaFileImage className="text-blue-400" />;
-    return <FaNotesMedical className="text-[var(--cis-blue)]" />;
+    return <FaNotesMedical className="text-(--cis-blue)" />;
   }
 
   function handleFileUpload(e) {
@@ -40,8 +40,8 @@ export default function TabArquivos({ arquivos, setArquivos }) {
 
   return (
     <div className="cis-panel p-6 mt-6 animate-fade-in">
-      <h2 className="text-xl font-bold mb-4 text-[var(--cis-navy)] flex items-center gap-2">
-        <FaFileDownload className="text-[var(--cis-blue)]" /> Arquivos
+      <h2 className="text-xl font-bold mb-4 text-(--cis-navy) flex items-center gap-2">
+        <FaFileDownload className="text-(--cis-blue)" /> Arquivos
       </h2>
       <div className="mb-6">
         <label className="cis-primary-button flex items-center gap-2 cursor-pointer w-fit">
@@ -63,7 +63,7 @@ export default function TabArquivos({ arquivos, setArquivos }) {
           {arquivos.map((arq) => (
             <div
               key={arq.id}
-              className="rounded-lg border border-[var(--cis-border)] border-l-4 border-l-[var(--cis-blue)] bg-[var(--cis-blue-soft)] p-4 flex items-center gap-4"
+              className="rounded-lg border border-(--cis-border) border-l-4 border-l-(--cis-blue) bg-(--cis-blue-soft) p-4 flex items-center gap-4"
             >
               <div className="flex items-center gap-3 flex-1">
                 {getFileIcon(arq.tipo)}
@@ -86,15 +86,6 @@ export default function TabArquivos({ arquivos, setArquivos }) {
           ))}
         </div>
       )}
-      <style>{`
-        .animate-fade-in {
-          animation: fadeIn .5s;
-        }
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px);}
-          to { opacity: 1; transform: translateY(0);}
-        }
-      `}</style>
     </div>
   );
 }

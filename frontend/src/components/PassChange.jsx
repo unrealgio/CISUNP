@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { apiFetch } from "../api";
+import { apiFetch, mensagemDeErro } from "../api";
 
 export default function PassChange({ email, onSenhaAlterada }) {
   const [novaSenha, setNovaSenha] = useState("");
@@ -28,7 +28,7 @@ export default function PassChange({ email, onSenhaAlterada }) {
           onSenhaAlterada();
         }, 1500); // TEMPO PARA MOSTRAR A MENSAGEM ANTES DE REDIRECIONAR
       } else {
-        setErro(data.error || "Erro ao trocar senha.");
+        setErro(mensagemDeErro(data, "Erro ao trocar senha."));
       }
     } catch {
       setErro("Erro de conexão.");
@@ -46,13 +46,15 @@ export default function PassChange({ email, onSenhaAlterada }) {
       }}
     >
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm flex flex-col items-center">
-        <h3 className="text-lg font-semibold mb-4 text-[#045397]">
+        <h3 className="text-lg font-semibold mb-4 text-(--cis-unp-blue)">
           Troque sua senha para acessar o sistema
         </h3>
         <form className="w-full" onSubmit={handleSubmit}>
           <input
             type="password"
-            placeholder="Nova senha"
+            placeholder="Nova senha (mínimo 8 caracteres)"
+            minLength={8}
+            maxLength={72}
             className="w-full px-4 py-2 border border-gray-400 rounded-lg mb-3"
             value={novaSenha}
             onChange={(e) => setNovaSenha(e.target.value)}
@@ -60,7 +62,7 @@ export default function PassChange({ email, onSenhaAlterada }) {
           />
           <button
             type="submit"
-            className="w-full bg-[#F9A23B] hover:bg-[#e68a1a] text-white font-semibold py-2 rounded-lg transition-all duration-200 shadow-lg"
+            className="w-full bg-(--cis-unp-orange) hover:bg-(--cis-unp-orange-hover) text-white font-semibold py-2 rounded-lg transition-all duration-200 shadow-lg"
             disabled={loading}
           >
             {loading ? "Alterando..." : "Alterar senha"}

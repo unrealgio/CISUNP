@@ -6,6 +6,12 @@ export function apiUrl(path) {
   return `${API_URL}${path}`;
 }
 
+// MONTA A MENSAGEM DE ERRO DE UMA RESPOSTA DA API
+// (MOTIVOS DA VALIDAÇÃO EM "details", SENÃO O "error", SENÃO O TEXTO PADRÃO)
+export function mensagemDeErro(data, padrao) {
+  return data?.details?.join(" ") || data?.error || padrao;
+}
+
 // CENTRALIZA AS REQUISIÇÕES PARA A API
 export function apiFetch(url, options = {}) {
   const headers = new Headers(options.headers || {});

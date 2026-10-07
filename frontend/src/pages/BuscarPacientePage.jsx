@@ -98,7 +98,7 @@ export default function BuscarPacientePage() {
     <>
       <Header />
       <Menu active="pacientes" />
-      <div className="bg-[var(--cis-background)] min-h-screen px-2 md:px-8 py-6">
+      <div className="bg-(--cis-background) min-h-screen px-2 md:px-8 py-6">
         {showAdd ? (
           <AddPaciente
             onAdd={handleAddPaciente}
@@ -107,15 +107,15 @@ export default function BuscarPacientePage() {
         ) : (
           <>
             <form
-              className="cis-panel flex flex-wrap gap-4 bg-[var(--cis-surface)] p-4 md:p-5 mb-6"
+              className="cis-panel flex flex-wrap gap-4 bg-(--cis-surface) p-4 md:p-5 mb-6"
               onSubmit={handleBuscar}
             >
-              <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-[var(--cis-border)] pb-4">
+              <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-(--cis-border) pb-4">
                 <div>
-                  <h1 className="text-xl md:text-2xl font-bold text-[var(--cis-navy)]">
+                  <h1 className="text-xl md:text-2xl font-bold text-(--cis-navy)">
                     Buscar pacientes
                   </h1>
-                  <p className="text-sm text-[var(--cis-muted)] mt-1">
+                  <p className="text-sm text-(--cis-muted) mt-1">
                     Consulte e acesse os dados cadastrais da clínica.
                   </p>
                 </div>
@@ -128,10 +128,7 @@ export default function BuscarPacientePage() {
                 </button>
               </div>
               {filtros.map((filtro) => (
-                <div
-                  key={filtro.key}
-                  className="flex flex-col flex-1 min-w-[160px]"
-                >
+                <div key={filtro.key} className="flex flex-col flex-1 min-w-40">
                   <label className="cis-label mb-1">
                     {filtro.icon} {filtro.label}:
                   </label>
@@ -158,9 +155,9 @@ export default function BuscarPacientePage() {
             {erro && <ErrorMessage>{erro}</ErrorMessage>}
 
             <div className="cis-panel overflow-x-auto p-3 md:p-4">
-              <table className="w-full min-w-[640px] text-left">
+              <table className="w-full min-w-160 text-left">
                 <thead>
-                  <tr className="bg-[var(--cis-navy)] text-white">
+                  <tr className="bg-(--cis-navy) text-white">
                     <th className="py-2 px-4 rounded-tl-lg">Paciente</th>
                     <th className="py-2 px-4">CPF</th>
                     <th className="py-2 px-4">Telefone</th>
@@ -187,7 +184,7 @@ export default function BuscarPacientePage() {
                     paginatedResults.map((p, idx) => (
                       <tr
                         key={p.cpf || p.patient || idx}
-                        className="border-b border-[var(--cis-border)] hover:bg-[var(--cis-blue-soft)] cursor-pointer transition-colors"
+                        className="border-b border-(--cis-border) hover:bg-(--cis-blue-soft) cursor-pointer transition-colors"
                         onClick={() => {
                           if (p.cpf) {
                             navigate(`/paciente/${encodeURIComponent(p.cpf)}`);
@@ -197,7 +194,7 @@ export default function BuscarPacientePage() {
                         }}
                         title="Ver detalhes do paciente"
                       >
-                        <td className="py-3 px-4 font-semibold text-[var(--cis-blue)] hover:underline">
+                        <td className="py-3 px-4 font-semibold text-(--cis-blue) hover:underline">
                           {p.patient}
                         </td>
                         <td className="py-2 px-4">{p.cpf}</td>
@@ -220,7 +217,7 @@ export default function BuscarPacientePage() {
                   >
                     <FaChevronLeft />
                   </button>
-                  <span className="font-semibold text-[var(--cis-navy)]">
+                  <span className="font-semibold text-(--cis-navy)">
                     Página {page} de {totalPages}
                   </span>
                   <button

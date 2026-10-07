@@ -312,7 +312,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
 
   return (
     <div className="w-full px-2 md:px-8 py-6">
-      <h2 className="text-2xl font-bold text-[#045397] mb-6">
+      <h2 className="text-2xl font-bold text-(--cis-unp-blue) mb-6">
         Minhas Consultas
       </h2>
 
@@ -324,7 +324,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
             value={search}
             onChange={handleSearch}
             placeholder="Buscar por nome do paciente..."
-            className="w-full rounded-lg px-4 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-[#F9A23B] focus:border-[#F9A23B] transition outline-none text-black placeholder-gray-500 text-base font-medium"
+            className="w-full rounded-lg px-4 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-(--cis-unp-orange) focus:border-(--cis-unp-orange) transition outline-none text-black placeholder-gray-500 text-base font-medium"
             aria-label="Buscar por nome do paciente"
           />
           <FaSearch className="absolute right-3 top-3 text-gray-400" />
@@ -345,10 +345,10 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
               style={{
                 borderColor:
                   c.status === "Confirmada"
-                    ? "#4ade80"
+                    ? "var(--cis-status-confirmada)"
                     : c.status === "Cancelada"
-                      ? "#f87171"
-                      : "#fbbf24",
+                      ? "var(--cis-status-cancelada)"
+                      : "var(--cis-status-pendente)",
               }}
               onClick={() => handleExpand(c.id)}
               tabIndex={0}
@@ -356,8 +356,8 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
               aria-label={`Detalhes da consulta de ${c.paciente}`}
             >
               <div className="flex items-center gap-2 mb-2">
-                <FaUser className="text-[#045397]" />
-                <span className="font-bold text-lg text-[#045397]">
+                <FaUser className="text-(--cis-unp-blue)" />
+                <span className="font-bold text-lg text-(--cis-unp-blue)">
                   {c.paciente}
                 </span>
                 <span
@@ -365,16 +365,16 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
                   style={{
                     background:
                       c.status === "Confirmada"
-                        ? "#dcfce7"
+                        ? "var(--cis-status-confirmada-bg)"
                         : c.status === "Cancelada"
-                          ? "#fee2e2"
-                          : "#fef9c3",
+                          ? "var(--cis-status-cancelada-bg)"
+                          : "var(--cis-status-pendente-bg)",
                     color:
                       c.status === "Confirmada"
-                        ? "#166534"
+                        ? "var(--cis-status-confirmada-text)"
                         : c.status === "Cancelada"
-                          ? "#991b1b"
-                          : "#92400e",
+                          ? "var(--cis-status-cancelada-text)"
+                          : "var(--cis-status-pendente-text)",
                   }}
                 >
                   {c.status}
@@ -412,7 +412,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
           >
             <FaChevronLeft />
           </button>
-          <span className="font-semibold text-[#045397]">
+          <span className="font-semibold text-(--cis-unp-blue)">
             Página {page} de {totalPages}
           </span>
           <button

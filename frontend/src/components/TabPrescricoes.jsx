@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { FaPills, FaPlus } from "react-icons/fa";
 import { apiFetch } from "../api";
 import { ErrorMessage } from "./StatusMessage";
+import { formatarDataHora } from "../utils/date";
 
 export default function TabPrescricoes({
   prescricoes,
@@ -50,8 +51,8 @@ export default function TabPrescricoes({
 
   return (
     <div className="cis-panel p-6 mt-6 animate-fade-in">
-      <h2 className="text-xl font-bold mb-4 text-[var(--cis-navy)] flex items-center gap-2">
-        <FaPills className="text-[var(--cis-orange)]" /> Prescrições
+      <h2 className="text-xl font-bold mb-4 text-(--cis-navy) flex items-center gap-2">
+        <FaPills className="text-(--cis-orange)" /> Prescrições
         <button
           className="cis-primary-button ml-auto flex items-center gap-1"
           onClick={() => setShowForm((v) => !v)}
@@ -109,12 +110,15 @@ export default function TabPrescricoes({
           {prescricoes.map((p) => (
             <div
               key={p.id}
-              className="rounded-lg border border-[var(--cis-border)] border-l-4 border-l-[var(--cis-orange)] bg-[var(--cis-orange-soft)] p-4 flex gap-4 items-center"
+              className="rounded-lg border border-(--cis-border) border-l-4 border-l-(--cis-orange) bg-(--cis-orange-soft) p-4 flex gap-4 items-center"
             >
-              <FaPills className="text-[var(--cis-orange)] text-2xl mr-2" />
+              <FaPills className="text-(--cis-orange) text-2xl mr-2" />
               <div>
                 <p>
                   <strong>Medicamento:</strong> {p.medicamento}
+                </p>
+                <p className="text-sm text-(--cis-muted)">
+                  Prescrita em {formatarDataHora(p.createdAt)}
                 </p>
                 <p>
                   <strong>Dose:</strong> {p.dose}

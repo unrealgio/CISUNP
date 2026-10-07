@@ -28,7 +28,18 @@ export default function List({
     setError("");
   }
 
-  function handleSave(idx, item) {
+  // FECHA O FORMULÁRIO DE EDIÇÃO E LIMPA OS CAMPOS
+  function limparEdicao() {
+    setEditingIndex(null);
+    setPatientName("");
+    setMedicoName("");
+    setCpf("");
+    setPhone("");
+    setNotes("");
+    setError("");
+  }
+
+  async function handleSave(idx, item) {
     if (!patientName.trim()) {
       setError("Digite o nome do paciente!");
       return;
@@ -38,7 +49,8 @@ export default function List({
       return;
     }
     setError("");
-    onSavePatient(
+    // SÓ LIMPA SE SALVOU; EM CASO DE ERRO, MANTÉM O QUE FOI DIGITADO
+    const salvou = await onSavePatient(
       item,
       patientName.trim(),
       medicoName.trim(),
@@ -46,12 +58,7 @@ export default function List({
       phone,
       notes,
     );
-    setEditingIndex(null);
-    setPatientName("");
-    setMedicoName("");
-    setCpf("");
-    setPhone("");
-    setNotes("");
+    if (salvou) limparEdicao();
   }
 
   function handleKeyDown(e, idx, item) {
@@ -59,32 +66,18 @@ export default function List({
       handleSave(idx, item);
     }
     if (e.key === "Escape") {
-      setEditingIndex(null);
-      setPatientName("");
-      setMedicoName("");
-      setCpf("");
-      setPhone("");
-      setNotes("");
-      setError("");
+      limparEdicao();
     }
   }
 
   function handleDelete(idx, item) {
     onDelete && onDelete(item);
-    if (editingIndex === idx) {
-      setEditingIndex(null);
-      setPatientName("");
-      setMedicoName("");
-      setCpf("");
-      setPhone("");
-      setNotes("");
-      setError("");
-    }
+    if (editingIndex === idx) limparEdicao();
   }
 
   return (
     <div className="flex-1 overflow-x-auto">
-      <div className="grid grid-cols-4 rounded-t-xl bg-[var(--cis-navy)] text-white font-semibold text-sm md:text-base px-4 md:px-6 py-3 min-w-[700px]">
+      <div className="grid grid-cols-4 rounded-t-xl bg-(--cis-navy) text-white font-semibold text-sm md:text-base px-4 md:px-6 py-3 min-w-175">
         <div className="text-left pl-4 md:pl-6">Horário</div>
         <div className="text-center">Paciente</div>
         <div className="text-center">Médico</div>
@@ -99,20 +92,20 @@ export default function List({
         </div>
       </div>
       {error && (
-        <div className="text-[var(--cis-danger)] bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
+        <div className="text-(--cis-danger) bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
           {error}
         </div>
       )}
-      <div className="flex flex-col gap-3 bg-[var(--cis-background)] rounded-b-xl p-4 min-w-[700px]">
+      <div className="flex flex-col gap-3 bg-(--cis-background) rounded-b-xl p-4 min-w-175">
         {schedules.map((item, idx) => (
           <div
             key={item.time}
             className={`grid grid-cols-4 items-center rounded-lg px-4 py-2 shadow ${
               selected?.time === item.time
-                ? "bg-[var(--cis-orange-soft)] border border-[var(--cis-orange)]"
+                ? "bg-(--cis-orange-soft) border border-(--cis-orange)"
                 : item.patient
-                  ? "bg-[var(--cis-surface)] border border-[var(--cis-border)] hover:border-[var(--cis-blue)]"
-                  : "bg-[var(--cis-surface)] border border-dashed border-[var(--cis-border)] hover:border-[var(--cis-blue)]"
+                  ? "bg-(--cis-surface) border border-(--cis-border) hover:border-(--cis-blue)"
+                  : "bg-(--cis-surface) border border-dashed border-(--cis-border) hover:border-(--cis-blue)"
             } cursor-pointer transition-colors`}
             onClick={() => onSelect && onSelect(item)}
           >
@@ -147,6 +140,7 @@ export default function List({
                     className="cis-input"
                     placeholder="CPF (somente números)"
                     inputMode="numeric"
+                    maxLength={11}
                     value={cpf}
                     onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
                   />
@@ -202,7 +196,7 @@ export default function List({
                   onKeyDown={(e) => handleKeyDown(e, idx, item)}
                 />
               ) : item.medico ? (
-                <span className="font-semibold text-[var(--cis-blue)]">
+                <span className="font-semibold text-(--cis-blue)">
                   {item.medico}
                 </span>
               ) : (
@@ -243,15 +237,7 @@ export default function List({
                   <button
                     className="p-1 rounded hover:bg-gray-100 text-gray-700 cursor-pointer"
                     aria-label="Cancelar"
-                    onClick={() => {
-                      setEditingIndex(null);
-                      setPatientName("");
-                      setMedicoName("");
-                      setCpf("");
-                      setPhone("");
-                      setNotes("");
-                      setError("");
-                    }}
+                    onClick={limparEdicao}
                     title="Cancelar"
                   >
                     <FaTimes />

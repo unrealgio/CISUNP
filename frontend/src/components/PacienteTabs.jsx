@@ -19,15 +19,15 @@ const tabs = [
 
 export default function PacienteTabs({ active, onTabChange }) {
   return (
-    <div className="flex overflow-x-auto bg-[var(--cis-surface)] border-b border-[var(--cis-border)] rounded-t-lg">
+    <div className="flex overflow-x-auto bg-(--cis-surface) border-b border-(--cis-border) rounded-t-lg">
       {tabs.map((tab) => (
         <button
           key={tab.key}
           className={`flex items-center gap-2 px-4 md:px-6 py-2 font-semibold text-sm md:text-base transition-all duration-200
             ${
               active === tab.key
-                ? "bg-[var(--cis-orange-soft)] text-[var(--cis-navy)] border-b-4 border-[var(--cis-orange)]"
-                : "text-[var(--cis-muted)] hover:bg-[var(--cis-blue-soft)] hover:text-[var(--cis-blue)]"
+                ? "bg-(--cis-orange-soft) text-(--cis-navy) border-b-4 border-(--cis-orange)"
+                : "text-(--cis-muted) hover:bg-(--cis-blue-soft) hover:text-(--cis-blue)"
             }`}
           onClick={() => onTabChange(tab.key)}
           title={tab.label}

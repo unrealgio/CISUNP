@@ -57,21 +57,21 @@ export default function Login() {
         backgroundPosition: "center",
       }}
     >
-      <div className="absolute inset-0 bg-[var(--cis-navy)] opacity-75"></div>
-      <div className="relative z-10 w-full max-w-md md:max-w-lg mx-4 bg-[var(--cis-surface)]/95 border border-white/60 rounded-2xl shadow-2xl p-7 md:p-9 flex flex-col items-center">
+      <div className="absolute inset-0 bg-(--cis-navy) opacity-75"></div>
+      <div className="relative z-10 w-full max-w-md md:max-w-lg mx-4 bg-(--cis-surface)/95 border border-white/60 rounded-2xl shadow-2xl p-7 md:p-9 flex flex-col items-center">
         <img
           src="/img/Unp_Final_Logo.png"
           alt="Logo UnP"
           className="h-14 md:h-16 mb-2"
         />
-        <h2 className="text-center text-[var(--cis-navy)] font-semibold mb-1 text-base md:text-lg tracking-wide">
+        <h2 className="text-center text-(--cis-navy) font-semibold mb-1 text-base md:text-lg tracking-wide">
           CIS - Centro Integrado de Saúde
         </h2>
         <form className="w-full mt-4" onSubmit={handleSubmit}>
           {/* USUÁRIO */}
           <div className="mb-4">
             <label
-              className="block text-[var(--cis-ink)] text-sm font-semibold mb-1"
+              className="block text-(--cis-ink) text-sm font-semibold mb-1"
               htmlFor="usuario"
             >
               Usuário <span className="text-red-500">*</span>
@@ -81,11 +81,11 @@ export default function Login() {
                 id="usuario"
                 type="email"
                 placeholder="usuario@unp.com.br"
-                className="w-full px-4 py-2.5 pr-10 border border-[var(--cis-border)] rounded-lg shadow-sm focus:border-[var(--cis-orange)] bg-white text-[var(--cis-ink)] placeholder-[var(--cis-muted)] text-base transition"
+                className="w-full px-4 py-2.5 pr-10 border border-(--cis-border) rounded-lg shadow-sm focus:border-(--cis-orange) bg-white text-(--cis-ink) placeholder-(--cis-muted) text-base transition"
                 required
                 aria-label="Usuário"
               />
-              <span className="absolute inset-y-0 right-3 flex items-center text-[var(--cis-muted)]">
+              <span className="absolute inset-y-0 right-3 flex items-center text-(--cis-muted)">
                 <FaUser size={20} />
               </span>
             </div>
@@ -93,7 +93,7 @@ export default function Login() {
           {/* SENHA */}
           <div className="mb-4">
             <label
-              className="block text-[var(--cis-ink)] text-sm font-semibold mb-1"
+              className="block text-(--cis-ink) text-sm font-semibold mb-1"
               htmlFor="senha"
             >
               Senha <span className="text-red-500">*</span>
@@ -103,14 +103,14 @@ export default function Login() {
                 id="senha"
                 type={showPassword ? "text" : "password"}
                 placeholder="********"
-                className="w-full px-4 py-2.5 pr-10 border border-[var(--cis-border)] rounded-lg shadow-sm focus:border-[var(--cis-orange)] bg-white text-[var(--cis-ink)] placeholder-[var(--cis-muted)] text-base transition"
+                className="w-full px-4 py-2.5 pr-10 border border-(--cis-border) rounded-lg shadow-sm focus:border-(--cis-orange) bg-white text-(--cis-ink) placeholder-(--cis-muted) text-base transition"
                 required
                 aria-label="Senha"
               />
               <button
                 type="button"
                 tabIndex={-1}
-                className="absolute inset-y-0 right-3 flex items-center text-[var(--cis-muted)]"
+                className="absolute inset-y-0 right-3 flex items-center text-(--cis-muted)"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
               >
@@ -121,7 +121,7 @@ export default function Login() {
           {/* MENSAGEM DE ERRO */}
           {error && (
             <div
-              className="w-full rounded-lg bg-red-50 border border-red-200 text-[var(--cis-danger)] text-sm mb-3 px-3 py-2 text-center"
+              className="w-full rounded-lg bg-red-50 border border-red-200 text-(--cis-danger) text-sm mb-3 px-3 py-2 text-center"
               role="alert"
             >
               {error}
@@ -131,7 +131,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full bg-[var(--cis-navy)] hover:bg-[var(--cis-blue)] text-white font-semibold py-2.5 rounded-lg transition-all duration-200 mb-2 shadow-md
+            className={`w-full bg-(--cis-navy) hover:bg-(--cis-blue) text-white font-semibold py-2.5 rounded-lg transition-all duration-200 mb-2 shadow-md
               ${loading ? "opacity-60 cursor-not-allowed" : "hover:scale-105 active:scale-95"}
             `}
           >
@@ -163,15 +163,6 @@ export default function Login() {
             )}
           </button>
         </form>
-        {/* ESQUECI A SENHA */}
-        <div className="w-full flex justify-center items-center mt-2">
-          <a
-            href="#"
-            className="text-sm text-[var(--cis-blue)] hover:text-[var(--cis-navy)] hover:underline"
-          >
-            Esqueci minha senha
-          </a>
-        </div>
       </div>
       {showChangePassword && (
         <PassChange email={email} onSenhaAlterada={handleSenhaAlterada} />

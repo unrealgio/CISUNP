@@ -42,13 +42,13 @@ export default function PacienteResumoCards({ resumo, onAction }) {
           key={card.key}
           className="cis-panel flex-1 p-4 flex flex-col items-center transition-all duration-200 hover:-translate-y-0.5"
         >
-          <div className="text-2xl md:text-3xl mb-2 text-[var(--cis-blue)]">
+          <div className="text-2xl md:text-3xl mb-2 text-(--cis-blue)">
             {card.icon}
           </div>
-          <div className="text-xl md:text-2xl font-bold mb-1 text-[var(--cis-navy)]">
+          <div className="text-xl md:text-2xl font-bold mb-1 text-(--cis-navy)">
             {resumo[card.key] ?? 0}
           </div>
-          <div className="text-sm md:text-base mb-2 text-[var(--cis-muted)]">
+          <div className="text-sm md:text-base mb-2 text-(--cis-muted)">
             {card.label}
           </div>
           <button

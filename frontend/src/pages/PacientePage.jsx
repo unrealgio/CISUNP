@@ -19,7 +19,6 @@ export default function PacientePage() {
   const [paciente, setPaciente] = useState(undefined);
   const [arquivos, setArquivos] = useState([]);
   const [prescricoes, setPrescricoes] = useState([]);
-  const [prontuario, setProntuario] = useState([]);
   const [erro, setErro] = useState("");
   const [erroPrescricoes, setErroPrescricoes] = useState("");
   // INCREMENTAR FORÇA RECARREGAR O PACIENTE (EX.: APÓS EDITAR)
@@ -27,7 +26,6 @@ export default function PacientePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setProntuario([]);
     setArquivos([]);
   }, [cpf]);
 
@@ -69,7 +67,7 @@ export default function PacientePage() {
   }, [cpf]);
 
   function handleAddPrescricao(nova) {
-    setPrescricoes((prev) => [...prev, nova]);
+    setPrescricoes((prev) => [nova, ...prev]);
   }
 
   if (paciente === undefined) {
@@ -102,7 +100,7 @@ export default function PacientePage() {
     <>
       <Header />
       <Menu active="pacientes" />
-      <div className="bg-gradient-to-br from-[#e3eaf6] to-[#f9fafb] min-h-screen px-2 md:px-8 py-6">
+      <div className="bg-linear-to-br from-(--cis-soft-blue) to-(--cis-soft-gray) min-h-screen px-2 md:px-8 py-6">
         <PacienteTabs active={activeTab} onTabChange={setActiveTab} />
         <div className="mt-4">
           <PacienteInfoCard
@@ -122,9 +120,7 @@ export default function PacientePage() {
             onAdd={handleAddPrescricao}
           />
         )}
-        {activeTab === "prontuario" && (
-          <TabProntuario prontuario={prontuario} />
-        )}
+        {activeTab === "prontuario" && <TabProntuario />}
         {activeTab === "arquivos" && (
           <TabArquivos arquivos={arquivos} setArquivos={setArquivos} />
         )}

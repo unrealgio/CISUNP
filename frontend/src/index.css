@@ -10,9 +10,32 @@
   --cis-muted: #667784;
   --cis-surface: #ffffff;
   --cis-background: #f3f6f7;
+  --cis-background-strong: oklch(87.2% 0.01 258.338);
   --cis-border: #d6e0e5;
   --cis-danger: #b53b3b;
+  --cis-orange-hover: #c97022;
+  --cis-blue-hover: #d5e6ed;
   --cis-shadow: 0 10px 30px rgba(18, 48, 74, 0.08);
+
+  /* UNP */
+  --cis-unp-blue: #045397;
+  --cis-unp-orange: #f9a23b;
+  --cis-unp-orange-hover: #e68a1a;
+  --cis-unp-steel: #7a97b6;
+  --cis-soft-gray: #f9fafb;
+  --cis-soft-blue: #e3eaf6;
+  --cis-line: #e5e7eb;
+
+  /* CONSULTAS */
+  --cis-status-confirmada: #4ade80;
+  --cis-status-confirmada-bg: #dcfce7;
+  --cis-status-confirmada-text: #166534;
+  --cis-status-pendente: #fbbf24;
+  --cis-status-pendente-bg: #fef9c3;
+  --cis-status-pendente-text: #92400e;
+  --cis-status-cancelada: #f87171;
+  --cis-status-cancelada-bg: #fee2e2;
+  --cis-status-cancelada-text: #991b1b;
 }
 
 * {

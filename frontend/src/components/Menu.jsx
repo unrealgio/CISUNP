@@ -25,7 +25,7 @@ export default function Menu({ active = "agenda" }) {
 
   return (
     <nav
-      className="bg-[var(--cis-surface)] border-b border-[var(--cis-border)] w-full flex justify-center items-center py-2 px-2 gap-1 md:gap-4 shadow-sm"
+      className="bg-(--cis-surface) border-b border-(--cis-border) w-full flex justify-center items-center py-2 px-2 gap-1 md:gap-4 shadow-sm"
       role="navigation"
       aria-label="Menu principal"
     >
@@ -36,8 +36,8 @@ export default function Menu({ active = "agenda" }) {
           className={`flex gap-2 items-center px-3 md:px-5 py-2 mx-1 md:mx-2 rounded-lg bg-transparent transition-all duration-200 group cursor-pointer
             ${
               active === item.key
-                ? "bg-[var(--cis-orange-soft)] text-[var(--cis-navy)] shadow-sm"
-                : "text-[var(--cis-muted)] hover:bg-[var(--cis-blue-soft)]"
+                ? "bg-(--cis-orange-soft) text-(--cis-navy) shadow-sm"
+                : "text-(--cis-muted) hover:bg-(--cis-blue-soft)"
             }
           `}
           aria-label={item.label}
@@ -46,8 +46,8 @@ export default function Menu({ active = "agenda" }) {
           <span
             className={`transition-transform duration-200 ${
               active === item.key
-                ? "text-[var(--cis-orange)]"
-                : "text-[var(--cis-muted)] group-hover:text-[var(--cis-blue)]"
+                ? "text-(--cis-orange)"
+                : "text-(--cis-muted) group-hover:text-(--cis-blue)"
             }`}
           >
             {item.icon}

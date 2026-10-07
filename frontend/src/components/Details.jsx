@@ -41,7 +41,7 @@ export default function Details({
 
   if (!schedule || (!schedule.patient && !editMode)) {
     return (
-      <div className="cis-panel p-4 mt-4 w-full text-center text-[var(--cis-muted)]">
+      <div className="cis-panel p-4 mt-4 w-full text-center text-(--cis-muted)">
         Selecione um paciente para ver os detalhes.
       </div>
     );
@@ -56,23 +56,27 @@ export default function Details({
     }
   }
 
-  function handleSave() {
+  async function handleSave() {
     if (!patient.trim()) {
       setError("O nome do paciente é obrigatório!");
       return;
     }
     setError("");
-    onSave &&
-      onSave({
+    // SÓ SAI DO MODO EDIÇÃO SE SALVOU; EM CASO DE ERRO, MANTÉM O QUE FOI DIGITADO
+    const salvou =
+      onSave &&
+      (await onSave({
         ...schedule,
         patient,
         cpf,
         phone,
         notes,
         medico,
-      });
-    setEditMode(false);
-    setEditField("");
+      }));
+    if (salvou) {
+      setEditMode(false);
+      setEditField("");
+    }
   }
 
   function handleDelete() {
@@ -88,7 +92,7 @@ export default function Details({
   return (
     <div className="cis-panel p-4 mt-4 w-full relative">
       {error && (
-        <div className="text-[var(--cis-danger)] bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
+        <div className="text-(--cis-danger) bg-red-50 border border-red-200 rounded-lg px-3 py-2 text-sm text-center mb-2">
           {error}
         </div>
       )}
@@ -114,6 +118,7 @@ export default function Details({
             type="text"
             className="cis-input max-w-full"
             inputMode="numeric"
+            maxLength={11}
             value={cpf}
             onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
           />
@@ -195,7 +200,7 @@ export default function Details({
           </button>
         )}
         <button
-          className="rounded-[0.55rem] bg-[var(--cis-danger)] px-4 py-2 font-bold text-white transition hover:bg-red-800 flex items-center gap-1"
+          className="rounded-[0.55rem] bg-(--cis-danger) px-4 py-2 font-bold text-white transition hover:bg-red-800 flex items-center gap-1"
           onClick={handleDelete}
         >
           <MdDelete /> Excluir
