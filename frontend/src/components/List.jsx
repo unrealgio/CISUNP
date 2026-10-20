@@ -77,7 +77,7 @@ export default function List({
   }
 
   return (
-    <div className="flex-1 overflow-x-auto">
+    <div className="flex-1 overflow-x-auto rounded-xl shadow-(--cis-shadow)">
       <div className="grid grid-cols-4 rounded-t-xl bg-(--cis-navy) text-white font-semibold text-sm md:text-base px-4 md:px-6 py-3 min-w-175">
         <div className="text-left pl-4 md:pl-6">Horário</div>
         <div className="text-center">Paciente</div>
@@ -97,7 +97,7 @@ export default function List({
           {error}
         </ErrorMessage>
       )}
-      <div className="flex flex-col gap-3 bg-(--cis-background) rounded-b-xl p-4 min-w-175">
+      <div className="flex flex-col gap-3 bg-(--cis-background) border border-t-0 border-(--cis-border) rounded-b-xl p-4 min-w-175">
         {schedules.map((item, idx) => (
           <div
             key={item.time}

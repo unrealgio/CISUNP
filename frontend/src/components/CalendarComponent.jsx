@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import Calendar from "react-calendar";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaCalendarDay, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import "react-calendar/dist/Calendar.css";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 import { dataLocalISO } from "../utils/date";
@@ -100,11 +100,11 @@ export default function CalendarComponent({
         </span>
         <button
           type="button"
-          className="cis-secondary-button text-sm"
+          className="cis-soft-button text-sm flex items-center gap-2"
           onClick={irParaHoje}
           aria-label="Ir para hoje"
         >
-          Hoje
+          <FaCalendarDay /> Hoje
         </button>
       </div>
     </div>

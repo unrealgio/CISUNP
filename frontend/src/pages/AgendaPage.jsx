@@ -191,7 +191,7 @@ export default function AgendaPage() {
           {loading ? "Carregando" : "Salvando alterações"}
         </LoadingMessage>
       )}
-      <div className="flex gap-6 bg-(--cis-background-strong) p-6 rounded-xl">
+      <div className="flex gap-6 p-6">
         <div className="flex-1">
           <List
             schedules={schedules}
