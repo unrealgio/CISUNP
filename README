@@ -17,7 +17,7 @@ O sistema centraliza informações de pacientes, agenda, prescrições e prontu�
 ## Funcionalidades
 
 - Autenticação JWT e alteração de senha no primeiro acesso.
-- Cadastro, busca, edição e exclusão de pacientes.
+- Cadastro, busca, edição e exclusão de pacientes (a exclusão preserva o histórico de agendamentos, prescrições e prontuários).
 - Agenda de consultas com prevenção de horários duplicados.
 - Prontuário odontológico com desenho da arcada e geração de PDF.
 - Cadastro e consulta de prescrições.
@@ -71,6 +71,7 @@ O backend está organizado em rotas, controllers, models e middlewares:
 - Node.js 20.19 ou superior (exigido pelo Vite 8 e pelo ESLint 10).
 - PostgreSQL em execução.
 - Um banco PostgreSQL criado para o projeto.
+- Um segundo banco, `cis_test`, para os testes automatizados do backend (veja [Testes do backend](#testes-do-backend)).
 
 ## Configuração do backend
 
@@ -150,6 +151,26 @@ Get-ChildItem .\backend -Recurse -Filter *.js |
   Where-Object { $_.FullName -notmatch '\\node_modules\\' } |
   ForEach-Object { node --check $_.FullName }
 ```
+
+### Testes do backend
+
+Os testes usam o executor nativo do Node (`node:test`), sem dependências extras, e ficam em [`backend/tests`](backend/tests).
+
+Os testes que acessam o banco usam um banco separado, `cis_test`, para não alterar os dados de desenvolvimento. Crie-o uma única vez, com as mesmas credenciais do `backend/.env`:
+
+```sql
+CREATE DATABASE cis_test;
+```
+
+(No pgAdmin: clique com o botão direito em **Databases → Create → Database...** e use o nome `cis_test`.)
+
+Depois, na pasta `backend`:
+
+```bash
+npm test
+```
+
+A cada execução, as tabelas do `cis_test` são apagadas e recriadas. Por segurança, os testes param com erro se estiverem apontando para qualquer outro banco.
 
 ## API principal
 
