@@ -89,6 +89,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
               type="text"
               name="patient"
               value={form.patient}
+              maxLength={120}
               onChange={handleChange}
               required
               className="cis-input"
@@ -119,6 +120,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
               type="text"
               name="phone"
               value={form.phone}
+              maxLength={255}
               onChange={handleChange}
               className="cis-input"
               placeholder="Telefone"
@@ -132,6 +134,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
               type="text"
               name="medico"
               value={form.medico}
+              maxLength={255}
               onChange={handleChange}
               className="cis-input"
               placeholder="Médico"
@@ -160,6 +163,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
               type="text"
               name="endereco"
               value={form.endereco}
+              maxLength={255}
               onChange={handleChange}
               className="cis-input"
               placeholder="Endereço"
@@ -170,6 +174,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
             <textarea
               name="notes"
               value={form.notes}
+              maxLength={255}
               onChange={handleChange}
               className="cis-input"
               placeholder="Observações"

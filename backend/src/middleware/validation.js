@@ -76,6 +76,14 @@ function validateIdParam(req, res, next) {
     : fail(res, ["Identificador inválido."]);
 }
 
+function validarTamanhos(body, campos, errors) {
+  for (const [campo, rotulo] of Object.entries(campos)) {
+    if (body[campo] != null && String(body[campo]).length > 255) {
+      errors.push(`O campo ${rotulo} deve ter no máximo 255 caracteres.`);
+    }
+  }
+}
+
 // VALIDAÇÕES COMUNS AO CADASTRO E À EDIÇÃO DE PACIENTE
 function validarCamposPaciente(body, errors) {
   const { patient, idade } = body;
@@ -95,11 +103,16 @@ function validarCamposPaciente(body, errors) {
   ) {
     errors.push("Idade deve ser um número entre 0 e 150.");
   }
-  for (const field of ["phone", "medico", "endereco", "notes"]) {
-    if (body[field] != null && String(body[field]).length > 255) {
-      errors.push(`Campo ${field} excede o limite de 255 caracteres.`);
-    }
-  }
+  validarTamanhos(
+    body,
+    {
+      phone: "Telefone",
+      medico: "Médico",
+      endereco: "Endereço",
+      notes: "Observações",
+    },
+    errors,
+  );
 }
 
 function validatePacienteBody(req, res, next) {
@@ -138,7 +151,8 @@ function validateIntervaloQuery(req, res, next) {
 }
 
 function validateAgendamentoBody(req, res, next) {
-  const { time, date, patient } = req.body || {};
+  const body = req.body || {};
+  const { time, date, patient, cpf } = body;
   const errors = [];
 
   if (!isTime(time)) errors.push("Horário deve estar no formato HH:MM.");
@@ -150,9 +164,14 @@ function validateAgendamentoBody(req, res, next) {
   ) {
     errors.push("Nome do paciente deve ter entre 2 e 120 caracteres.");
   }
-  if (req.body.cpf && !isCpf(req.body.cpf)) {
+  if (cpf && !isCpf(cpf)) {
     errors.push("CPF deve conter 11 números.");
   }
+  validarTamanhos(
+    body,
+    { phone: "Telefone", medico: "Médico", notes: "Observações" },
+    errors,
+  );
 
   return errors.length ? fail(res, errors) : next();
 }
@@ -169,6 +188,11 @@ function validatePrescricaoBody(req, res, next) {
   ) {
     errors.push("Medicamento deve ter entre 2 e 255 caracteres.");
   }
+  validarTamanhos(
+    req.body || {},
+    { dose: "Dose", frequencia: "Frequência", observacao: "Observação" },
+    errors,
+  );
 
   return errors.length ? fail(res, errors) : next();
 }

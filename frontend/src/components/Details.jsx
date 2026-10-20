@@ -118,6 +118,7 @@ export default function Details({
             type="text"
             className="cis-input max-w-full"
             value={patient}
+            maxLength={120}
             onChange={(e) => setPatient(e.target.value)}
             onKeyDown={handleKeyDown}
           />
@@ -152,6 +153,7 @@ export default function Details({
             type="text"
             className="cis-input max-w-full"
             value={medico}
+            maxLength={255}
             onChange={(e) => setMedico(e.target.value)}
             onKeyDown={handleKeyDown}
           />
@@ -168,6 +170,7 @@ export default function Details({
             type="text"
             className="cis-campo-compacto"
             value={phone}
+            maxLength={255}
             onChange={(e) => setPhone(e.target.value)}
           />
         ) : (
@@ -180,6 +183,7 @@ export default function Details({
           <textarea
             className="cis-input"
             value={notes}
+            maxLength={255}
             onChange={(e) => setNotes(e.target.value)}
           />
         ) : (

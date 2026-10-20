@@ -69,6 +69,7 @@ export default function TabPrescricoes({
           <input
             name="medicamento"
             value={form.medicamento}
+            maxLength={255}
             onChange={handleChange}
             placeholder="Medicamento"
             className="cis-input"
@@ -77,6 +78,7 @@ export default function TabPrescricoes({
           <input
             name="dose"
             value={form.dose}
+            maxLength={255}
             onChange={handleChange}
             placeholder="Dose"
             className="cis-input"
@@ -84,6 +86,7 @@ export default function TabPrescricoes({
           <input
             name="frequencia"
             value={form.frequencia}
+            maxLength={255}
             onChange={handleChange}
             placeholder="Frequência"
             className="cis-input"
@@ -91,6 +94,7 @@ export default function TabPrescricoes({
           <input
             name="observacao"
             value={form.observacao}
+            maxLength={255}
             onChange={handleChange}
             placeholder="Observação"
             className="cis-input"

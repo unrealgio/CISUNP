@@ -119,6 +119,7 @@ export default function PacienteInfoCard({
                 name="patient"
                 className="cis-input w-44 text-sm"
                 value={form.patient}
+                maxLength={120}
                 onChange={handleEditChange}
                 placeholder="Nome do paciente"
                 autoFocus
@@ -153,6 +154,7 @@ export default function PacienteInfoCard({
                 name="phone"
                 className="cis-input w-28 text-sm"
                 value={form.phone}
+                maxLength={255}
                 onChange={handleEditChange}
                 placeholder="Telefone"
               />
@@ -168,6 +170,7 @@ export default function PacienteInfoCard({
                 name="medico"
                 className="cis-input w-28 text-sm"
                 value={form.medico}
+                maxLength={255}
                 onChange={handleEditChange}
                 placeholder="Médico"
               />
@@ -216,6 +219,7 @@ export default function PacienteInfoCard({
                   name="endereco"
                   className="cis-input w-40 text-sm"
                   value={form.endereco}
+                  maxLength={255}
                   onChange={handleEditChange}
                   placeholder="Endereço"
                 />
@@ -231,6 +235,7 @@ export default function PacienteInfoCard({
                 name="notes"
                 className="cis-input text-sm"
                 value={form.notes}
+                maxLength={255}
                 onChange={handleEditChange}
                 placeholder="Observações"
                 rows={2}

@@ -132,6 +132,7 @@ export default function List({
                     className="cis-input"
                     placeholder="Nome do paciente"
                     value={patientName}
+                    maxLength={120}
                     onChange={(e) => setPatientName(e.target.value)}
                     onKeyDown={(e) => handleKeyDown(e, item)}
                     autoFocus
@@ -150,6 +151,7 @@ export default function List({
                     className="cis-input"
                     placeholder="Telefone"
                     value={phone}
+                    maxLength={255}
                     onChange={(e) => setPhone(e.target.value)}
                   />
                   <input
@@ -157,6 +159,7 @@ export default function List({
                     className="cis-input"
                     placeholder="Observações"
                     value={notes}
+                    maxLength={255}
                     onChange={(e) => setNotes(e.target.value)}
                   />
                 </div>
@@ -193,6 +196,7 @@ export default function List({
                   className="cis-input w-32"
                   placeholder="Nome do médico"
                   value={medicoName}
+                  maxLength={255}
                   onChange={(e) => setMedicoName(e.target.value)}
                   onKeyDown={(e) => handleKeyDown(e, item)}
                 />
