@@ -72,7 +72,11 @@ export default function PacienteInfoCard({
   }
 
   async function handleDelete() {
-    if (!window.confirm("Tem certeza que deseja excluir este paciente?"))
+    if (
+      !window.confirm(
+        "Tem certeza que deseja excluir este paciente? O histórico de agendamentos, prescrições e prontuários será mantido.",
+      )
+    )
       return;
     if (loading) return;
     setLoading(true);

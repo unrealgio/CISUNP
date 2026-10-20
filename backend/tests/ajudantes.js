@@ -13,9 +13,27 @@ function gerarTokenDeTeste(dados = {}, opcoes = { expiresIn: "5m" }) {
 function iniciarServidor() {
   return new Promise((resolve) => {
     const servidor = app.listen(0, () => {
-      const { port } = servidor.address();
+      const url = `http://localhost:${servidor.address().port}`;
+
+      async function chamar(
+        metodo,
+        caminho,
+        corpo,
+        token = gerarTokenDeTeste(),
+      ) {
+        const headers = { "Content-Type": "application/json" };
+        if (token) headers.Authorization = `Bearer ${token}`;
+        const res = await fetch(`${url}${caminho}`, {
+          method: metodo,
+          headers,
+          body: corpo === undefined ? undefined : JSON.stringify(corpo),
+        });
+        return { status: res.status, corpo: await res.json() };
+      }
+
       resolve({
-        url: `http://localhost:${port}`,
+        url,
+        chamar,
         fechar: () => new Promise((fim) => servidor.close(fim)),
       });
     });

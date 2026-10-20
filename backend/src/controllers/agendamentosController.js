@@ -52,9 +52,11 @@ async function sincronizarPaciente(
   const [paciente, created] = await Paciente.findOrCreate({
     where: { cpf },
     defaults: { patient, cpf, phone, medico },
+    paranoid: false,
     transaction,
   });
   if (created) return;
+  if (paciente.deletedAt) await paciente.restore({ transaction });
 
   // PREENCHE OS CAMPOS VAZIOS
   const camposVazios = {};

@@ -34,9 +34,19 @@ function camposDoPaciente(body) {
   return { patient: patient.trim(), phone, medico, idade, endereco, notes };
 }
 
-// CRIA UM PACIENTE (O CPF NÃO PODE ESTAR CADASTRADO)
+// CRIA UM PACIENTE (O CPF NÃO PODE ESTAR CADASTRADO; SE O PACIENTE FOI EXCLUÍDO, ELE É REATIVADO)
 exports.criar = async (req, res) => {
   try {
+    const existente = await Paciente.findOne({
+      where: { cpf: req.body.cpf },
+      paranoid: false,
+    });
+    if (existente?.deletedAt) {
+      await existente.restore();
+      await existente.update(camposDoPaciente(req.body));
+      return res.status(201).json(existente);
+    }
+
     const paciente = await Paciente.create({
       cpf: req.body.cpf,
       ...camposDoPaciente(req.body),

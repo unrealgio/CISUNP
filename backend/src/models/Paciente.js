@@ -15,7 +15,10 @@ const Paciente = sequelize.define(
   },
   {
     tableName: "pacientes",
-    timestamps: false,
+    timestamps: true,
+    createdAt: false,
+    updatedAt: false,
+    paranoid: true,
   },
 );
 
