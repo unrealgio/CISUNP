@@ -98,11 +98,6 @@
     @apply rounded-[0.55rem] border border-(--cis-orange) bg-(--cis-orange-soft) px-4 py-2 font-bold text-(--cis-orange-text) transition hover:bg-(--cis-orange) hover:text-(--cis-on-orange) disabled:cursor-not-allowed disabled:opacity-60;
   }
 
-  /* BOTÕES DO PRONTUÁRIO */
-  .cis-success-button {
-    @apply bg-green-600 text-white px-4 py-2 rounded font-bold;
-  }
-
   /* BOTÕES DE ÍCONE */
   .cis-icon-button {
     @apply p-1 rounded cursor-pointer;
