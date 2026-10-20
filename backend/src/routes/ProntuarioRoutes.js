@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const prontuarioController = require("../controllers/prontuarioController");
-const authenticateToken = require("../middleware/middleware");
+const { authenticateToken } = require("../middleware/middleware");
 const {
   validateCpfQuery,
   validateProntuarioBody,

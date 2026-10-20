@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/loginController");
-const authenticateToken = require("../middleware/middleware");
+const {
+  authenticateToken,
+  authenticateTrocaDeSenha,
+} = require("../middleware/middleware");
 const {
   validateLogin,
   validateChangePassword,
@@ -11,7 +14,7 @@ router.post("/login", validateLogin, authController.login);
 router.get("/session", authenticateToken, authController.session);
 router.post(
   "/change-password",
-  authenticateToken,
+  authenticateTrocaDeSenha,
   validateChangePassword,
   authController.changePassword,
 );

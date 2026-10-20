@@ -9,7 +9,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [showChangePassword, setShowChangePassword] = useState(false);
-  const [email, setEmail] = useState("");
+  const [senhaAtual, setSenhaAtual] = useState("");
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -28,7 +28,7 @@ export default function Login() {
 
       if (res.ok && data.token) {
         localStorage.setItem("token", data.token);
-        setEmail(emailInput);
+        setSenhaAtual(senhaInput);
         if (data.firstAccess) {
           setShowChangePassword(true);
         } else {
@@ -163,7 +163,10 @@ export default function Login() {
         </form>
       </div>
       {showChangePassword && (
-        <PassChange email={email} onSenhaAlterada={handleSenhaAlterada} />
+        <PassChange
+          senhaAtual={senhaAtual}
+          onSenhaAlterada={handleSenhaAlterada}
+        />
       )}
     </div>
   );

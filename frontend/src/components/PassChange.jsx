@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { apiFetch, mensagemDeErro } from "../api";
 
-export default function PassChange({ email, onSenhaAlterada }) {
+export default function PassChange({ senhaAtual, onSenhaAlterada }) {
   const [novaSenha, setNovaSenha] = useState("");
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState("");
@@ -15,14 +15,12 @@ export default function PassChange({ email, onSenhaAlterada }) {
     try {
       const res = await apiFetch("/api/change-password", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ email, novaSenha }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ senhaAtual, novaSenha }),
       });
       const data = await res.json();
       if (res.ok) {
+        localStorage.setItem("token", data.token);
         setMensagem("Senha alterada com sucesso!");
         setTimeout(() => {
           onSenhaAlterada();

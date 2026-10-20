@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const prescricaoController = require("../controllers/prescricaoController");
-const authenticateToken = require("../middleware/middleware");
+const { authenticateToken } = require("../middleware/middleware");
 const {
   validateCpfQuery,
   validatePrescricaoBody,

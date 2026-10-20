@@ -38,16 +38,21 @@ function validateLogin(req, res, next) {
 }
 
 function validateChangePassword(req, res, next) {
-  const { email, novaSenha } = req.body || {};
+  const { senhaAtual, novaSenha } = req.body || {};
   const errors = [];
 
-  if (!isEmail(email)) errors.push("E-mail inválido.");
+  if (typeof senhaAtual !== "string" || !senhaAtual) {
+    errors.push("Informe a senha atual.");
+  }
   if (
     typeof novaSenha !== "string" ||
     novaSenha.length < 8 ||
     novaSenha.length > 72
   ) {
     errors.push("A nova senha deve ter entre 8 e 72 caracteres.");
+  }
+  if (novaSenha === senhaAtual) {
+    errors.push("A nova senha deve ser diferente da atual.");
   }
 
   return errors.length ? fail(res, errors) : next();
