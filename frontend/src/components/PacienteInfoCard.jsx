@@ -9,9 +9,10 @@ import {
   FaCheck,
   FaTimes,
   FaUserMd,
+  FaRegCalendar,
 } from "react-icons/fa";
 import { apiFetch, mensagemDeErro } from "../api";
-import { ErrorMessage } from "./StatusMessage";
+import { ErrorMessage, EstadoVazio } from "./StatusMessage";
 import { formatarDataISO } from "../utils/date";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 
@@ -110,7 +111,7 @@ export default function PacienteInfoCard({
   return (
     <div className="cis-panel p-6 flex flex-col md:flex-row gap-6 items-start mb-4">
       {operationError && <ErrorMessage>{operationError}</ErrorMessage>}
-      <div className="flex flex-col items-center min-w-30">
+      <div className="flex flex-col items-center min-w-30 wrap-anywhere">
         <FaUserCircle
           className="text-(--cis-blue) bg-(--cis-blue-soft) rounded-full"
           size={72}
@@ -151,7 +152,7 @@ export default function PacienteInfoCard({
             )}
           </div>
           <div className="flex items-center justify-center gap-1 text-sm">
-            <FaPhone className="text-gray-500" />{" "}
+            <FaPhone className="text-gray-500 shrink-0" />{" "}
             {editing ? (
               <input
                 type="text"
@@ -167,7 +168,7 @@ export default function PacienteInfoCard({
             )}
           </div>
           <div className="flex items-center justify-center gap-1 text-sm">
-            <FaUserMd className="text-gray-500" />{" "}
+            <FaUserMd className="text-gray-500 shrink-0" />{" "}
             {editing ? (
               <input
                 type="text"
@@ -200,8 +201,12 @@ export default function PacienteInfoCard({
                   </li>
                 ))
               ) : (
-                <li className="text-sm text-gray-400">
-                  Nenhum agendamento futuro
+                <li>
+                  <EstadoVazio
+                    compacto
+                    icone={<FaRegCalendar />}
+                    titulo="Nenhum agendamento futuro"
+                  />
                 </li>
               )}
             </ul>

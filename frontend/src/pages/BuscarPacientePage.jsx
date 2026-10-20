@@ -13,7 +13,11 @@ import Header from "../components/Header";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 import Menu from "../components/Menu";
 import AddPaciente from "../components/AddPaciente";
-import { ErrorMessage, LoadingMessage } from "../components/StatusMessage";
+import {
+  ErrorMessage,
+  EstadoVazio,
+  LoadingMessage,
+} from "../components/StatusMessage";
 import { useNavigate } from "react-router-dom";
 
 const filtros = [
@@ -154,11 +158,12 @@ export default function BuscarPacientePage() {
                     </tr>
                   ) : paginatedResults.length === 0 ? (
                     <tr>
-                      <td
-                        colSpan={4}
-                        className="text-center py-6 text-gray-500"
-                      >
-                        Nenhum paciente encontrado.
+                      <td colSpan={4} className="p-4">
+                        <EstadoVazio
+                          icone={<FaSearch />}
+                          titulo="Nenhum paciente encontrado."
+                          dica="Confira o termo digitado ou cadastre um novo paciente."
+                        />
                       </td>
                     </tr>
                   ) : (

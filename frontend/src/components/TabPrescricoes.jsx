@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { FaPills, FaPlus } from "react-icons/fa";
 import { apiFetch, mensagemDeErro } from "../api";
-import { ErrorMessage } from "./StatusMessage";
+import { ErrorMessage, EstadoVazio } from "./StatusMessage";
 import { formatarDataHora } from "../utils/date";
 
 export default function TabPrescricoes({
@@ -55,7 +55,7 @@ export default function TabPrescricoes({
       <h2 className="text-xl font-bold mb-4 text-(--cis-navy) flex items-center gap-2">
         <FaPills className="text-(--cis-orange-text)" /> Prescrições
         <button
-          className="cis-primary-button ml-auto flex items-center gap-1"
+          className="cis-soft-button ml-auto flex items-center gap-1"
           onClick={() => setShowForm((v) => !v)}
           disabled={loading}
         >
@@ -109,7 +109,11 @@ export default function TabPrescricoes({
         </form>
       )}
       {prescricoes.length === 0 ? (
-        <p className="text-gray-500">Nenhuma prescrição cadastrada.</p>
+        <EstadoVazio
+          icone={<FaPills />}
+          titulo="Nenhuma prescrição cadastrada."
+          dica="Use o botão Adicionar para registrar a primeira."
+        />
       ) : (
         <div className="space-y-4">
           {prescricoes.map((p) => (
@@ -117,8 +121,8 @@ export default function TabPrescricoes({
               key={p.id}
               className="rounded-lg border border-(--cis-border) border-l-4 border-l-(--cis-orange) bg-(--cis-orange-soft) p-4 flex gap-4 items-center"
             >
-              <FaPills className="text-(--cis-orange-text) text-2xl mr-2" />
-              <div>
+              <FaPills className="text-(--cis-orange-text) text-2xl mr-2 shrink-0" />
+              <div className="min-w-0 wrap-anywhere">
                 <p>
                   <strong>Medicamento:</strong> {p.medicamento}
                 </p>

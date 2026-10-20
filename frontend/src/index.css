@@ -6,7 +6,7 @@
   --cis-blue-soft: #e8f1f5;
   --cis-orange: #f9a23b;
   --cis-orange-soft: #fff2df;
-  --cis-orange-text: #b85c12;
+  --cis-orange-text: #a95210;
   --cis-on-orange: var(--cis-navy);
   --cis-steel: #4a6a8c;
   --cis-ink: #243746;
@@ -50,7 +50,8 @@ body {
   margin: 0;
   background: var(--cis-background);
   color: var(--cis-ink);
-  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  font-family: "Inter Variable", "Segoe UI", sans-serif;
+  overflow-wrap: break-word;
   -webkit-font-smoothing: antialiased;
 }
 

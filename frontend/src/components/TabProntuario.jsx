@@ -11,11 +11,15 @@ import {
   FaCheckCircle,
   FaDownload,
   FaSave,
+  FaStethoscope,
+  FaClipboardList,
+  FaFileMedical,
 } from "react-icons/fa";
 import { ReactSketchCanvas } from "react-sketch-canvas";
 import { apiFetch, apiUrl, mensagemDeErro } from "../api";
 import { dataLocalISO, formatarDataISO } from "../utils/date";
 import { useBuscarDados } from "../hooks/useBuscarDados";
+import { EstadoVazio } from "./StatusMessage";
 
 export default function TabProntuario({ cpf }) {
   const canvasRef = useRef();
@@ -168,7 +172,7 @@ export default function TabProntuario({ cpf }) {
       )}
       {/* SAÚDE BUCAL */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
+        <div className="cis-titulo-secao">
           <FaSmile /> Saúde Bucal
         </div>
         <div className="grid md:grid-cols-2 gap-4 bg-(--cis-soft-gray) rounded-lg p-4 border shadow">
@@ -309,7 +313,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* ANTECEDENTES FAMILIARES */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
+        <div className="cis-titulo-secao">
           <FaUserMd /> Antecedentes Familiares
         </div>
         <textarea
@@ -322,8 +326,8 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* EXAME CLÍNICO */}
       <div className="mb-6">
-        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg">
-          Exame Clínico
+        <div className="cis-titulo-secao">
+          <FaStethoscope /> Exame Clínico
         </div>
         <div className="bg-(--cis-soft-gray) rounded-lg p-4 border shadow mb-4 space-y-2">
           <div className="flex gap-4 flex-wrap">
@@ -454,7 +458,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* DESENHO NA ARCADA DENTÁRIA (900x700, MESMO TAMANHO USADO NO PDF) */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
+        <div className="cis-titulo-secao">
           <FaPencilAlt /> Marque os procedimentos na arcada dentária:
         </div>
         <div className="flex flex-col items-center w-full">
@@ -497,14 +501,14 @@ export default function TabProntuario({ cpf }) {
           </div>
           <div className="flex flex-row gap-2">
             <button
-              className="cis-unp-button button-animate flex items-center gap-2"
+              className="cis-secondary-button button-animate flex items-center gap-2"
               onClick={handleUndoCanvas}
               type="button"
             >
               <FaUndo /> Desfazer
             </button>
             <button
-              className="cis-steel-button button-animate flex items-center gap-2"
+              className="cis-secondary-button button-animate flex items-center gap-2"
               onClick={handleClearCanvas}
               type="button"
             >
@@ -515,8 +519,8 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* ALTERAÇÕES ENCONTRADAS */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
-          <FaSmile /> Alterações
+        <div className="cis-titulo-secao">
+          <FaClipboardList /> Alterações
         </div>
         <textarea
           className="cis-textarea-simples"
@@ -528,7 +532,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       <div className="mb-8 flex justify-end">
         <button
-          className="cis-success-button flex items-center gap-2"
+          className="cis-primary-button flex items-center gap-2"
           onClick={handleSalvarProntuario}
           type="button"
           disabled={salvando}
@@ -538,13 +542,17 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* HISTÓRICO DE PRONTUÁRIOS COM LINK PARA O PDF */}
       <div>
-        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
+        <div className="cis-titulo-secao">
           <FaCalendarAlt /> Registros do Prontuário:
         </div>
         {historico.carregando ? (
           <p className="text-gray-500">Carregando registros</p>
         ) : registros.length === 0 ? (
-          <p className="text-gray-500">Nenhum registro de prontuário.</p>
+          <EstadoVazio
+            icone={<FaFileMedical />}
+            titulo="Nenhum registro de prontuário."
+            dica="Preencha a ficha acima e clique em Salvar/Exportar PDF para criar o primeiro."
+          />
         ) : (
           <div className="space-y-4">
             {registros.map((registro) => (

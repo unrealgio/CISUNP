@@ -5,7 +5,9 @@ import {
   FaFileImage,
   FaNotesMedical,
   FaUpload,
+  FaFolderOpen,
 } from "react-icons/fa";
+import { EstadoVazio } from "./StatusMessage";
 
 export default function TabArquivos({ arquivos, setArquivos }) {
   const [uploading, setUploading] = useState(false);
@@ -57,7 +59,11 @@ export default function TabArquivos({ arquivos, setArquivos }) {
         </label>
       </div>
       {arquivos.length === 0 ? (
-        <p className="text-gray-500">Nenhum arquivo disponível</p>
+        <EstadoVazio
+          icone={<FaFolderOpen />}
+          titulo="Nenhum arquivo disponível"
+          dica="Envie exames, radiografias ou documentos do paciente."
+        />
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {arquivos.map((arq) => (

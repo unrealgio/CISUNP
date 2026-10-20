@@ -88,15 +88,17 @@
     @apply w-full px-4 py-2.5 pr-10 border border-(--cis-border) rounded-lg shadow-sm focus:border-(--cis-orange) bg-white text-(--cis-ink) placeholder-(--cis-muted) text-base transition;
   }
 
+  /* TÍTULOS */
+  .cis-titulo-secao {
+    @apply mb-3 flex items-center gap-2 border-b border-(--cis-border) pb-2 text-lg font-semibold text-(--cis-orange-text);
+  }
+
+  /* BOTÕES */
+  .cis-soft-button {
+    @apply rounded-[0.55rem] border border-(--cis-orange) bg-(--cis-orange-soft) px-4 py-2 font-bold text-(--cis-orange-text) transition hover:bg-(--cis-orange) hover:text-(--cis-on-orange) disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
   /* BOTÕES DO PRONTUÁRIO */
-  .cis-unp-button {
-    @apply bg-(--cis-unp-orange) text-(--cis-on-orange) px-4 py-2 rounded shadow hover:bg-(--cis-unp-orange-hover) font-semibold;
-  }
-
-  .cis-steel-button {
-    @apply bg-(--cis-unp-steel) text-white px-4 py-2 rounded shadow hover:bg-(--cis-unp-blue) font-semibold;
-  }
-
   .cis-success-button {
     @apply bg-green-600 text-white px-4 py-2 rounded font-bold;
   }

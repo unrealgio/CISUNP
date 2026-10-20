@@ -11,6 +11,33 @@ const estilosErro = {
     "rounded-lg bg-red-50 border border-red-200 text-(--cis-danger) text-sm px-3 py-2 text-center",
 };
 
+export function EstadoVazio({ icone, titulo, dica, compacto = false }) {
+  if (compacto) {
+    return (
+      <p className="flex items-center gap-2 text-sm text-(--cis-muted)">
+        {icone && (
+          <span className="shrink-0" aria-hidden="true">
+            {icone}
+          </span>
+        )}
+        {titulo}
+      </p>
+    );
+  }
+
+  return (
+    <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-(--cis-border) bg-(--cis-surface) px-6 py-8 text-center">
+      {icone && (
+        <span className="text-3xl text-(--cis-unp-steel)" aria-hidden="true">
+          {icone}
+        </span>
+      )}
+      <p className="font-semibold text-(--cis-ink)">{titulo}</p>
+      {dica && <p className="text-sm text-(--cis-muted)">{dica}</p>}
+    </div>
+  );
+}
+
 export function ErrorMessage({ children, compacto = false, className = "" }) {
   const estilo = compacto ? estilosErro.compacto : estilosErro.padrao;
   return (

@@ -10,6 +10,7 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
+import { EstadoVazio } from "./StatusMessage";
 
 const consultasExemplo = [
   {
@@ -332,8 +333,12 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
       {/* CARDS DE CONSULTAS */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {paginatedConsultas.length === 0 ? (
-          <div className="col-span-full text-center text-gray-500 py-12">
-            Nenhuma consulta encontrada.
+          <div className="col-span-full">
+            <EstadoVazio
+              icone={<FaCalendarAlt />}
+              titulo="Nenhuma consulta encontrada."
+              dica="Tente buscar por outro nome."
+            />
           </div>
         ) : (
           paginatedConsultas.map((c) => (
