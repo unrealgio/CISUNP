@@ -4,7 +4,7 @@
 .cis-panel {
   background: var(--cis-surface);
   border: 1px solid var(--cis-border);
-  border-radius: 0.9rem;
+  border-radius: 1rem;
   box-shadow: var(--cis-shadow);
 }
 
@@ -34,7 +34,7 @@
 
 .cis-input:focus {
   border-color: var(--cis-orange);
-  box-shadow: 0 0 0 3px rgba(229, 139, 53, 0.16);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--cis-orange) 30%, transparent);
   outline: none;
 }
 
@@ -50,7 +50,7 @@
 
 .cis-primary-button {
   background: var(--cis-orange);
-  color: white;
+  color: var(--cis-on-orange);
 }
 
 .cis-primary-button:hover {
@@ -90,7 +90,7 @@
 
   /* BOTÕES DO PRONTUÁRIO */
   .cis-unp-button {
-    @apply bg-(--cis-unp-orange) text-white px-4 py-2 rounded shadow hover:bg-(--cis-unp-orange-hover) font-semibold;
+    @apply bg-(--cis-unp-orange) text-(--cis-on-orange) px-4 py-2 rounded shadow hover:bg-(--cis-unp-orange-hover) font-semibold;
   }
 
   .cis-steel-button {

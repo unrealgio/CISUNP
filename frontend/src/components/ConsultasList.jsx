@@ -339,7 +339,7 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
           paginatedConsultas.map((c) => (
             <div
               key={c.id}
-              className={`bg-white rounded-xl shadow-lg p-5 flex flex-col gap-2 border-l-4 transition hover:shadow-xl hover:scale-[1.02] cursor-pointer`}
+              className={`bg-white rounded-xl shadow-lg p-5 flex flex-col gap-2 border-l-4 transition hover:shadow-xl hover:-translate-y-0.5 cursor-pointer`}
               style={{
                 borderColor:
                   c.status === "Confirmada"

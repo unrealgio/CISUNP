@@ -148,7 +148,7 @@ export default function TabProntuario({ cpf }) {
           className={`fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg flex items-center gap-2
             ${
               toast.type === "info"
-                ? "bg-(--cis-unp-orange) text-white"
+                ? "bg-(--cis-unp-orange) text-(--cis-on-orange)"
                 : "bg-green-500 text-white"
             }
             animate-toast`}
@@ -168,7 +168,7 @@ export default function TabProntuario({ cpf }) {
       )}
       {/* SAÚDE BUCAL */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
           <FaSmile /> Saúde Bucal
         </div>
         <div className="grid md:grid-cols-2 gap-4 bg-(--cis-soft-gray) rounded-lg p-4 border shadow">
@@ -309,7 +309,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* ANTECEDENTES FAMILIARES */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
           <FaUserMd /> Antecedentes Familiares
         </div>
         <textarea
@@ -322,7 +322,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* EXAME CLÍNICO */}
       <div className="mb-6">
-        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg">
+        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg">
           Exame Clínico
         </div>
         <div className="bg-(--cis-soft-gray) rounded-lg p-4 border shadow mb-4 space-y-2">
@@ -454,7 +454,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* DESENHO NA ARCADA DENTÁRIA (900x700, MESMO TAMANHO USADO NO PDF) */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
           <FaPencilAlt /> Marque os procedimentos na arcada dentária:
         </div>
         <div className="flex flex-col items-center w-full">
@@ -515,7 +515,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* ALTERAÇÕES ENCONTRADAS */}
       <div className="mb-6 animate-fade-in">
-        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
           <FaSmile /> Alterações
         </div>
         <textarea
@@ -538,7 +538,7 @@ export default function TabProntuario({ cpf }) {
       </div>
       {/* HISTÓRICO DE PRONTUÁRIOS COM LINK PARA O PDF */}
       <div>
-        <div className="font-semibold mb-2 text-(--cis-unp-orange) text-lg flex items-center gap-2">
+        <div className="font-semibold mb-2 text-(--cis-orange-text) text-lg flex items-center gap-2">
           <FaCalendarAlt /> Registros do Prontuário:
         </div>
         {historico.carregando ? (
@@ -550,7 +550,7 @@ export default function TabProntuario({ cpf }) {
             {registros.map((registro) => (
               <div
                 key={registro.id}
-                className="bg-linear-to-r from-(--cis-soft-gray) to-(--cis-soft-blue) rounded-lg p-4 border-l-4 border-(--cis-unp-steel) shadow transition hover:scale-[1.02] hover:shadow-lg flex gap-4 items-center animate-slide-in"
+                className="bg-linear-to-r from-(--cis-soft-gray) to-(--cis-soft-blue) rounded-lg p-4 border-l-4 border-(--cis-unp-steel) shadow transition hover:-translate-y-0.5 hover:shadow-lg flex gap-4 items-center animate-slide-in"
               >
                 <FaCalendarAlt className="text-(--cis-unp-steel) text-2xl mr-2" />
                 <div>

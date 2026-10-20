@@ -53,7 +53,7 @@ export default function TabPrescricoes({
   return (
     <div className="cis-panel p-6 mt-6 animate-fade-in">
       <h2 className="text-xl font-bold mb-4 text-(--cis-navy) flex items-center gap-2">
-        <FaPills className="text-(--cis-orange)" /> Prescrições
+        <FaPills className="text-(--cis-orange-text)" /> Prescrições
         <button
           className="cis-primary-button ml-auto flex items-center gap-1"
           onClick={() => setShowForm((v) => !v)}
@@ -117,7 +117,7 @@ export default function TabPrescricoes({
               key={p.id}
               className="rounded-lg border border-(--cis-border) border-l-4 border-l-(--cis-orange) bg-(--cis-orange-soft) p-4 flex gap-4 items-center"
             >
-              <FaPills className="text-(--cis-orange) text-2xl mr-2" />
+              <FaPills className="text-(--cis-orange-text) text-2xl mr-2" />
               <div>
                 <p>
                   <strong>Medicamento:</strong> {p.medicamento}

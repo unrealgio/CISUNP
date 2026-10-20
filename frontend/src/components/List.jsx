@@ -105,9 +105,9 @@ export default function List({
               selected?.time === item.time
                 ? "bg-(--cis-orange-soft) border border-(--cis-orange)"
                 : item.patient
-                  ? "bg-(--cis-surface) border border-(--cis-border) hover:border-(--cis-blue)"
-                  : "bg-(--cis-surface) border border-dashed border-(--cis-border) hover:border-(--cis-blue)"
-            } cursor-pointer transition-colors`}
+                  ? "bg-(--cis-surface) border border-(--cis-border) hover:border-(--cis-blue) hover:bg-(--cis-blue-soft)"
+                  : "bg-(--cis-surface) border border-dashed border-(--cis-border) hover:border-(--cis-blue) hover:bg-(--cis-blue-soft)"
+            } cursor-pointer transition hover:shadow-md`}
             onClick={() => onSelect && onSelect(item)}
           >
             <span className="text-left font-bold flex items-center gap-2 pl-4 md:pl-6">

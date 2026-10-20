@@ -78,7 +78,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
     <div className="cis-panel p-5 md:p-7 max-w-5xl mx-auto mt-6 animate-fade-in flex flex-col md:flex-row gap-6">
       <div className="flex-1">
         <h2 className="text-2xl font-bold mb-6 text-(--cis-navy) flex items-center gap-2">
-          <FaUserPlus className="text-(--cis-orange)" /> Adicionar Paciente
+          <FaUserPlus className="text-(--cis-orange-text)" /> Adicionar Paciente
         </h2>
         <form className="grid md:grid-cols-2 gap-4" onSubmit={handleSubmit}>
           <div className="space-y-1">

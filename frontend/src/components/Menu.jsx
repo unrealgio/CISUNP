@@ -46,7 +46,7 @@ export default function Menu({ active = "agenda" }) {
           <span
             className={`transition-transform duration-200 ${
               active === item.key
-                ? "text-(--cis-orange)"
+                ? "text-(--cis-orange-text)"
                 : "text-(--cis-muted) group-hover:text-(--cis-blue)"
             }`}
           >

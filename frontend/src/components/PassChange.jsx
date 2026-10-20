@@ -60,7 +60,7 @@ export default function PassChange({ senhaAtual, onSenhaAlterada }) {
           />
           <button
             type="submit"
-            className="w-full bg-(--cis-unp-orange) hover:bg-(--cis-unp-orange-hover) text-white font-semibold py-2 rounded-lg transition-all duration-200 shadow-lg"
+            className="w-full bg-(--cis-unp-orange) hover:bg-(--cis-unp-orange-hover) text-(--cis-on-orange) font-semibold py-2 rounded-lg transition-all duration-200 shadow-lg"
             disabled={loading}
           >
             {loading ? "Alterando..." : "Alterar senha"}
