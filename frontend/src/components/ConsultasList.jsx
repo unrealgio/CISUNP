@@ -323,10 +323,10 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
             value={search}
             onChange={handleSearch}
             placeholder="Buscar por nome do paciente..."
-            className="w-full rounded-lg px-4 py-2 border border-gray-300 shadow-sm focus:ring-2 focus:ring-(--cis-unp-orange) focus:border-(--cis-unp-orange) transition outline-none text-black placeholder-gray-500 text-base font-medium"
+            className="w-full rounded-lg px-4 py-2 border border-(--cis-border) bg-(--cis-surface) shadow-sm focus:ring-2 focus:ring-(--cis-unp-orange) focus:border-(--cis-unp-orange) transition outline-none text-(--cis-ink) placeholder-(--cis-muted) text-base font-medium"
             aria-label="Buscar por nome do paciente"
           />
-          <FaSearch className="absolute right-3 top-3 text-gray-400" />
+          <FaSearch className="absolute right-3 top-3 text-(--cis-muted)" />
         </div>
       </div>
 
@@ -386,16 +386,16 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
                   {expanded === c.id ? <FaChevronUp /> : <FaChevronDown />}
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-gray-700">
+              <div className="flex items-center gap-2 text-(--cis-ink)">
                 <FaCalendarAlt /> {c.data}
                 <FaClock className="ml-4" /> {c.hora}
               </div>
-              <div className="flex items-center gap-2 text-gray-700">
+              <div className="flex items-center gap-2 text-(--cis-ink)">
                 <FaUserMd /> {c.equipe}
               </div>
               {/* DETALHES EXPANDIDOS DAS CONSULTAS */}
               {expanded === c.id && (
-                <div className="mt-3 p-3 rounded bg-gray-50 border border-gray-200 text-gray-700 text-sm">
+                <div className="mt-3 p-3 rounded bg-(--cis-background) border border-(--cis-border) text-(--cis-ink) text-sm">
                   <strong>Detalhes:</strong> {c.detalhes}
                 </div>
               )}

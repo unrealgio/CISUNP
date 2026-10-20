@@ -116,7 +116,7 @@ export default function PacienteInfoCard({
           className="text-(--cis-blue) bg-(--cis-blue-soft) rounded-full"
           size={72}
         />
-        <div className="mt-2 text-gray-700 text-center">
+        <div className="mt-2 text-(--cis-ink) text-center">
           <div className="font-bold text-lg text-(--cis-navy)">
             {editing ? (
               <input
@@ -152,7 +152,7 @@ export default function PacienteInfoCard({
             )}
           </div>
           <div className="flex items-center justify-center gap-1 text-sm">
-            <FaPhone className="text-gray-500 shrink-0" />{" "}
+            <FaPhone className="text-(--cis-muted) shrink-0" />{" "}
             {editing ? (
               <input
                 type="text"
@@ -168,7 +168,7 @@ export default function PacienteInfoCard({
             )}
           </div>
           <div className="flex items-center justify-center gap-1 text-sm">
-            <FaUserMd className="text-gray-500 shrink-0" />{" "}
+            <FaUserMd className="text-(--cis-muted) shrink-0" />{" "}
             {editing ? (
               <input
                 type="text"
@@ -251,7 +251,7 @@ export default function PacienteInfoCard({
               />
             ) : (
               paciente.notes || (
-                <span className="text-gray-400">Nenhuma observação</span>
+                <span className="text-(--cis-muted)">Nenhuma observação</span>
               )
             )}
           </div>

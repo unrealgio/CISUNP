@@ -182,7 +182,7 @@ export default function AgendaPage() {
       <Header />
       <Menu active="agenda" />
       {erroExibido && (
-        <div className="mx-6 mt-4 rounded-lg bg-red-100 px-4 py-3 text-center text-red-700">
+        <div className="mx-6 mt-4 rounded-lg bg-(--cis-danger-soft) px-4 py-3 text-center text-(--cis-danger)">
           {erroExibido}
         </div>
       )}

@@ -75,7 +75,7 @@ export default function Login() {
               className="block text-(--cis-ink) text-sm font-semibold mb-1"
               htmlFor="usuario"
             >
-              Usuário <span className="text-red-500">*</span>
+              Usuário <span className="text-(--cis-danger)">*</span>
             </label>
             <div className="relative">
               <input
@@ -97,7 +97,7 @@ export default function Login() {
               className="block text-(--cis-ink) text-sm font-semibold mb-1"
               htmlFor="senha"
             >
-              Senha <span className="text-red-500">*</span>
+              Senha <span className="text-(--cis-danger)">*</span>
             </label>
             <div className="relative">
               <input

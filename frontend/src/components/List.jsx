@@ -114,12 +114,12 @@ export default function List({
               + {item.time}
               {item.patient ? (
                 <span
-                  className="inline-block w-2 h-2 rounded-full bg-green-500"
+                  className="inline-block w-2 h-2 rounded-full bg-(--cis-success)"
                   title="Ocupado"
                 ></span>
               ) : (
                 <span
-                  className="inline-block w-2 h-2 rounded-full bg-gray-400"
+                  className="inline-block w-2 h-2 rounded-full bg-(--cis-muted)"
                   title="Livre"
                 ></span>
               )}
@@ -167,9 +167,9 @@ export default function List({
                 <span className="font-semibold">{item.patient}</span>
               ) : (
                 <>
-                  <span className="text-gray-400 italic">Disponível</span>
+                  <span className="text-(--cis-muted) italic">Disponível</span>
                   <button
-                    className="cis-icon-button hover:bg-blue-100 text-blue-700"
+                    className="cis-icon-button cis-icone-acao"
                     aria-label="Adicionar paciente"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -206,9 +206,9 @@ export default function List({
                 </span>
               ) : (
                 <>
-                  <span className="text-gray-400 italic">Disponível</span>
+                  <span className="text-(--cis-muted) italic">Disponível</span>
                   <button
-                    className="cis-icon-button hover:bg-blue-100 text-blue-700"
+                    className="cis-icon-button cis-icone-acao"
                     aria-label="Adicionar médico"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -232,7 +232,7 @@ export default function List({
               {editingIndex === idx ? (
                 <>
                   <button
-                    className="cis-icon-button hover:bg-green-100 text-green-700"
+                    className="cis-icon-button cis-icone-confirmar"
                     aria-label="Salvar"
                     onClick={() => handleSave(item)}
                     title="Salvar"
@@ -240,7 +240,7 @@ export default function List({
                     <FaCheck />
                   </button>
                   <button
-                    className="cis-icon-button hover:bg-gray-100 text-gray-700"
+                    className="cis-icon-button cis-icone-neutro"
                     aria-label="Cancelar"
                     onClick={limparEdicao}
                     title="Cancelar"
@@ -251,7 +251,7 @@ export default function List({
               ) : (
                 <>
                   <button
-                    className="cis-icon-button hover:bg-blue-100 text-blue-700"
+                    className="cis-icon-button cis-icone-acao"
                     aria-label="Editar"
                     onClick={(e) => {
                       e.stopPropagation();
@@ -269,7 +269,7 @@ export default function List({
                     <FaEdit />
                   </button>
                   <button
-                    className="cis-icon-button hover:bg-red-100 text-red-700"
+                    className="cis-icon-button cis-icone-perigo"
                     aria-label="Excluir"
                     onClick={(e) => {
                       e.stopPropagation();

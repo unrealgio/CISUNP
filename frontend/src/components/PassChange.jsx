@@ -53,7 +53,7 @@ export default function PassChange({ senhaAtual, onSenhaAlterada }) {
             placeholder="Nova senha (mínimo 8 caracteres)"
             minLength={8}
             maxLength={72}
-            className="w-full px-4 py-2 border border-gray-400 rounded-lg mb-3"
+            className="w-full px-4 py-2 border border-(--cis-border) rounded-lg mb-3"
             value={novaSenha}
             onChange={(e) => setNovaSenha(e.target.value)}
             required
@@ -67,12 +67,14 @@ export default function PassChange({ senhaAtual, onSenhaAlterada }) {
           </button>
         </form>
         {mensagem && (
-          <div className="text-green-600 text-sm mt-2 text-center">
+          <div className="text-(--cis-success) text-sm mt-2 text-center">
             {mensagem}
           </div>
         )}
         {erro && (
-          <div className="text-red-600 text-sm mt-2 text-center">{erro}</div>
+          <div className="text-(--cis-danger) text-sm mt-2 text-center">
+            {erro}
+          </div>
         )}
       </div>
     </div>

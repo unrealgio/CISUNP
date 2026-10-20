@@ -10,12 +10,17 @@
   --cis-on-orange: var(--cis-navy);
   --cis-steel: #4a6a8c;
   --cis-ink: #243746;
-  --cis-muted: #667784;
+  --cis-muted: #5e6e7b;
   --cis-surface: #ffffff;
   --cis-background: #f3f6f7;
   --cis-background-strong: oklch(87.2% 0.01 258.338);
   --cis-border: #d6e0e5;
   --cis-danger: #b53b3b;
+  --cis-danger-hover: #8f2e2e;
+  --cis-danger-soft: #fef2f2;
+  --cis-danger-soft-hover: #fee2e2;
+  --cis-danger-line: #fecaca;
+  --cis-success: #15803d;
   --cis-orange-hover: #e68a1a;
   --cis-blue-hover: #d5e6ed;
   --cis-shadow:

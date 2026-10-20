@@ -138,7 +138,9 @@ export default function Details({
             onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
           />
         ) : (
-          schedule.cpf || <span className="text-gray-400">Não informado</span>
+          schedule.cpf || (
+            <span className="text-(--cis-muted)">Não informado</span>
+          )
         )}
       </div>
       <div className="mb-2">
@@ -159,7 +161,7 @@ export default function Details({
           />
         ) : (
           schedule.medico || (
-            <span className="text-gray-400 italic">Disponível</span>
+            <span className="text-(--cis-muted) italic">Disponível</span>
           )
         )}
       </div>
@@ -174,7 +176,9 @@ export default function Details({
             onChange={(e) => setPhone(e.target.value)}
           />
         ) : (
-          schedule.phone || <span className="text-gray-400">Não informado</span>
+          schedule.phone || (
+            <span className="text-(--cis-muted)">Não informado</span>
+          )
         )}
       </div>
       <div className="mb-2">
@@ -187,7 +191,7 @@ export default function Details({
             onChange={(e) => setNotes(e.target.value)}
           />
         ) : (
-          schedule.notes || <span className="text-gray-400">Nenhuma</span>
+          schedule.notes || <span className="text-(--cis-muted)">Nenhuma</span>
         )}
       </div>
       <div className="flex gap-2 mt-2">

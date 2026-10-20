@@ -153,7 +153,7 @@ export default function TabProntuario({ cpf }) {
             ${
               toast.type === "info"
                 ? "bg-(--cis-unp-orange) text-(--cis-on-orange)"
-                : "bg-green-500 text-white"
+                : "bg-(--cis-success) text-white"
             }
             animate-toast`}
         >
@@ -166,7 +166,7 @@ export default function TabProntuario({ cpf }) {
         Odontológico
       </h2>
       {erro && (
-        <div className="bg-red-50 border border-red-200 text-(--cis-danger) rounded-lg p-4 mb-4 text-center font-semibold">
+        <div className="bg-(--cis-danger-soft) border border-(--cis-danger-line) text-(--cis-danger) rounded-lg p-4 mb-4 text-center font-semibold">
           {erro}
         </div>
       )}
@@ -546,7 +546,7 @@ export default function TabProntuario({ cpf }) {
           <FaCalendarAlt /> Registros do Prontuário:
         </div>
         {historico.carregando ? (
-          <p className="text-gray-500">Carregando registros</p>
+          <p className="text-(--cis-muted)">Carregando registros</p>
         ) : registros.length === 0 ? (
           <EstadoVazio
             icone={<FaFileMedical />}
@@ -572,7 +572,7 @@ export default function TabProntuario({ cpf }) {
                     href={apiUrl(`/uploads/prontuarios/${registro.pdf}`)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-700 underline flex items-center gap-1 mt-2"
+                    className="text-(--cis-blue) underline flex items-center gap-1 mt-2"
                   >
                     <FaDownload /> Baixar PDF do Prontuário
                   </a>

@@ -100,20 +100,36 @@
 
   /* BOTÕES DE ÍCONE */
   .cis-icon-button {
-    @apply p-1 rounded cursor-pointer;
+    @apply p-1 rounded cursor-pointer transition disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent;
+  }
+
+  .cis-icone-acao {
+    @apply text-(--cis-blue) hover:bg-(--cis-blue-soft);
+  }
+
+  .cis-icone-confirmar {
+    @apply text-(--cis-orange-text) hover:bg-(--cis-orange-soft);
+  }
+
+  .cis-icone-perigo {
+    @apply text-(--cis-danger) hover:bg-(--cis-danger-soft);
+  }
+
+  .cis-icone-neutro {
+    @apply text-(--cis-muted) hover:bg-(--cis-background);
   }
 
   .cis-page-button {
-    @apply p-2 rounded bg-gray-200 hover:bg-gray-300 transition disabled:opacity-50;
+    @apply p-2 rounded bg-(--cis-blue-soft) text-(--cis-navy) hover:bg-(--cis-blue-hover) transition disabled:opacity-50;
   }
 
   /* BOTÕES DE EXCLUSÃO */
   .cis-danger-button {
-    @apply rounded-[0.55rem] bg-(--cis-danger) px-4 py-2 font-bold text-white transition hover:bg-red-800;
+    @apply rounded-[0.55rem] bg-(--cis-danger) px-4 py-2 font-bold text-white transition hover:bg-(--cis-danger-hover);
   }
 
   .cis-danger-soft-button {
-    @apply rounded-[0.55rem] border border-red-200 bg-red-50 px-3 py-1 font-semibold text-red-900 transition hover:bg-red-100;
+    @apply rounded-[0.55rem] border border-(--cis-danger-line) bg-(--cis-danger-soft) px-3 py-1 font-semibold text-(--cis-danger) transition hover:bg-(--cis-danger-soft-hover);
   }
 }
 

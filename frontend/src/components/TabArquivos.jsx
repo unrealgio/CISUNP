@@ -13,8 +13,8 @@ export default function TabArquivos({ arquivos, setArquivos }) {
   const [uploading, setUploading] = useState(false);
 
   function getFileIcon(tipo) {
-    if (tipo === "PDF") return <FaFilePdf className="text-red-500" />;
-    if (tipo === "Imagem") return <FaFileImage className="text-blue-400" />;
+    if (tipo === "PDF") return <FaFilePdf className="text-(--cis-danger)" />;
+    if (tipo === "Imagem") return <FaFileImage className="text-(--cis-blue)" />;
     return <FaNotesMedical className="text-(--cis-blue)" />;
   }
 

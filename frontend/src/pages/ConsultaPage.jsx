@@ -7,7 +7,7 @@ export default function ConsultaPage() {
     <>
       <Header />
       <Menu active="consultas" />
-      <div className="bg-gray-200 min-h-screen">
+      <div className="bg-(--cis-background) min-h-screen">
         <ConsultasList />
       </div>
     </>
