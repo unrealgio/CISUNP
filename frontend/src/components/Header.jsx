@@ -1,19 +1,8 @@
 import { FaUserCircle, FaSignOutAlt } from "react-icons/fa";
-
-// LÊ O E-MAIL DO USUÁRIO NA PARTE DO MEIO DO TOKEN (JWT), APENAS PARA EXIBIÇÃO
-// A VALIDAÇÃO DO TOKEN CONTINUA SENDO FEITA PELO BACKEND
-function emailDoUsuario() {
-  try {
-    const payload = localStorage.getItem("token").split(".")[1];
-    const json = atob(payload.replace(/-/g, "+").replace(/_/g, "/"));
-    return JSON.parse(json).email || null;
-  } catch {
-    return null;
-  }
-}
+import { emailDoToken } from "../api";
 
 export default function Header() {
-  const email = emailDoUsuario();
+  const email = emailDoToken();
 
   function handleLogout() {
     localStorage.removeItem("token");

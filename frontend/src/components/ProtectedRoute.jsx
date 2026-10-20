@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { apiUrl } from "../api";
 import { LoadingMessage } from "./StatusMessage";
+import SessaoExpirada from "./SessaoExpirada";
 
 export default function ProtectedRoute({ children }) {
   // SEM TOKEN, JÁ COMEÇA COMO NÃO AUTORIZADO, COM TOKEN, AGUARDA A VALIDAÇÃO
@@ -35,5 +36,12 @@ export default function ProtectedRoute({ children }) {
     return <LoadingMessage>Validando sessão</LoadingMessage>;
   }
 
-  return authorized ? children : <Navigate to="/" replace />;
+  return authorized ? (
+    <>
+      {children}
+      <SessaoExpirada />
+    </>
+  ) : (
+    <Navigate to="/" replace />
+  );
 }
