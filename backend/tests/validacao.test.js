@@ -5,6 +5,7 @@ const {
   validateChangePassword,
   validatePacienteBody,
   validatePrescricaoBody,
+  validateStatusBody,
 } = require("../src/middleware/validation");
 const { rodarMiddleware } = require("./ajudantes");
 
@@ -94,6 +95,24 @@ describe("validatePrescricaoBody", () => {
       "O campo Frequência deve ter no máximo 255 caracteres.",
       "O campo Observação deve ter no máximo 255 caracteres.",
     ]);
+  });
+});
+
+describe("validateStatusBody", () => {
+  test("aceita os quatro status", () => {
+    for (const status of ["pendente", "confirmada", "realizada", "cancelada"]) {
+      const { chamouNext } = rodarMiddleware(validateStatusBody, {
+        body: { status },
+      });
+      assert.equal(chamouNext, true, status);
+    }
+  });
+
+  test("recusa status desconhecido ou ausente", () => {
+    for (const body of [{ status: "Confirmada" }, { status: "x" }, {}]) {
+      const { res } = rodarMiddleware(validateStatusBody, { body });
+      assert.equal(res.statusCode, 400);
+    }
   });
 });
 

@@ -1,299 +1,83 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import {
   FaUser,
   FaCalendarAlt,
   FaClock,
   FaUserMd,
+  FaPhone,
   FaChevronLeft,
   FaChevronRight,
   FaSearch,
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
-import { EstadoVazio } from "./StatusMessage";
+import { apiFetch, mensagemDeErro } from "../api";
+import { useBuscarDados } from "../hooks/useBuscarDados";
+import { dataLocalISO, formatarDataISO } from "../utils/date";
+import { ErrorMessage, EstadoVazio, LoadingMessage } from "./StatusMessage";
 
-const consultasExemplo = [
-  {
-    id: 1,
-    paciente: "Ana Paula Silva",
-    data: "10/09/2025",
-    hora: "14:00",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Consulta de rotina e avaliação odontológica geral.",
+const STATUS = {
+  pendente: {
+    rotulo: "Pendente",
+    plural: "Pendentes",
+    acao: "Voltar para pendente",
   },
-  {
-    id: 2,
-    paciente: "Bruno Costa",
-    data: "11/09/2025",
-    hora: "09:30",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Primeira consulta odontológica do paciente.",
+  confirmada: {
+    rotulo: "Confirmada",
+    plural: "Confirmadas",
+    acao: "Confirmar",
   },
-  {
-    id: 3,
-    paciente: "Carla Mendes",
-    data: "12/09/2025",
-    hora: "16:00",
-    equipe: "Odontologia",
-    status: "Cancelada",
-    detalhes: "Consulta cancelada pelo paciente.",
+  realizada: {
+    rotulo: "Realizada",
+    plural: "Realizadas",
+    acao: "Marcar como realizada",
   },
-  {
-    id: 4,
-    paciente: "Daniela Rocha",
-    data: "13/09/2025",
-    hora: "10:00",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Avaliação de lesão na mucosa bucal.",
+  cancelada: {
+    rotulo: "Cancelada",
+    plural: "Canceladas",
+    acao: "Cancelar consulta",
   },
-  {
-    id: 5,
-    paciente: "Eduardo Martins",
-    data: "14/09/2025",
-    hora: "15:00",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Investigação de dor na articulação temporomandibular (ATM).",
-  },
-  {
-    id: 6,
-    paciente: "Fernanda Lima",
-    data: "15/09/2025",
-    hora: "11:30",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Retorno para avaliação de radiografia panorâmica.",
-  },
-  {
-    id: 7,
-    paciente: "Gabriel Souza",
-    data: "16/09/2025",
-    hora: "13:00",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Acompanhamento de tratamento de canal.",
-  },
-  {
-    id: 8,
-    paciente: "Helena Castro",
-    data: "17/09/2025",
-    hora: "09:00",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Avaliação inicial para tratamento ortodôntico.",
-  },
-  {
-    id: 9,
-    paciente: "Igor Almeida",
-    data: "18/09/2025",
-    hora: "14:30",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Avaliação de sensibilidade dentária.",
-  },
-  {
-    id: 10,
-    paciente: "Juliana Pereira",
-    data: "19/09/2025",
-    hora: "16:30",
-    equipe: "Odontologia",
-    status: "Cancelada",
-    detalhes: "Consulta cancelada pelo médico.",
-  },
-  {
-    id: 11,
-    paciente: "Kleber Nunes",
-    data: "20/09/2025",
-    hora: "08:30",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Avaliação de bruxismo e confecção de placa miorrelaxante.",
-  },
-  {
-    id: 12,
-    paciente: "Larissa Gomes",
-    data: "21/09/2025",
-    hora: "10:30",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Limpeza e remoção de tártaro.",
-  },
-  {
-    id: 13,
-    paciente: "Marcos Tavares",
-    data: "22/09/2025",
-    hora: "12:00",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Avaliação de dente do siso incluso.",
-  },
-  {
-    id: 14,
-    paciente: "Natália Fernandes",
-    data: "23/09/2025",
-    hora: "15:30",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Restauração de cárie em molar.",
-  },
-  {
-    id: 15,
-    paciente: "Edmilson Neves",
-    data: "24/09/2025",
-    hora: "09:45",
-    equipe: "Odontologia",
-    status: "Cancelada",
-    detalhes: "Consulta cancelada pelo paciente.",
-  },
-  {
-    id: 16,
-    paciente: "Patrícia Lopes",
-    data: "25/09/2025",
-    hora: "11:00",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Avaliação de sangramento gengival.",
-  },
-  {
-    id: 17,
-    paciente: "Renato Oliveira",
-    data: "26/09/2025",
-    hora: "13:30",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Manutenção do aparelho ortodôntico.",
-  },
-  {
-    id: 18,
-    paciente: "Sofia Martins",
-    data: "27/09/2025",
-    hora: "15:00",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Acompanhamento odontológico de gestante.",
-  },
-  {
-    id: 19,
-    paciente: "Thiago Ribeiro",
-    data: "28/09/2025",
-    hora: "09:00",
-    equipe: "Odontologia",
-    status: "Cancelada",
-    detalhes: "Consulta cancelada pelo paciente.",
-  },
-  {
-    id: 20,
-    paciente: "Ursula Freitas",
-    data: "29/09/2025",
-    hora: "10:30",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Avaliação para clareamento dental.",
-  },
-  {
-    id: 21,
-    paciente: "Vinícius Cardoso",
-    data: "30/09/2025",
-    hora: "14:00",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Investigação de dor de dente aguda.",
-  },
-  {
-    id: 22,
-    paciente: "Wesley Santos",
-    data: "01/10/2025",
-    hora: "16:00",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Avaliação de halitose.",
-  },
-  {
-    id: 23,
-    paciente: "Xuxa Menezes",
-    data: "02/10/2025",
-    hora: "08:30",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Consulta de rotina com aplicação de flúor.",
-  },
-  {
-    id: 24,
-    paciente: "Yasmin Duarte",
-    data: "03/10/2025",
-    hora: "10:00",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Tratamento periodontal em paciente diabético.",
-  },
-  {
-    id: 25,
-    paciente: "Zeca Amaral",
-    data: "04/10/2025",
-    hora: "12:30",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Avaliação para implante dentário.",
-  },
-  {
-    id: 26,
-    paciente: "Amanda Figueiredo",
-    data: "05/10/2025",
-    hora: "15:30",
-    equipe: "Odontologia",
-    status: "Cancelada",
-    detalhes: "Consulta cancelada pelo médico.",
-  },
-  {
-    id: 27,
-    paciente: "Bruno Teixeira",
-    data: "06/10/2025",
-    hora: "09:45",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Ajuste de prótese dentária.",
-  },
-  {
-    id: 28,
-    paciente: "Camila Souza",
-    data: "07/10/2025",
-    hora: "11:15",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Troca de restauração antiga.",
-  },
-  {
-    id: 29,
-    paciente: "Diego Lima",
-    data: "08/10/2025",
-    hora: "13:00",
-    equipe: "Odontologia",
-    status: "Confirmada",
-    detalhes: "Retorno pós-extração dentária.",
-  },
-  {
-    id: 30,
-    paciente: "Elisa Torres",
-    data: "09/10/2025",
-    hora: "14:45",
-    equipe: "Odontologia",
-    status: "Pendente",
-    detalhes: "Retorno para avaliação de cicatrização.",
-  },
-];
+};
 
-export default function ConsultasList({ consultas = consultasExemplo }) {
+function ordenarConsultas(lista) {
+  const hoje = dataLocalISO();
+  const chave = (c) => `${c.date} ${c.time}`;
+  const futuras = lista
+    .filter((c) => c.date >= hoje)
+    .sort((a, b) => chave(a).localeCompare(chave(b)));
+  const passadas = lista
+    .filter((c) => c.date < hoje)
+    .sort((a, b) => chave(b).localeCompare(chave(a)));
+  return [...futuras, ...passadas];
+}
+
+export default function ConsultasList() {
+  const consultas = useBuscarDados(
+    "/api/agendamentos/todos",
+    "Erro ao carregar consultas.",
+  );
   const [search, setSearch] = useState("");
+  const [filtro, setFiltro] = useState("todas");
   const [page, setPage] = useState(1);
   const [expanded, setExpanded] = useState(null);
+  const [alterando, setAlterando] = useState(null);
+  const [erroStatus, setErroStatus] = useState(null);
   const itemsPerPage = 12;
 
-  // FILTRO POR NOME DO PACIENTE
-  const filteredConsultas = consultas.filter((c) =>
-    c.paciente.toLowerCase().includes(search.toLowerCase()),
+  const lista = ordenarConsultas(
+    Array.isArray(consultas.dados) ? consultas.dados : [],
+  );
+  const contagem = lista.reduce(
+    (total, c) => ({ ...total, [c.status]: (total[c.status] || 0) + 1 }),
+    { todas: lista.length },
+  );
+
+  // FILTRO POR STATUS E NOME DO PACIENTE
+  const filteredConsultas = lista.filter(
+    (c) =>
+      (filtro === "todas" || c.status === filtro) &&
+      c.patient.toLowerCase().includes(search.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredConsultas.length / itemsPerPage);
@@ -307,17 +91,67 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
     setPage(1);
   }
 
+  function escolherFiltro(novoFiltro) {
+    setFiltro(novoFiltro);
+    setPage(1);
+  }
+
   function handleExpand(id) {
     setExpanded(expanded === id ? null : id);
+  }
+
+  function handleKeyDown(e, id) {
+    if (e.target !== e.currentTarget) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handleExpand(id);
+    }
+  }
+
+  async function mudarStatus(consulta, status) {
+    if (
+      status === "cancelada" &&
+      !window.confirm(
+        "Cancelar esta consulta? O horário ficará livre na agenda.",
+      )
+    )
+      return;
+    setAlterando(consulta.id);
+    setErroStatus(null);
+    try {
+      const res = await apiFetch(`/api/agendamentos/${consulta.id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setErroStatus({
+          id: consulta.id,
+          mensagem: mensagemDeErro(data, "Erro ao alterar o status."),
+        });
+        return;
+      }
+      consultas.alterarDados((prev) =>
+        prev.map((c) => (c.id === data.id ? data : c)),
+      );
+    } catch {
+      setErroStatus({
+        id: consulta.id,
+        mensagem: "Erro de conexão com o servidor.",
+      });
+    } finally {
+      setAlterando(null);
+    }
   }
 
   return (
     <div className="w-full px-2 md:px-8 py-6">
       <h2 className="text-2xl font-bold text-(--cis-unp-blue) mb-6">
-        Minhas Consultas
+        Consultas
       </h2>
-      <div className="flex items-center gap-2 mb-6 max-w-md">
-        <div className="relative w-full">
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="relative w-full max-w-md">
           <input
             type="text"
             value={search}
@@ -328,105 +162,170 @@ export default function ConsultasList({ consultas = consultasExemplo }) {
           />
           <FaSearch className="absolute right-3 top-3 text-(--cis-muted)" />
         </div>
-      </div>
-
-      {/* CARDS DE CONSULTAS */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {paginatedConsultas.length === 0 ? (
-          <div className="col-span-full">
-            <EstadoVazio
-              icone={<FaCalendarAlt />}
-              titulo="Nenhuma consulta encontrada."
-              dica="Tente buscar por outro nome."
-            />
-          </div>
-        ) : (
-          paginatedConsultas.map((c) => (
-            <div
-              key={c.id}
-              className={`bg-white rounded-xl shadow-lg p-5 flex flex-col gap-2 border-l-4 transition hover:shadow-xl hover:-translate-y-0.5 cursor-pointer`}
-              style={{
-                borderColor:
-                  c.status === "Confirmada"
-                    ? "var(--cis-status-confirmada)"
-                    : c.status === "Cancelada"
-                      ? "var(--cis-status-cancelada)"
-                      : "var(--cis-status-pendente)",
-              }}
-              onClick={() => handleExpand(c.id)}
-              tabIndex={0}
-              aria-expanded={expanded === c.id}
-              aria-label={`Detalhes da consulta de ${c.paciente}`}
+        <div
+          className="flex flex-wrap gap-2"
+          role="group"
+          aria-label="Filtrar por status"
+        >
+          {["todas", ...Object.keys(STATUS)].map((chave) => (
+            <button
+              key={chave}
+              type="button"
+              className="cis-filtro"
+              aria-pressed={filtro === chave}
+              onClick={() => escolherFiltro(chave)}
             >
-              <div className="flex items-center gap-2 mb-2">
-                <FaUser className="text-(--cis-unp-blue)" />
-                <span className="font-bold text-lg text-(--cis-unp-blue)">
-                  {c.paciente}
-                </span>
-                <span
-                  className="ml-auto px-2 py-1 rounded text-xs font-semibold"
-                  style={{
-                    background:
-                      c.status === "Confirmada"
-                        ? "var(--cis-status-confirmada-bg)"
-                        : c.status === "Cancelada"
-                          ? "var(--cis-status-cancelada-bg)"
-                          : "var(--cis-status-pendente-bg)",
-                    color:
-                      c.status === "Confirmada"
-                        ? "var(--cis-status-confirmada-text)"
-                        : c.status === "Cancelada"
-                          ? "var(--cis-status-cancelada-text)"
-                          : "var(--cis-status-pendente-text)",
-                  }}
-                >
-                  {c.status}
-                </span>
-                <span className="ml-2">
-                  {expanded === c.id ? <FaChevronUp /> : <FaChevronDown />}
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-(--cis-ink)">
-                <FaCalendarAlt /> {c.data}
-                <FaClock className="ml-4" /> {c.hora}
-              </div>
-              <div className="flex items-center gap-2 text-(--cis-ink)">
-                <FaUserMd /> {c.equipe}
-              </div>
-              {/* DETALHES EXPANDIDOS DAS CONSULTAS */}
-              {expanded === c.id && (
-                <div className="mt-3 p-3 rounded bg-(--cis-background) border border-(--cis-border) text-(--cis-ink) text-sm">
-                  <strong>Detalhes:</strong> {c.detalhes}
-                </div>
-              )}
-            </div>
-          ))
-        )}
+              {chave === "todas" ? "Todas" : STATUS[chave].plural} (
+              {contagem[chave] || 0})
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* PAGINAÇÃO */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-2 mt-8">
-          <button
-            className="cis-page-button"
-            onClick={() => setPage(page - 1)}
-            disabled={page === 1}
-            aria-label="Página anterior"
-          >
-            <FaChevronLeft />
-          </button>
-          <span className="font-semibold text-(--cis-unp-blue)">
-            Página {page} de {totalPages}
-          </span>
-          <button
-            className="cis-page-button"
-            onClick={() => setPage(page + 1)}
-            disabled={page === totalPages}
-            aria-label="Próxima página"
-          >
-            <FaChevronRight />
-          </button>
-        </div>
+      {consultas.carregando ? (
+        <LoadingMessage>Carregando consultas</LoadingMessage>
+      ) : consultas.erro ? (
+        <ErrorMessage>{consultas.erro}</ErrorMessage>
+      ) : (
+        <>
+          {/* CARDS DE CONSULTAS */}
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 items-start">
+            {paginatedConsultas.length === 0 ? (
+              <div className="col-span-full">
+                <EstadoVazio
+                  icone={<FaCalendarAlt />}
+                  titulo="Nenhuma consulta encontrada."
+                  dica={
+                    lista.length === 0
+                      ? "Os agendamentos feitos na Agenda aparecem aqui."
+                      : "Tente buscar por outro nome ou mudar o filtro."
+                  }
+                />
+              </div>
+            ) : (
+              paginatedConsultas.map((c) => (
+                <div
+                  key={c.id}
+                  className="bg-(--cis-surface) rounded-xl shadow-lg p-5 flex flex-col gap-2 border-l-4 transition hover:shadow-xl hover:-translate-y-0.5 cursor-pointer wrap-anywhere"
+                  style={{ borderColor: `var(--cis-status-${c.status})` }}
+                  onClick={() => handleExpand(c.id)}
+                  onKeyDown={(e) => handleKeyDown(e, c.id)}
+                  tabIndex={0}
+                  aria-expanded={expanded === c.id}
+                  aria-label={`Detalhes da consulta de ${c.patient}`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <FaUser className="text-(--cis-unp-blue) shrink-0" />
+                    <span className="font-bold text-lg text-(--cis-unp-blue) min-w-0">
+                      {c.patient}
+                    </span>
+                    <span
+                      className="ml-auto px-2 py-1 rounded text-xs font-semibold shrink-0"
+                      style={{
+                        background: `var(--cis-status-${c.status}-bg)`,
+                        color: `var(--cis-status-${c.status}-text)`,
+                      }}
+                    >
+                      {STATUS[c.status]?.rotulo || c.status}
+                    </span>
+                    <span className="ml-2 shrink-0">
+                      {expanded === c.id ? <FaChevronUp /> : <FaChevronDown />}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 text-(--cis-ink)">
+                    <FaCalendarAlt /> {formatarDataISO(c.date)}
+                    <FaClock className="ml-4" /> {c.time}
+                  </div>
+                  <div className="flex items-center gap-2 text-(--cis-ink)">
+                    <FaUserMd className="shrink-0" />
+                    {c.medico || (
+                      <span className="text-(--cis-muted)">
+                        Médico não informado
+                      </span>
+                    )}
+                  </div>
+                  {/* DETALHES EXPANDIDOS DAS CONSULTAS */}
+                  {expanded === c.id && (
+                    <div className="mt-3 p-3 rounded bg-(--cis-background) border border-(--cis-border) text-(--cis-ink) text-sm flex flex-col gap-2">
+                      <p>
+                        <strong>Observações:</strong>{" "}
+                        {c.notes || (
+                          <span className="text-(--cis-muted)">Nenhuma</span>
+                        )}
+                      </p>
+                      {c.phone && (
+                        <p className="flex items-center gap-2">
+                          <FaPhone className="shrink-0" /> {c.phone}
+                        </p>
+                      )}
+                      {c.cpf && (
+                        <Link
+                          to={`/paciente/${c.cpf}`}
+                          className="text-(--cis-blue) underline w-fit"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Ver ficha do paciente
+                        </Link>
+                      )}
+                      <div className="flex flex-wrap gap-2 pt-2 border-t border-(--cis-border)">
+                        {Object.keys(STATUS)
+                          .filter((status) => status !== c.status)
+                          .map((status) => (
+                            <button
+                              key={status}
+                              type="button"
+                              className={`${
+                                status === "cancelada"
+                                  ? "cis-danger-soft-button px-4 py-2"
+                                  : "cis-secondary-button"
+                              } text-sm`}
+                              disabled={alterando === c.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                mudarStatus(c, status);
+                              }}
+                            >
+                              {STATUS[status].acao}
+                            </button>
+                          ))}
+                      </div>
+                      {erroStatus?.id === c.id && (
+                        <ErrorMessage compacto>
+                          {erroStatus.mensagem}
+                        </ErrorMessage>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* PAGINAÇÃO */}
+          {totalPages > 1 && (
+            <div className="flex justify-center items-center gap-2 mt-8">
+              <button
+                className="cis-page-button"
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+                aria-label="Página anterior"
+              >
+                <FaChevronLeft />
+              </button>
+              <span className="font-semibold text-(--cis-unp-blue)">
+                Página {page} de {totalPages}
+              </span>
+              <button
+                className="cis-page-button"
+                onClick={() => setPage(page + 1)}
+                disabled={page === totalPages}
+                aria-label="Próxima página"
+              >
+                <FaChevronRight />
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

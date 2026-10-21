@@ -2,13 +2,16 @@ const Agendamentos = require("../models/Agendamentos");
 const Paciente = require("../models/Paciente");
 const sequelize = require("../../config/database");
 const { Op } = require("sequelize");
+const { hojeLocal } = require("../utils/datas");
+
+const naoCancelado = { [Op.ne]: "cancelada" };
 
 // LISTA OS AGENDAMENTOS POR DATA
 exports.buscarPorData = async (req, res) => {
   const { date } = req.query;
   try {
     const agendamentos = await Agendamentos.findAll({
-      where: { date },
+      where: { date, status: naoCancelado },
       order: [["time", "ASC"]],
     });
     res.json(agendamentos);
@@ -24,7 +27,7 @@ exports.diasComAgendamento = async (req, res) => {
   try {
     const dias = await Agendamentos.findAll({
       attributes: ["date"],
-      where: { date: { [Op.between]: [inicio, fim] } },
+      where: { date: { [Op.between]: [inicio, fim] }, status: naoCancelado },
       group: ["date"],
       raw: true,
     });
@@ -34,14 +37,6 @@ exports.diasComAgendamento = async (req, res) => {
     res.status(500).json({ error: "Erro ao listar dias com agendamentos." });
   }
 };
-
-// DATA FORMATADA
-function hojeLocal() {
-  const agora = new Date();
-  const mes = String(agora.getMonth() + 1).padStart(2, "0");
-  const dia = String(agora.getDate()).padStart(2, "0");
-  return `${agora.getFullYear()}-${mes}-${dia}`;
-}
 
 // SINCRONIZA PACIENTE PELO CPF
 async function sincronizarPaciente(
@@ -86,7 +81,7 @@ exports.criar = async (req, res) => {
   try {
     transaction = await sequelize.transaction();
     const ocupado = await Agendamentos.findOne({
-      where: { date, time },
+      where: { date, time, status: naoCancelado },
       transaction,
     });
     if (ocupado) {
@@ -133,6 +128,36 @@ exports.atualizar = async (req, res) => {
   }
 };
 
+// LISTA TODOS OS AGENDAMENTOS (PÁGINA CONSULTAS), INCLUSIVE OS CANCELADOS
+exports.listarTodos = async (req, res) => {
+  try {
+    const agendamentos = await Agendamentos.findAll({
+      order: [
+        ["date", "ASC"],
+        ["time", "ASC"],
+      ],
+    });
+    res.json(agendamentos);
+  } catch (err) {
+    console.error("Erro ao listar consultas:", err);
+    res.status(500).json({ error: "Erro ao listar consultas." });
+  }
+};
+
+// ALTERA O STATUS DE UM AGENDAMENTO
+exports.atualizarStatus = async (req, res) => {
+  try {
+    const agendamento = await Agendamentos.findByPk(req.params.id);
+    if (!agendamento) {
+      return res.status(404).json({ error: "Agendamento não encontrado." });
+    }
+    await agendamento.update({ status: req.body.status });
+    res.json(agendamento);
+  } catch (err) {
+    await responderErroAoSalvar(res, null, err);
+  }
+};
+
 // EXCLUI UM AGENDAMENTO
 exports.excluir = async (req, res) => {
   const { id } = req.params;
@@ -156,6 +181,7 @@ exports.futurosPorPaciente = async (req, res) => {
       where: {
         cpf,
         date: { [Op.gte]: hoje },
+        status: naoCancelado,
       },
       order: [
         ["date", "ASC"],

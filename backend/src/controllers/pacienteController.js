@@ -1,4 +1,8 @@
+const { Op } = require("sequelize");
 const Paciente = require("../models/Paciente");
+const Agendamentos = require("../models/Agendamentos");
+const sequelize = require("../../config/database");
+const { hojeLocal } = require("../utils/datas");
 
 // LISTA TODOS OS PACIENTES
 exports.listarTodos = async (req, res) => {
@@ -63,15 +67,31 @@ exports.criar = async (req, res) => {
   }
 };
 
-// EXCLUI UM PACIENTE
+// EXCLUI UM PACIENTE E CANCELA OS AGENDAMENTOS FUTUROS DELE
 exports.excluir = async (req, res) => {
   const { cpf } = req.params;
+  const transaction = await sequelize.transaction();
   try {
-    const deleted = await Paciente.destroy({ where: { cpf } });
-    if (!deleted)
+    const deleted = await Paciente.destroy({ where: { cpf }, transaction });
+    if (!deleted) {
+      await transaction.rollback();
       return res.status(404).json({ error: "Paciente não encontrado." });
+    }
+    await Agendamentos.update(
+      { status: "cancelada" },
+      {
+        where: {
+          cpf,
+          date: { [Op.gte]: hojeLocal() },
+          status: { [Op.in]: ["pendente", "confirmada"] },
+        },
+        transaction,
+      },
+    );
+    await transaction.commit();
     res.json({ success: true });
   } catch (err) {
+    if (!transaction.finished) await transaction.rollback();
     console.error("Erro ao excluir paciente:", err);
     res.status(500).json({ error: "Erro ao excluir paciente." });
   }

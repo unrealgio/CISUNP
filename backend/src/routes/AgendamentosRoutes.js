@@ -6,6 +6,7 @@ const {
   validateAgendamentoQuery,
   validateIntervaloQuery,
   validateAgendamentoBody,
+  validateStatusBody,
   validateCpfQuery,
   validateIdParam,
 } = require("../middleware/validation");
@@ -13,6 +14,7 @@ const {
 router.use(authenticateToken);
 
 router.get("/", validateAgendamentoQuery, agendamentosController.buscarPorData);
+router.get("/todos", agendamentosController.listarTodos);
 router.get(
   "/dias",
   validateIntervaloQuery,
@@ -24,6 +26,12 @@ router.put(
   validateIdParam,
   validateAgendamentoBody,
   agendamentosController.atualizar,
+);
+router.patch(
+  "/:id/status",
+  validateIdParam,
+  validateStatusBody,
+  agendamentosController.atualizarStatus,
 );
 router.delete("/:id", validateIdParam, agendamentosController.excluir);
 router.get(

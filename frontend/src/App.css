@@ -98,6 +98,14 @@
     @apply rounded-[0.55rem] border border-(--cis-orange) bg-(--cis-orange-soft) px-4 py-2 font-bold text-(--cis-orange-text) transition hover:bg-(--cis-orange) hover:text-(--cis-on-orange) disabled:cursor-not-allowed disabled:opacity-60;
   }
 
+  .cis-filtro {
+    @apply rounded-full border border-(--cis-border) bg-(--cis-surface) px-3 py-1.5 text-sm font-semibold text-(--cis-ink) transition hover:bg-(--cis-blue-soft);
+  }
+
+  .cis-filtro[aria-pressed="true"] {
+    @apply border-(--cis-navy) bg-(--cis-navy) text-white hover:bg-(--cis-navy);
+  }
+
   /* BOTÕES DE ÍCONE */
   .cis-icon-button {
     @apply p-1 rounded cursor-pointer transition disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent;

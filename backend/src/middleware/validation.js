@@ -1,3 +1,5 @@
+const { STATUS_AGENDAMENTO } = require("../utils/statusAgendamento");
+
 function fail(res, errors) {
   return res.status(400).json({ error: "Dados inválidos.", details: errors });
 }
@@ -176,6 +178,13 @@ function validateAgendamentoBody(req, res, next) {
   return errors.length ? fail(res, errors) : next();
 }
 
+function validateStatusBody(req, res, next) {
+  const { status } = req.body || {};
+  return STATUS_AGENDAMENTO.includes(status)
+    ? next()
+    : fail(res, [`Status deve ser: ${STATUS_AGENDAMENTO.join(", ")}.`]);
+}
+
 function validatePrescricaoBody(req, res, next) {
   const { cpf, medicamento } = req.body || {};
   const errors = [];
@@ -225,6 +234,7 @@ module.exports = {
   validateAgendamentoQuery,
   validateIntervaloQuery,
   validateAgendamentoBody,
+  validateStatusBody,
   validatePrescricaoBody,
   validateProntuarioBody,
 };

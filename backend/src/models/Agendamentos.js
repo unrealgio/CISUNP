@@ -1,5 +1,6 @@
-const { DataTypes } = require("sequelize");
+const { DataTypes, Op } = require("sequelize");
 const sequelize = require("../../config/database");
+const { STATUS_AGENDAMENTO } = require("../utils/statusAgendamento");
 
 const Agendamentos = sequelize.define(
   "Agendamentos",
@@ -12,11 +13,24 @@ const Agendamentos = sequelize.define(
     phone: { type: DataTypes.STRING, allowNull: true },
     notes: { type: DataTypes.STRING, allowNull: true },
     medico: { type: DataTypes.STRING, allowNull: true },
+    status: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      defaultValue: "pendente",
+      validate: { isIn: [STATUS_AGENDAMENTO] },
+    },
   },
   {
     tableName: "agendamentos",
     timestamps: false,
-    indexes: [{ unique: true, fields: ["date", "time"] }],
+    indexes: [
+      {
+        unique: true,
+        fields: ["date", "time"],
+        name: "agendamentos_horario_ativo",
+        where: { status: { [Op.ne]: "cancelada" } },
+      },
+    ],
   },
 );
 

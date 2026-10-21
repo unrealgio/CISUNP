@@ -44,6 +44,9 @@
   --cis-status-cancelada: #f87171;
   --cis-status-cancelada-bg: #fee2e2;
   --cis-status-cancelada-text: #991b1b;
+  --cis-status-realizada: var(--cis-blue);
+  --cis-status-realizada-bg: var(--cis-blue-soft);
+  --cis-status-realizada-text: var(--cis-navy);
 }
 
 * {
