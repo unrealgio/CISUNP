@@ -19,6 +19,7 @@ O sistema centraliza informações de pacientes, agenda, prescrições e prontu�
 - Autenticação JWT e alteração de senha no primeiro acesso.
 - Cadastro, busca, edição e exclusão de pacientes (a exclusão preserva o histórico de agendamentos, prescrições e prontuários).
 - Agenda de consultas com prevenção de horários duplicados.
+- Página de consultas com status (pendente, confirmada, realizada, cancelada), filtro e busca. Cancelar uma consulta libera o horário na agenda.
 - Prontuário odontológico com desenho da arcada e geração de PDF.
 - Cadastro e consulta de prescrições.
 - Rotas clínicas protegidas por autenticação.
@@ -99,6 +100,7 @@ O arquivo `.env` contém credenciais locais e não deve ser versionado.
 ```bash
 cd backend
 npm install
+npm run db:migrate
 npm run dev
 ```
 
@@ -106,7 +108,10 @@ npm run dev
 
 O backend inicia na porta definida em `PORT` (no exemplo acima, `http://localhost:3001`).
 
-O Sequelize utiliza `sync()` para manter as tabelas durante o desenvolvimento. O projeto ainda não utiliza migrations.
+A estrutura do banco é criada e atualizada por **migrations** (pasta [`backend/migrations`](backend/migrations)), com o `sequelize-cli`. Sempre que houver uma migration nova, rode `npm run db:migrate` antes de iniciar o backend. Outros comandos:
+
+- `npm run db:migrate:status`: mostra quais migrations já foram aplicadas.
+- `npm run db:migrate:undo`: desfaz a última migration.
 
 ### Frontend
 
@@ -170,7 +175,7 @@ Depois, na pasta `backend`:
 npm test
 ```
 
-A cada execução, as tabelas do `cis_test` são apagadas e recriadas. Por segurança, os testes param com erro se estiverem apontando para qualquer outro banco.
+A cada execução, as tabelas do `cis_test` são apagadas e recriadas pelas migrations. Por segurança, os testes param com erro se estiverem apontando para qualquer outro banco.
 
 ## API principal
 
@@ -178,7 +183,7 @@ A cada execução, as tabelas do `cis_test` são apagadas e recriadas. Por segur
 - `GET /api/session`
 - `POST /api/change-password`
 - `GET|POST|PUT|DELETE /api/pacientes`
-- `GET|POST|PUT|DELETE /api/agendamentos`
+- `GET|POST|PUT|DELETE /api/agendamentos` e `PATCH /api/agendamentos/:id/status`
 - `GET|POST /api/prescricoes`
 - `GET|POST /api/prontuarios`
 
