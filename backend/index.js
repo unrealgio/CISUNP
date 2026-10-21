@@ -6,11 +6,11 @@ const sequelize = require("./config/database");
 const User = require("./src/models/User");
 const app = require("./app");
 
-// SINCRONIZANDO BANCO E INICIANDO SERVIDOR
+// CONECTANDO AO BANCO (ESTRUTURA CRIADA PELAS MIGRATIONS) E INICIANDO SERVIDOR
 sequelize
-  .sync({ force: false })
+  .authenticate()
   .then(async () => {
-    console.log("Banco sincronizado e tabelas criadas!");
+    console.log("Banco conectado!");
 
     // CRIANDO USUÁRIO ADMIN PADRÃO
     const adminPassword = process.env.ADMIN_PASSWORD;
@@ -29,5 +29,5 @@ sequelize
     });
   })
   .catch((err) => {
-    console.error("Erro ao sincronizar banco:", err);
+    console.error("Erro ao iniciar o backend:", err);
   });
