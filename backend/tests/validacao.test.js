@@ -27,11 +27,10 @@ describe("validateAgendamentoBody", () => {
     assert.equal(chamouNext, true);
   });
 
-  test("aceita 255 caracteres em telefone, médico e observações", () => {
+  test("aceita 255 caracteres em médico e observações", () => {
     const { chamouNext } = rodarMiddleware(validateAgendamentoBody, {
       body: {
         ...agendamento,
-        phone: texto255,
         medico: texto255,
         notes: texto255,
       },
@@ -39,11 +38,10 @@ describe("validateAgendamentoBody", () => {
     assert.equal(chamouNext, true);
   });
 
-  test("recusa mais de 255 caracteres em telefone, médico e observações", () => {
+  test("recusa mais de 255 caracteres em médico e observações", () => {
     const { res, chamouNext } = rodarMiddleware(validateAgendamentoBody, {
       body: {
         ...agendamento,
-        phone: texto256,
         medico: texto256,
         notes: texto256,
       },
@@ -51,10 +49,44 @@ describe("validateAgendamentoBody", () => {
     assert.equal(chamouNext, false);
     assert.equal(res.statusCode, 400);
     assert.deepEqual(res.corpo.details, [
-      "O campo Telefone deve ter no máximo 255 caracteres.",
       "O campo Médico deve ter no máximo 255 caracteres.",
       "O campo Observações deve ter no máximo 255 caracteres.",
     ]);
+  });
+
+  test("aceita telefone fixo e celular, com ou sem máscara, e vazio", () => {
+    for (const phone of [
+      "84999990000",
+      "(84) 99999-0000",
+      "8432011234",
+      "(84) 3201-1234",
+      "",
+      undefined,
+    ]) {
+      const { chamouNext } = rodarMiddleware(validateAgendamentoBody, {
+        body: { ...agendamento, phone },
+      });
+      assert.equal(chamouNext, true, String(phone));
+    }
+  });
+
+  test("recusa telefone sem DDD, com dígitos a mais ou com letras", () => {
+    for (const phone of [
+      "99999000",
+      "849912313123",
+      "04999990000",
+      "8419999000",
+      "aaaa",
+    ]) {
+      const { res } = rodarMiddleware(validateAgendamentoBody, {
+        body: { ...agendamento, phone },
+      });
+      assert.deepEqual(
+        res.corpo?.details,
+        ["Telefone deve ter DDD + número (10 ou 11 dígitos)."],
+        phone,
+      );
+    }
   });
 
   test("recusa requisição sem body com 400", () => {

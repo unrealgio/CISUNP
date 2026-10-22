@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { apiFetch, mensagemDeErro } from "../api";
 import { ErrorMessage } from "./StatusMessage";
+import CampoTelefone from "./CampoTelefone";
 
 export default function AddPaciente({ onAdd, onCancel }) {
   const [form, setForm] = useState({
@@ -116,14 +117,9 @@ export default function AddPaciente({ onAdd, onCancel }) {
             <label className="cis-label">
               <FaPhone /> Telefone:
             </label>
-            <input
-              type="text"
-              name="phone"
+            <CampoTelefone
               value={form.phone}
-              maxLength={255}
-              onChange={handleChange}
-              className="cis-input"
-              placeholder="Telefone"
+              onChange={(phone) => setForm({ ...form, phone })}
             />
           </div>
           <div className="space-y-1">

@@ -3,6 +3,7 @@ import { FaEdit, FaCheck, FaTimes } from "react-icons/fa";
 import { MdPersonAdd, MdMedicalServices, MdEventBusy } from "react-icons/md";
 import { ErrorMessage } from "./StatusMessage";
 import BuscaPaciente from "./BuscaPaciente";
+import CampoTelefone from "./CampoTelefone";
 import { STATUS } from "../utils/statusAgendamento";
 
 export default function List({
@@ -155,13 +156,10 @@ export default function List({
                         setCpf(e.target.value.replace(/\D/g, ""))
                       }
                     />
-                    <input
-                      type="text"
-                      className="cis-input"
-                      placeholder="Telefone"
+                    <CampoTelefone
                       value={phone}
-                      maxLength={255}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={setPhone}
+                      placeholder="Telefone"
                     />
                     <input
                       type="text"

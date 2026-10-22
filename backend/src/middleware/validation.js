@@ -1,5 +1,6 @@
 const { STATUS_AGENDAMENTO } = require("../utils/statusAgendamento");
 const { hojeLocal, horaLocal } = require("../utils/datas");
+const { apenasDigitos, isTelefone } = require("../utils/telefone");
 const { STATUS_PROCEDIMENTO } = require("../utils/statusProcedimento");
 const {
   CATEGORIAS_ARQUIVO,
@@ -92,6 +93,14 @@ function validarTamanhos(body, campos, errors) {
   }
 }
 
+// TELEFONE É OPCIONAL, MAS SE VIER PRECISA TER DDD + NÚMERO (ACEITA COM OU SEM MÁSCARA)
+function validarTelefone(phone, errors) {
+  if (phone == null || String(phone).trim() === "") return;
+  if (!isTelefone(apenasDigitos(phone))) {
+    errors.push("Telefone deve ter DDD + número (10 ou 11 dígitos).");
+  }
+}
+
 // VALIDAÇÕES COMUNS AO CADASTRO E À EDIÇÃO DE PACIENTE
 function validarCamposPaciente(body, errors) {
   const { patient, idade } = body;
@@ -111,10 +120,10 @@ function validarCamposPaciente(body, errors) {
   ) {
     errors.push("Idade deve ser um número entre 0 e 150.");
   }
+  validarTelefone(body.phone, errors);
   validarTamanhos(
     body,
     {
-      phone: "Telefone",
       medico: "Médico",
       endereco: "Endereço",
       notes: "Observações",
@@ -175,16 +184,13 @@ function validateAgendamentoBody(req, res, next) {
   if (cpf && !isCpf(cpf)) {
     errors.push("CPF deve conter 11 números.");
   }
-  validarTamanhos(
-    body,
-    { phone: "Telefone", medico: "Médico", notes: "Observações" },
-    errors,
-  );
+  validarTelefone(body.phone, errors);
+  validarTamanhos(body, { medico: "Médico", notes: "Observações" }, errors);
 
   return errors.length ? fail(res, errors) : next();
 }
 
-// SÓ NA CRIAÇÃO: EDITAR UMA CONSULTA ANTIGA (EX.: OBSERVAÇÕES) CONTINUA PERMITIDO
+// SÓ NA CRIAÇÃO: EDITAR UMA CONSULTA ANTIGA CONTINUA PERMITIDO
 function validateAgendamentoFuturo(req, res, next) {
   const { date, time } = req.body;
   const hoje = hojeLocal();

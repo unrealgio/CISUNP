@@ -1,6 +1,7 @@
 import { useId, useRef, useState } from "react";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 import { formatarCpf } from "../utils/cpf";
+import { formatarTelefone } from "../utils/telefone";
 
 // CAMPO DE NOME DO PACIENTE COM SUGESTÕES DOS PACIENTES CADASTRADOS
 export default function BuscaPaciente({
@@ -113,7 +114,7 @@ export default function BuscaPaciente({
               </span>
               <span className="block text-xs text-(--cis-muted)">
                 CPF {formatarCpf(paciente.cpf)}
-                {paciente.phone ? ` · ${paciente.phone}` : ""}
+                {paciente.phone ? ` · ${formatarTelefone(paciente.phone)}` : ""}
               </span>
             </li>
           ))}

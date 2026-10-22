@@ -200,7 +200,7 @@ describe("agendamentos", () => {
       time: "12:30",
       date: "2099-03-16",
       patient: "Visitante Avulso",
-      phone: "84900000000",
+      phone: "(84) 90000-0000",
       cpf: "",
     });
     assert.equal(status, 201);

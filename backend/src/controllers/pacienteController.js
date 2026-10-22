@@ -5,6 +5,7 @@ const Procedimento = require("../models/Procedimento");
 const Arquivo = require("../models/Arquivo");
 const sequelize = require("../../config/database");
 const { hojeLocal } = require("../utils/datas");
+const { telefoneParaSalvar } = require("../utils/telefone");
 
 // LISTA TODOS OS PACIENTES
 exports.listarTodos = async (req, res) => {
@@ -98,7 +99,14 @@ function camposDoPaciente(body) {
   // IDADE VAZIA VIRA NULL, PQ O POSTGRES NÃO ACEITA CAMPO VAZIO
   const idade =
     body.idade === "" || body.idade == null ? null : Number(body.idade);
-  return { patient: patient.trim(), phone, medico, idade, endereco, notes };
+  return {
+    patient: patient.trim(),
+    phone: telefoneParaSalvar(phone),
+    medico,
+    idade,
+    endereco,
+    notes,
+  };
 }
 
 // CRIA UM PACIENTE (O CPF NÃO PODE ESTAR CADASTRADO; SE O PACIENTE FOI EXCLUÍDO, ELE É REATIVADO)

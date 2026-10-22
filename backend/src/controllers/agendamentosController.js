@@ -3,6 +3,7 @@ const Paciente = require("../models/Paciente");
 const sequelize = require("../../config/database");
 const { Op } = require("sequelize");
 const { hojeLocal } = require("../utils/datas");
+const { telefoneParaSalvar } = require("../utils/telefone");
 
 const naoCancelado = { [Op.ne]: "cancelada" };
 
@@ -68,9 +69,10 @@ async function sincronizarPaciente(
 ) {
   if (!cpf) return null;
   const nome = patient.trim();
+  const telefone = telefoneParaSalvar(phone);
   const [paciente, created] = await Paciente.findOrCreate({
     where: { cpf },
-    defaults: { patient: nome, cpf, phone: phone || null, medico },
+    defaults: { patient: nome, cpf, phone: telefone, medico },
     paranoid: false,
     transaction,
   });
@@ -78,7 +80,7 @@ async function sincronizarPaciente(
   if (paciente.deletedAt) await paciente.restore({ transaction });
 
   const alteracoes = { patient: nome };
-  if (phone) alteracoes.phone = phone;
+  if (telefone) alteracoes.phone = telefone;
   if (!paciente.medico && medico) alteracoes.medico = medico;
   await paciente.update(alteracoes, { transaction });
   return paciente;
@@ -94,7 +96,7 @@ function camposDoAgendamento(body, paciente) {
     medico,
     pacienteId: paciente ? paciente.id : null,
     patient: paciente ? null : patient.trim(),
-    phone: paciente ? null : phone || null,
+    phone: paciente ? null : telefoneParaSalvar(phone),
   };
 }
 

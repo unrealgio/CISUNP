@@ -102,7 +102,11 @@ describe("migration pacienteId (dados antigos ligados pelo CPF)", () => {
   });
 
   test("desfazer a migration devolve o CPF e o nome às tabelas", async () => {
-    rodarMigrations("db:migrate:undo");
+    rodarMigrations(
+      "db:migrate:undo:all",
+      "--to",
+      "20261023000000-paciente-id.js",
+    );
 
     const [agendamento] = await consultar(
       `SELECT * FROM agendamentos WHERE time = '13:00'`,

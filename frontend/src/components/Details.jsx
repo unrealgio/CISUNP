@@ -3,6 +3,9 @@ import { MdEdit, MdSave, MdClose, MdEventBusy } from "react-icons/md";
 import { ErrorMessage } from "./StatusMessage";
 import BuscaPaciente from "./BuscaPaciente";
 import AcoesStatus from "./AcoesStatus";
+import CampoTelefone from "./CampoTelefone";
+import { formatarTelefone } from "../utils/telefone";
+import { formatarCpf } from "../utils/cpf";
 import { STATUS } from "../utils/statusAgendamento";
 
 function Campo({ rotulo, children }) {
@@ -186,7 +189,7 @@ export default function Details({
               onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
             />
           ) : (
-            schedule.cpf || <Vazio>Não informado</Vazio>
+            formatarCpf(schedule.cpf) || <Vazio>Não informado</Vazio>
           )}
         </Campo>
         <Campo rotulo="Médico">
@@ -206,15 +209,9 @@ export default function Details({
         </Campo>
         <Campo rotulo="Telefone">
           {editandoTudo ? (
-            <input
-              type="text"
-              className="cis-input"
-              value={phone}
-              maxLength={255}
-              onChange={(e) => setPhone(e.target.value)}
-            />
+            <CampoTelefone value={phone} onChange={setPhone} />
           ) : (
-            schedule.phone || <Vazio>Não informado</Vazio>
+            formatarTelefone(schedule.phone) || <Vazio>Não informado</Vazio>
           )}
         </Campo>
         <Campo rotulo="Observações">

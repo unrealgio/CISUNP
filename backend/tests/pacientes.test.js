@@ -88,6 +88,28 @@ describe("pacientes", () => {
     assert.equal(status, 400);
   });
 
+  test("guarda o telefone só com os dígitos, mesmo enviado com máscara", async () => {
+    const { status, corpo } = await api.chamar(
+      "PUT",
+      "/api/pacientes/22233344455",
+      { patient: "Mariana Souza", phone: "(84) 3201-1234" },
+    );
+    assert.equal(status, 200);
+    assert.equal(corpo.phone, "8432011234");
+  });
+
+  test("recusa telefone inválido com 400", async () => {
+    const { status, corpo } = await api.chamar(
+      "PUT",
+      "/api/pacientes/22233344455",
+      { patient: "Mariana Souza", phone: "849912313123" },
+    );
+    assert.equal(status, 400);
+    assert.deepEqual(corpo.details, [
+      "Telefone deve ter DDD + número (10 ou 11 dígitos).",
+    ]);
+  });
+
   test("responde 404 para CPF não cadastrado", async () => {
     const { status } = await api.chamar("GET", "/api/pacientes/99999999999");
     assert.equal(status, 404);

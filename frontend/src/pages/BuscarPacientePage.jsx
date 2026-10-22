@@ -19,6 +19,8 @@ import {
   LoadingMessage,
 } from "../components/StatusMessage";
 import { useNavigate } from "react-router-dom";
+import { formatarCpf } from "../utils/cpf";
+import { apenasDigitos, formatarTelefone } from "../utils/telefone";
 
 const filtros = [
   { key: "patient", label: "Paciente", icon: <FaUsers /> },
@@ -27,12 +29,23 @@ const filtros = [
   { key: "medico", label: "Médico", icon: <FaUserMd /> },
 ];
 
+const CAMPOS_NUMERICOS = ["cpf", "phone"];
+
+// CPF E TELEFONE COMPARAM SÓ OS DÍGITOS, PARA A BUSCA FUNCIONAR COM OU SEM PONTUAÇÃO
+function campoConfere(chave, valor, termo) {
+  if (!termo) return true;
+  if (!valor) return false;
+  if (CAMPOS_NUMERICOS.includes(chave)) {
+    const digitos = apenasDigitos(termo);
+    return digitos !== "" && apenasDigitos(valor).includes(digitos);
+  }
+  return valor.toLowerCase().includes(termo.toLowerCase());
+}
+
 // FILTRA OS PACIENTES PELOS CAMPOS DE BUSCA PREENCHIDOS
 function filtrarPacientes(pacientes, filtro) {
   return pacientes.filter((p) =>
-    Object.entries(filtro).every(
-      ([k, v]) => !v || (p[k] && p[k].toLowerCase().includes(v.toLowerCase())),
-    ),
+    Object.entries(filtro).every(([k, v]) => campoConfere(k, p[k], v)),
   );
 }
 
@@ -183,8 +196,14 @@ export default function BuscarPacientePage() {
                         <td className="py-3 px-4 font-semibold text-(--cis-blue) hover:underline">
                           {p.patient}
                         </td>
-                        <td className="py-2 px-4">{p.cpf}</td>
-                        <td className="py-2 px-4">{p.phone}</td>
+                        <td className="py-2 px-4 whitespace-nowrap">
+                          {formatarCpf(p.cpf)}
+                        </td>
+                        <td className="py-2 px-4 whitespace-nowrap">
+                          {formatarTelefone(p.phone) || (
+                            <span className="text-(--cis-muted)">—</span>
+                          )}
+                        </td>
                         <td className="py-2 px-4">{p.medico}</td>
                       </tr>
                     ))

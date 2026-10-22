@@ -15,6 +15,9 @@ import { apiFetch, mensagemDeErro } from "../api";
 import { ErrorMessage, EstadoVazio } from "./StatusMessage";
 import { formatarDataISO } from "../utils/date";
 import { useBuscarDados } from "../hooks/useBuscarDados";
+import CampoTelefone from "./CampoTelefone";
+import { formatarTelefone } from "../utils/telefone";
+import { formatarCpf } from "../utils/cpf";
 
 // MONTA O FORMULÁRIO DE EDIÇÃO COM OS DADOS ATUAIS DO PACIENTE
 function formDoPaciente(paciente) {
@@ -154,17 +157,17 @@ export default function PacienteInfoCard({
           <div className="flex items-center justify-center gap-1 text-sm">
             <FaPhone className="text-(--cis-muted) shrink-0" />{" "}
             {editing ? (
-              <input
-                type="text"
-                name="phone"
-                className="cis-input w-28 text-sm"
+              <CampoTelefone
+                className="cis-input text-sm"
                 value={form.phone}
-                maxLength={255}
-                onChange={handleEditChange}
-                placeholder="Telefone"
+                onChange={(phone) => setForm({ ...form, phone })}
               />
             ) : (
-              paciente.phone
+              formatarTelefone(paciente.phone) || (
+                <span className="text-(--cis-muted)">
+                  Telefone não informado
+                </span>
+              )
             )}
           </div>
           <div className="flex items-center justify-center gap-1 text-sm">
@@ -217,7 +220,7 @@ export default function PacienteInfoCard({
           <div className="text-sm flex flex-col gap-2">
             <span className="flex items-center gap-2">
               <FaIdCard className="text-(--cis-muted)" /> <span>CPF:</span>{" "}
-              <span className="font-semibold">{paciente.cpf}</span>
+              <span className="font-semibold">{formatarCpf(paciente.cpf)}</span>
             </span>
             <span className="flex items-center gap-2">
               <FaMapMarkerAlt className="text-(--cis-muted)" />{" "}

@@ -19,6 +19,7 @@ import { dataLocalISO, formatarDataISO } from "../utils/date";
 import { ErrorMessage, EstadoVazio, LoadingMessage } from "./StatusMessage";
 import { STATUS } from "../utils/statusAgendamento";
 import { formatarCpf } from "../utils/cpf";
+import { formatarTelefone } from "../utils/telefone";
 import AcoesStatus from "./AcoesStatus";
 
 function ordenarConsultas(lista) {
@@ -387,7 +388,7 @@ export default function ConsultasList() {
                                 {c.phone ? (
                                   <span className="flex items-center gap-2">
                                     <FaPhone className="shrink-0 text-(--cis-muted)" />
-                                    {c.phone}
+                                    {formatarTelefone(c.phone)}
                                   </span>
                                 ) : (
                                   <Vazio>Não informado</Vazio>
