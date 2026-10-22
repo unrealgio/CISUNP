@@ -17,17 +17,31 @@ const cli = path.join(
   "sequelize",
 );
 
-async function prepararBanco() {
-  await sequelize.getQueryInterface().dropAllTables();
-  execFileSync(process.execPath, [cli, "db:migrate"], {
+function rodarMigrations(...argumentos) {
+  execFileSync(process.execPath, [cli, ...argumentos], {
     cwd: path.join(__dirname, ".."),
     env: { ...process.env, DB_NAME: "cis_test" },
     stdio: "pipe",
   });
 }
 
+async function apagarTabelas() {
+  await sequelize.getQueryInterface().dropAllTables();
+}
+
+async function prepararBanco() {
+  await apagarTabelas();
+  rodarMigrations("db:migrate");
+}
+
 function fecharBanco() {
   return sequelize.close();
 }
 
-module.exports = { prepararBanco, fecharBanco };
+module.exports = {
+  prepararBanco,
+  fecharBanco,
+  apagarTabelas,
+  rodarMigrations,
+  sequelize,
+};

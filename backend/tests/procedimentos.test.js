@@ -10,6 +10,9 @@ describe("procedimentos", () => {
   before(async () => {
     await prepararBanco();
     api = await iniciarServidor();
+    for (const cpf of ["12312312312", "99999999999"]) {
+      await api.chamar("POST", "/api/pacientes", { cpf, patient: "Teste" });
+    }
   });
 
   after(async () => {
@@ -35,6 +38,14 @@ describe("procedimentos", () => {
     assert.equal(corpo.status, "planejado");
     assert.equal(corpo.data, null);
     idPlanejado = corpo.id;
+  });
+
+  test("recusa procedimento para CPF sem cadastro com 404", async () => {
+    const { status } = await api.chamar("POST", "/api/procedimentos", {
+      ...procedimento,
+      cpf: "00000000000",
+    });
+    assert.equal(status, 404);
   });
 
   test("recusa procedimento realizado sem data", async () => {

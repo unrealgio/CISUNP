@@ -46,9 +46,8 @@ function formatarDadosProntuario(dados) {
 // LISTA OS PRONTUÁRIOS DE UM PACIENTE PELO CPF
 exports.listarPorCpf = async (req, res) => {
   try {
-    const { cpf } = req.query;
     const registros = await Prontuario.findAll({
-      where: { cpf },
+      where: { pacienteId: req.paciente.id },
       order: [["createdAt", "DESC"]],
     });
     res.json(registros);
@@ -78,7 +77,8 @@ exports.adicionar = async (req, res) => {
 
     doc.fontSize(18).text("Prontuário Odontológico", { align: "center" });
     doc.moveDown();
-    doc.fontSize(12).text(`CPF: ${cpf}`);
+    doc.fontSize(12).text(`Paciente: ${req.paciente.patient}`);
+    doc.text(`CPF: ${cpf}`);
     doc.text(`Data: ${date}`);
     doc.text(`Hora: ${time}`);
     doc.moveDown();
@@ -154,7 +154,7 @@ exports.adicionar = async (req, res) => {
 
     try {
       const prontuario = await Prontuario.create({
-        cpf,
+        pacienteId: req.paciente.id,
         date,
         time,
         dados,

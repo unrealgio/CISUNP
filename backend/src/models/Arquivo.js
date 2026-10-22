@@ -6,7 +6,7 @@ const Arquivo = sequelize.define(
   "Arquivo",
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    cpf: { type: DataTypes.STRING, allowNull: false },
+    pacienteId: { type: DataTypes.INTEGER, allowNull: false },
     nome: { type: DataTypes.STRING, allowNull: false },
     categoria: {
       type: DataTypes.STRING,

@@ -5,7 +5,7 @@ const Prescricao = sequelize.define(
   "Prescricao",
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    cpf: { type: DataTypes.STRING, allowNull: false },
+    pacienteId: { type: DataTypes.INTEGER, allowNull: false },
     medicamento: DataTypes.STRING,
     dose: DataTypes.STRING,
     frequencia: DataTypes.STRING,

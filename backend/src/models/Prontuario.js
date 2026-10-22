@@ -5,7 +5,7 @@ const Prontuario = sequelize.define(
   "Prontuario",
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    cpf: { type: DataTypes.STRING, allowNull: false },
+    pacienteId: { type: DataTypes.INTEGER, allowNull: false },
     date: DataTypes.STRING,
     time: DataTypes.STRING,
     dados: DataTypes.JSON,

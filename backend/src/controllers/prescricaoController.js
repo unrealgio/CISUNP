@@ -3,9 +3,8 @@ const Prescricao = require("../models/Prescricao");
 // LISTA AS PRESCRIÇÕES DE UM PACIENTE PELO CPF
 exports.listarPorCpf = async (req, res) => {
   try {
-    const { cpf } = req.query;
     const lista = await Prescricao.findAll({
-      where: { cpf },
+      where: { pacienteId: req.paciente.id },
       order: [["createdAt", "DESC"]],
     });
     res.json(lista);
@@ -18,9 +17,9 @@ exports.listarPorCpf = async (req, res) => {
 // ADICIONA UMA NOVA PRESCRIÇÃO
 exports.adicionar = async (req, res) => {
   try {
-    const { cpf, medicamento, dose, frequencia, observacao } = req.body;
+    const { medicamento, dose, frequencia, observacao } = req.body;
     const prescricao = await Prescricao.create({
-      cpf,
+      pacienteId: req.paciente.id,
       medicamento,
       dose,
       frequencia,

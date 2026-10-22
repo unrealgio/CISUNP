@@ -6,15 +6,36 @@ const { hojeLocal } = require("../utils/datas");
 
 const naoCancelado = { [Op.ne]: "cancelada" };
 
+// TRAZ O PACIENTE JUNTO (MESMO SE EXCLUÍDO, PARA O HISTÓRICO CONTINUAR COM NOME)
+const incluirPaciente = {
+  model: Paciente,
+  as: "paciente",
+  paranoid: false,
+  attributes: ["patient", "cpf", "phone"],
+};
+
+// RESPONDE NO FORMATO DE SEMPRE: NOME, CPF E TELEFONE VÊM DO CADASTRO OU DO PRÓPRIO AGENDAMENTO (AVULSO)
+function comDadosDoPaciente(agendamento) {
+  const { paciente, ...dados } = agendamento.toJSON();
+  if (!paciente) return { ...dados, cpf: null };
+  return {
+    ...dados,
+    patient: paciente.patient,
+    cpf: paciente.cpf,
+    phone: paciente.phone,
+  };
+}
+
 // LISTA OS AGENDAMENTOS POR DATA
 exports.buscarPorData = async (req, res) => {
   const { date } = req.query;
   try {
     const agendamentos = await Agendamentos.findAll({
       where: { date, status: naoCancelado },
+      include: [incluirPaciente],
       order: [["time", "ASC"]],
     });
-    res.json(agendamentos);
+    res.json(agendamentos.map(comDadosDoPaciente));
   } catch (err) {
     console.error("Erro ao listar agendamentos:", err);
     res.status(500).json({ error: "Erro ao listar agendamentos." });
@@ -38,28 +59,42 @@ exports.diasComAgendamento = async (req, res) => {
   }
 };
 
-// SINCRONIZA PACIENTE PELO CPF
+// COM CPF: CRIA O PACIENTE OU ATUALIZA NOME E TELEFONE (O MÉDICO SÓ PREENCHE SE ESTIVER VAZIO)
+// SEM CPF: AGENDAMENTO AVULSO, SEM CADASTRO
 async function sincronizarPaciente(
   { cpf, patient, phone, medico },
   transaction,
 ) {
-  if (!cpf) return;
+  if (!cpf) return null;
+  const nome = patient.trim();
   const [paciente, created] = await Paciente.findOrCreate({
     where: { cpf },
-    defaults: { patient, cpf, phone, medico },
+    defaults: { patient: nome, cpf, phone: phone || null, medico },
     paranoid: false,
     transaction,
   });
-  if (created) return;
+  if (created) return paciente;
   if (paciente.deletedAt) await paciente.restore({ transaction });
 
-  // PREENCHE OS CAMPOS VAZIOS
-  const camposVazios = {};
-  if (!paciente.phone && phone) camposVazios.phone = phone;
-  if (!paciente.medico && medico) camposVazios.medico = medico;
-  if (Object.keys(camposVazios).length) {
-    await paciente.update(camposVazios, { transaction });
-  }
+  const alteracoes = { patient: nome };
+  if (phone) alteracoes.phone = phone;
+  if (!paciente.medico && medico) alteracoes.medico = medico;
+  await paciente.update(alteracoes, { transaction });
+  return paciente;
+}
+
+// NOME E TELEFONE SÓ FICAM NO AGENDAMENTO QUANDO NÃO HÁ PACIENTE CADASTRADO
+function camposDoAgendamento(body, paciente) {
+  const { time, date, patient, phone, notes, medico } = body;
+  return {
+    time,
+    date,
+    notes,
+    medico,
+    pacienteId: paciente ? paciente.id : null,
+    patient: paciente ? null : patient.trim(),
+    phone: paciente ? null : phone || null,
+  };
 }
 
 // DESFAZ A TRANSAÇÃO E RESPONDE COM O ERRO ADEQUADO
@@ -76,7 +111,7 @@ async function responderErroAoSalvar(res, transaction, err) {
 
 // CRIA UM AGENDAMENTO
 exports.criar = async (req, res) => {
-  const { time, date, patient, cpf, phone, notes, medico } = req.body;
+  const { time, date } = req.body;
   let transaction;
   try {
     transaction = await sequelize.transaction();
@@ -91,13 +126,14 @@ exports.criar = async (req, res) => {
         .json({ error: "Já existe um agendamento neste horário." });
     }
 
-    await sincronizarPaciente(req.body, transaction);
+    const paciente = await sincronizarPaciente(req.body, transaction);
     const agendamento = await Agendamentos.create(
-      { time, date, patient, cpf, phone, notes, medico },
+      camposDoAgendamento(req.body, paciente),
       { transaction },
     );
     await transaction.commit();
-    res.status(201).json(agendamento);
+    await agendamento.reload({ include: [incluirPaciente] });
+    res.status(201).json(comDadosDoPaciente(agendamento));
   } catch (err) {
     await responderErroAoSalvar(res, transaction, err);
   }
@@ -106,7 +142,6 @@ exports.criar = async (req, res) => {
 // ATUALIZA UM AGENDAMENTO
 exports.atualizar = async (req, res) => {
   const { id } = req.params;
-  const { time, date, patient, cpf, phone, notes, medico } = req.body;
   let transaction;
   try {
     transaction = await sequelize.transaction();
@@ -116,13 +151,13 @@ exports.atualizar = async (req, res) => {
       return res.status(404).json({ error: "Agendamento não encontrado." });
     }
 
-    await sincronizarPaciente(req.body, transaction);
-    await agendamento.update(
-      { time, date, patient, cpf, phone, notes, medico },
-      { transaction },
-    );
+    const paciente = await sincronizarPaciente(req.body, transaction);
+    await agendamento.update(camposDoAgendamento(req.body, paciente), {
+      transaction,
+    });
     await transaction.commit();
-    res.json(agendamento);
+    await agendamento.reload({ include: [incluirPaciente] });
+    res.json(comDadosDoPaciente(agendamento));
   } catch (err) {
     await responderErroAoSalvar(res, transaction, err);
   }
@@ -132,12 +167,13 @@ exports.atualizar = async (req, res) => {
 exports.listarTodos = async (req, res) => {
   try {
     const agendamentos = await Agendamentos.findAll({
+      include: [incluirPaciente],
       order: [
         ["date", "ASC"],
         ["time", "ASC"],
       ],
     });
-    res.json(agendamentos);
+    res.json(agendamentos.map(comDadosDoPaciente));
   } catch (err) {
     console.error("Erro ao listar consultas:", err);
     res.status(500).json({ error: "Erro ao listar consultas." });
@@ -147,12 +183,14 @@ exports.listarTodos = async (req, res) => {
 // ALTERA O STATUS DE UM AGENDAMENTO
 exports.atualizarStatus = async (req, res) => {
   try {
-    const agendamento = await Agendamentos.findByPk(req.params.id);
+    const agendamento = await Agendamentos.findByPk(req.params.id, {
+      include: [incluirPaciente],
+    });
     if (!agendamento) {
       return res.status(404).json({ error: "Agendamento não encontrado." });
     }
     await agendamento.update({ status: req.body.status });
-    res.json(agendamento);
+    res.json(comDadosDoPaciente(agendamento));
   } catch (err) {
     await responderErroAoSalvar(res, null, err);
   }
@@ -174,21 +212,20 @@ exports.excluir = async (req, res) => {
 
 // LISTA OS AGENDAMENTOS FUTUROS
 exports.futurosPorPaciente = async (req, res) => {
-  const { cpf } = req.query;
-  const hoje = hojeLocal();
   try {
     const agendamentos = await Agendamentos.findAll({
       where: {
-        cpf,
-        date: { [Op.gte]: hoje },
+        pacienteId: req.paciente.id,
+        date: { [Op.gte]: hojeLocal() },
         status: naoCancelado,
       },
+      include: [incluirPaciente],
       order: [
         ["date", "ASC"],
         ["time", "ASC"],
       ],
     });
-    res.json(agendamentos);
+    res.json(agendamentos.map(comDadosDoPaciente));
   } catch (err) {
     console.error("Erro ao buscar agendamentos futuros:", err);
     res.status(500).json({ error: "Erro ao buscar agendamentos futuros." });

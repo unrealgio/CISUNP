@@ -6,7 +6,7 @@ const Procedimento = sequelize.define(
   "Procedimento",
   {
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    cpf: { type: DataTypes.STRING, allowNull: false },
+    pacienteId: { type: DataTypes.INTEGER, allowNull: false },
     tipo: { type: DataTypes.STRING, allowNull: false },
     dente: DataTypes.STRING,
     data: DataTypes.STRING,

@@ -14,11 +14,17 @@ const { iniciarServidor, gerarTokenDeTeste } = require("./ajudantes");
 describe("arquivos do paciente", () => {
   let api;
   let idEnviado;
+  let pacienteId;
   const conteudo = Buffer.from("%PDF-1.4 arquivo de teste");
 
   before(async () => {
     await prepararBanco();
     api = await iniciarServidor();
+    const { corpo } = await api.chamar("POST", "/api/pacientes", {
+      cpf: "12312312312",
+      patient: "Paciente Arquivos",
+    });
+    pacienteId = corpo.id;
   });
 
   after(async () => {
@@ -64,6 +70,13 @@ describe("arquivos do paciente", () => {
     ]);
   });
 
+  test("recusa arquivo para CPF sem cadastro com 404", async () => {
+    const res = await enviar(conteudo, "application/pdf", {
+      cpf: "00000000000",
+    });
+    assert.equal(res.status, 404);
+  });
+
   test("recusa categoria inválida", async () => {
     const res = await enviar(conteudo, "application/pdf", {
       categoria: "foto",
@@ -104,7 +117,7 @@ describe("arquivos do paciente", () => {
   });
 
   test("excluir remove o registro e o arquivo do disco", async () => {
-    const pasta = path.join(process.env.PASTA_ARQUIVOS, "12312312312");
+    const pasta = path.join(process.env.PASTA_ARQUIVOS, String(pacienteId));
     assert.equal(fs.readdirSync(pasta).length, 1);
 
     const { status } = await api.chamar("DELETE", `/api/arquivos/${idEnviado}`);

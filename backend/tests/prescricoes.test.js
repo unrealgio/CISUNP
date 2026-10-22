@@ -9,6 +9,9 @@ describe("prescrições", () => {
   before(async () => {
     await prepararBanco();
     api = await iniciarServidor();
+    for (const cpf of ["12312312312", "98798798798"]) {
+      await api.chamar("POST", "/api/pacientes", { cpf, patient: "Teste" });
+    }
   });
 
   after(async () => {
@@ -46,8 +49,17 @@ describe("prescrições", () => {
   test("não mistura prescrições de outro paciente", async () => {
     const { corpo } = await api.chamar(
       "GET",
-      "/api/prescricoes?cpf=99999999999",
+      "/api/prescricoes?cpf=98798798798",
     );
     assert.deepEqual(corpo, []);
+  });
+
+  test("recusa prescrição para CPF sem cadastro com 404", async () => {
+    const { status, corpo } = await api.chamar("POST", "/api/prescricoes", {
+      cpf: "99999999999",
+      medicamento: "Dipirona",
+    });
+    assert.equal(status, 404);
+    assert.equal(corpo.error, "Paciente não encontrado.");
   });
 });

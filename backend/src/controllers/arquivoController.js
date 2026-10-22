@@ -14,7 +14,7 @@ function semCaminho(arquivo) {
 exports.listarPorCpf = async (req, res) => {
   try {
     const lista = await Arquivo.findAll({
-      where: { cpf: req.query.cpf },
+      where: { pacienteId: req.paciente.id },
       order: [["createdAt", "DESC"]],
     });
     res.json(lista);
@@ -26,10 +26,10 @@ exports.listarPorCpf = async (req, res) => {
 
 // SALVA O ARQUIVO NO DISCO COM UM NOME GERADO PELO SERVIDOR (O NOME ORIGINAL FICA SÓ NO BANCO)
 exports.enviar = async (req, res) => {
-  const { cpf, categoria, nome } = req.query;
+  const { categoria, nome } = req.query;
   const tipoMime = req.get("Content-Type");
   const caminho = path.join(
-    cpf,
+    String(req.paciente.id),
     `${crypto.randomUUID()}${EXTENSOES_PERMITIDAS[tipoMime]}`,
   );
   const destino = path.join(PASTA_ARQUIVOS, caminho);
@@ -37,7 +37,7 @@ exports.enviar = async (req, res) => {
     await fs.mkdir(path.dirname(destino), { recursive: true });
     await fs.writeFile(destino, req.body);
     const arquivo = await Arquivo.create({
-      cpf,
+      pacienteId: req.paciente.id,
       nome: nome.trim(),
       categoria,
       tipoMime,

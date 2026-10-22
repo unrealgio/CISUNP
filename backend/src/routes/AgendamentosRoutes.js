@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const agendamentosController = require("../controllers/agendamentosController");
 const { authenticateToken } = require("../middleware/middleware");
+const { carregarPaciente } = require("../middleware/paciente");
 const {
   validateAgendamentoQuery,
   validateIntervaloQuery,
@@ -37,6 +38,7 @@ router.delete("/:id", validateIdParam, agendamentosController.excluir);
 router.get(
   "/futuros",
   validateCpfQuery,
+  carregarPaciente,
   agendamentosController.futurosPorPaciente,
 );
 

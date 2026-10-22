@@ -39,6 +39,7 @@ exports.resumo = async (req, res) => {
     if (!paciente)
       return res.status(404).json({ error: "Paciente não encontrado." });
 
+    const pacienteId = paciente.id;
     const [
       consultas,
       faltas,
@@ -47,12 +48,12 @@ exports.resumo = async (req, res) => {
       procedimentosPlanejados,
       exames,
     ] = await Promise.all([
-      Agendamentos.count({ where: { cpf, status: "realizada" } }),
-      Agendamentos.count({ where: { cpf, status: "faltou" } }),
-      Agendamentos.count({ where: { cpf, status: "cancelada" } }),
-      Procedimento.count({ where: { cpf, status: "realizado" } }),
-      Procedimento.count({ where: { cpf, status: "planejado" } }),
-      Arquivo.count({ where: { cpf, categoria: "exame" } }),
+      Agendamentos.count({ where: { pacienteId, status: "realizada" } }),
+      Agendamentos.count({ where: { pacienteId, status: "faltou" } }),
+      Agendamentos.count({ where: { pacienteId, status: "cancelada" } }),
+      Procedimento.count({ where: { pacienteId, status: "realizado" } }),
+      Procedimento.count({ where: { pacienteId, status: "planejado" } }),
+      Arquivo.count({ where: { pacienteId, categoria: "exame" } }),
     ]);
     res.json({
       consultas,
@@ -111,16 +112,17 @@ exports.excluir = async (req, res) => {
   const { cpf } = req.params;
   const transaction = await sequelize.transaction();
   try {
-    const deleted = await Paciente.destroy({ where: { cpf }, transaction });
-    if (!deleted) {
+    const paciente = await Paciente.findOne({ where: { cpf }, transaction });
+    if (!paciente) {
       await transaction.rollback();
       return res.status(404).json({ error: "Paciente não encontrado." });
     }
+    await paciente.destroy({ transaction });
     await Agendamentos.update(
       { status: "cancelada" },
       {
         where: {
-          cpf,
+          pacienteId: paciente.id,
           date: { [Op.gte]: hojeLocal() },
           status: { [Op.in]: ["pendente", "confirmada"] },
         },

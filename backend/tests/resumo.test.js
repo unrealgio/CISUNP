@@ -27,7 +27,7 @@ describe("resumo do paciente", () => {
   });
 
   test("conta consultas, faltas, cancelamentos, procedimentos e exames", async () => {
-    await api.chamar("POST", "/api/pacientes", {
+    const { corpo: paciente } = await api.chamar("POST", "/api/pacientes", {
       cpf,
       patient: "Paciente Resumo",
     });
@@ -63,7 +63,7 @@ describe("resumo do paciente", () => {
     });
 
     const arquivo = {
-      cpf,
+      pacienteId: paciente.id,
       nome: "x.pdf",
       tipoMime: "application/pdf",
       tamanho: 1,

@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const arquivoController = require("../controllers/arquivoController");
 const { authenticateToken } = require("../middleware/middleware");
+const { carregarPaciente } = require("../middleware/paciente");
 const {
   validateCpfQuery,
   validateIdParam,
@@ -11,7 +12,12 @@ const { EXTENSOES_PERMITIDAS, TAMANHO_MAXIMO } = require("../utils/arquivos");
 
 router.use(authenticateToken);
 
-router.get("/", validateCpfQuery, arquivoController.listarPorCpf);
+router.get(
+  "/",
+  validateCpfQuery,
+  carregarPaciente,
+  arquivoController.listarPorCpf,
+);
 router.post(
   "/",
   express.raw({
@@ -19,6 +25,7 @@ router.post(
     limit: TAMANHO_MAXIMO,
   }),
   validateArquivoUpload,
+  carregarPaciente,
   arquivoController.enviar,
 );
 router.get("/:id/download", validateIdParam, arquivoController.baixar);

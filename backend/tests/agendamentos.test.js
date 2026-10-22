@@ -125,4 +125,62 @@ describe("agendamentos", () => {
     const busca = await api.chamar("GET", "/api/pacientes/55566677788");
     assert.equal(busca.status, 200);
   });
+
+  test("agendar com CPF já cadastrado atualiza nome e telefone, mas não troca o médico", async () => {
+    await api.chamar("POST", "/api/agendamentos", {
+      ...agendamento,
+      time: "11:00",
+      patient: "João Atualizado",
+      phone: "84977770000",
+      medico: "Dr. Bruno",
+    });
+    const { corpo } = await api.chamar("GET", "/api/pacientes/55566677788");
+    assert.equal(corpo.patient, "João Atualizado");
+    assert.equal(corpo.phone, "84977770000");
+    assert.equal(corpo.medico, "Dra. Ana");
+  });
+
+  test("telefone vazio na agenda não apaga o telefone do cadastro", async () => {
+    await api.chamar("POST", "/api/agendamentos", {
+      ...agendamento,
+      time: "11:30",
+      patient: "João Atualizado",
+      phone: "",
+    });
+    const { corpo } = await api.chamar("GET", "/api/pacientes/55566677788");
+    assert.equal(corpo.phone, "84977770000");
+  });
+
+  test("corrigir o nome no cadastro muda o nome em todas as consultas", async () => {
+    await api.chamar("PUT", "/api/pacientes/55566677788", {
+      patient: "João Corrigido",
+    });
+    const { corpo } = await api.chamar(
+      "GET",
+      "/api/agendamentos?date=2099-03-15",
+    );
+    assert.ok(corpo.length >= 3);
+    for (const item of corpo) {
+      assert.equal(item.patient, "João Corrigido");
+      assert.equal(item.cpf, "55566677788");
+    }
+  });
+
+  test("agendamento sem CPF é avulso: guarda nome e telefone e não cria paciente", async () => {
+    const { status, corpo } = await api.chamar("POST", "/api/agendamentos", {
+      time: "12:30",
+      date: "2099-03-16",
+      patient: "Visitante Avulso",
+      phone: "84900000000",
+      cpf: "",
+    });
+    assert.equal(status, 201);
+    assert.equal(corpo.pacienteId, null);
+    assert.equal(corpo.cpf, null);
+    assert.equal(corpo.patient, "Visitante Avulso");
+    assert.equal(corpo.phone, "84900000000");
+
+    const lista = await api.chamar("GET", "/api/pacientes/todos");
+    assert.ok(!lista.corpo.some((p) => p.patient === "Visitante Avulso"));
+  });
 });

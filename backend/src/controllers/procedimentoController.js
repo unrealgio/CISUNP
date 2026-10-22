@@ -1,9 +1,9 @@
 const Procedimento = require("../models/Procedimento");
 
-function camposDoProcedimento(body) {
-  const { cpf, tipo, dente, data, status, observacao } = body;
+function camposDoProcedimento(req) {
+  const { tipo, dente, data, status, observacao } = req.body;
   return {
-    cpf,
+    pacienteId: req.paciente.id,
     tipo: tipo.trim(),
     dente: dente || null,
     data: data || null,
@@ -16,7 +16,7 @@ function camposDoProcedimento(body) {
 exports.listarPorCpf = async (req, res) => {
   try {
     const lista = await Procedimento.findAll({
-      where: { cpf: req.query.cpf },
+      where: { pacienteId: req.paciente.id },
       order: [
         ["status", "ASC"],
         ["data", "DESC NULLS LAST"],
@@ -33,9 +33,7 @@ exports.listarPorCpf = async (req, res) => {
 // ADICIONA UM PROCEDIMENTO
 exports.adicionar = async (req, res) => {
   try {
-    const procedimento = await Procedimento.create(
-      camposDoProcedimento(req.body),
-    );
+    const procedimento = await Procedimento.create(camposDoProcedimento(req));
     res.status(201).json(procedimento);
   } catch (err) {
     console.error("Erro ao adicionar procedimento:", err);
@@ -50,7 +48,7 @@ exports.atualizar = async (req, res) => {
     if (!procedimento) {
       return res.status(404).json({ error: "Procedimento não encontrado." });
     }
-    await procedimento.update(camposDoProcedimento(req.body));
+    await procedimento.update(camposDoProcedimento(req));
     res.json(procedimento);
   } catch (err) {
     console.error("Erro ao atualizar procedimento:", err);
