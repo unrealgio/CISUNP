@@ -27,7 +27,7 @@ O sistema centraliza informações de pacientes, agenda, prescrições e prontu�
 - Prontuário odontológico com desenho da arcada e geração de PDF.
 - Cadastro e consulta de prescrições.
 - Rotas clínicas protegidas por autenticação.
-- Validação de e-mails, senhas, CPF, datas, horários e campos obrigatórios.
+- Validação de e-mails, senhas, CPF, telefones, datas, horários e campos obrigatórios. Telefones são digitados com máscara, guardados só com os números (DDD + 8 ou 9 dígitos) e exibidos no formato (84) 99999-0000.
 
 ## Tecnologias
 
@@ -114,6 +114,8 @@ A estrutura do banco é criada e atualizada por **migrations** (pasta [`backend/
 
 - `npm run db:migrate:status`: mostra quais migrations já foram aplicadas.
 - `npm run db:migrate:undo`: desfaz a última migration.
+
+Para ter dados de demonstração (pacientes fictícios com CPF e telefone válidos, consultas passadas e futuras em todos os status, procedimentos e prescrições), rode `npm run db:seed`. O seeder pode ser executado mais de uma vez: ele substitui os dados de demonstração anteriores, e as datas das consultas são calculadas a partir do dia em que é executado. `npm run db:seed:undo` remove esses dados. Os usuários de login não são afetados.
 
 ### Frontend
 
