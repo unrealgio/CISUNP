@@ -19,13 +19,14 @@ O sistema centraliza informações de pacientes, agenda, prescrições e prontu�
 - Autenticação JWT e alteração de senha no primeiro acesso.
 - Cadastro, busca, edição e exclusão de pacientes (a exclusão preserva o histórico de agendamentos, prescrições e prontuários).
 - Agenda de consultas com prevenção de horários duplicados.
-- Página de consultas com status (pendente, confirmada, realizada, cancelada), filtro e busca. Cancelar uma consulta libera o horário na agenda.
+- Página de consultas com status (pendente, confirmada, realizada, faltou, cancelada), filtro por status e por paciente, e busca. Cancelar uma consulta libera o horário na agenda; uma falta mantém o horário registrado.
+- Ficha do paciente com resumo calculado no banco: consultas realizadas, procedimentos, exames, faltas e cancelamentos.
+- Procedimentos odontológicos por paciente (plano de tratamento e histórico), com dente na numeração FDI.
+- Envio, download e exclusão de arquivos do paciente (exames, documentos), em PDF ou imagem de até 10 MB.
 - Prontuário odontológico com desenho da arcada e geração de PDF.
 - Cadastro e consulta de prescrições.
 - Rotas clínicas protegidas por autenticação.
 - Validação de e-mails, senhas, CPF, datas, horários e campos obrigatórios.
-
-> A aba de arquivos ainda é uma simulação local do frontend. O fluxo persistente de arquivos não está implementado.
 
 ## Tecnologias
 
@@ -182,13 +183,19 @@ A cada execução, as tabelas do `cis_test` são apagadas e recriadas pelas migr
 - `POST /api/login`
 - `GET /api/session`
 - `POST /api/change-password`
-- `GET|POST|PUT|DELETE /api/pacientes`
+- `GET|POST|PUT|DELETE /api/pacientes` e `GET /api/pacientes/:cpf/resumo`
 - `GET|POST|PUT|DELETE /api/agendamentos` e `PATCH /api/agendamentos/:id/status`
 - `GET|POST /api/prescricoes`
 - `GET|POST /api/prontuarios`
+- `GET|POST|PUT|DELETE /api/procedimentos`
+- `GET|POST|DELETE /api/arquivos` e `GET /api/arquivos/:id/download`
 
 As rotas clínicas exigem `Authorization: Bearer <token>`.
 
+O envio de arquivo (`POST /api/arquivos?cpf=...&categoria=...&nome=...`) recebe o conteúdo bruto do arquivo no corpo da requisição, com o `Content-Type` do arquivo (`application/pdf`, `image/png`, `image/jpeg` ou `image/webp`). Os arquivos ficam em `backend/uploads/arquivos`, que não é versionada.
+
 ## Licença
 
-Este projeto está licenciado sob os termos da licença MIT. Consulte [LICENSE](LICENSE).
+Todos os direitos reservados. O código está publicado apenas para visualização e avaliação (portfólio); não é permitido copiá-lo, modificá-lo, distribuí-lo ou usá-lo em outros projetos sem autorização do autor. Consulte [LICENSE](LICENSE).
+
+All rights reserved. The code is published for viewing and evaluation only (portfolio); copying, modifying, distributing or using it in other projects is not permitted without the author's authorization. See [LICENSE](LICENSE).
