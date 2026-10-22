@@ -78,7 +78,7 @@ export default function List({
 
   return (
     <div className="flex-1 overflow-x-auto rounded-xl shadow-(--cis-shadow)">
-      <div className="grid grid-cols-4 rounded-t-xl bg-(--cis-navy) text-white font-semibold text-sm md:text-base px-4 md:px-6 py-3 min-w-175">
+      <div className="grid grid-cols-4 gap-x-4 rounded-t-xl bg-(--cis-navy) text-white font-semibold text-sm md:text-base px-4 md:px-6 py-3 min-w-175">
         <div className="text-left pl-4 md:pl-6">Horário</div>
         <div className="text-center">Paciente</div>
         <div className="text-center">Médico</div>
@@ -101,7 +101,7 @@ export default function List({
         {schedules.map((item, idx) => (
           <div
             key={item.time}
-            className={`grid grid-cols-4 items-center rounded-lg px-4 py-2 shadow ${
+            className={`grid grid-cols-4 gap-x-4 items-center rounded-lg px-4 py-2 shadow ${
               selected?.time === item.time
                 ? "bg-(--cis-orange-soft) border border-(--cis-orange)"
                 : item.patient
@@ -126,7 +126,7 @@ export default function List({
             </span>
             <span className="text-center flex items-center justify-center gap-2">
               {editingIndex === idx ? (
-                <div className="flex flex-col gap-1 w-full">
+                <div className="flex flex-col gap-2 w-full">
                   <input
                     type="text"
                     className="cis-input"
