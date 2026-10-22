@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   FaUser,
   FaCalendarAlt,
@@ -11,6 +11,7 @@ import {
   FaSearch,
   FaChevronDown,
   FaChevronUp,
+  FaTimes,
 } from "react-icons/fa";
 import { apiFetch, mensagemDeErro } from "../api";
 import { useBuscarDados } from "../hooks/useBuscarDados";
@@ -32,6 +33,11 @@ const STATUS = {
     rotulo: "Realizada",
     plural: "Realizadas",
     acao: "Marcar como realizada",
+  },
+  faltou: {
+    rotulo: "Faltou",
+    plural: "Faltas",
+    acao: "Marcar falta",
   },
   cancelada: {
     rotulo: "Cancelada",
@@ -57,17 +63,25 @@ export default function ConsultasList() {
     "/api/agendamentos/todos",
     "Erro ao carregar consultas.",
   );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const cpfFiltro = searchParams.get("cpf");
   const [search, setSearch] = useState("");
-  const [filtro, setFiltro] = useState("todas");
+  const [filtro, setFiltro] = useState(() =>
+    STATUS[searchParams.get("status")] ? searchParams.get("status") : "todas",
+  );
   const [page, setPage] = useState(1);
   const [expanded, setExpanded] = useState(null);
   const [alterando, setAlterando] = useState(null);
   const [erroStatus, setErroStatus] = useState(null);
   const itemsPerPage = 12;
 
+  const todas = Array.isArray(consultas.dados) ? consultas.dados : [];
   const lista = ordenarConsultas(
-    Array.isArray(consultas.dados) ? consultas.dados : [],
+    cpfFiltro ? todas.filter((c) => c.cpf === cpfFiltro) : todas,
   );
+  const nomeDoPacienteFiltrado = cpfFiltro
+    ? lista[0]?.patient || `CPF ${cpfFiltro}`
+    : "";
   const contagem = lista.reduce(
     (total, c) => ({ ...total, [c.status]: (total[c.status] || 0) + 1 }),
     { todas: lista.length },
@@ -93,6 +107,11 @@ export default function ConsultasList() {
 
   function escolherFiltro(novoFiltro) {
     setFiltro(novoFiltro);
+    setPage(1);
+  }
+
+  function limparFiltroDePaciente() {
+    setSearchParams({});
     setPage(1);
   }
 
@@ -162,6 +181,19 @@ export default function ConsultasList() {
           />
           <FaSearch className="absolute right-3 top-3 text-(--cis-muted)" />
         </div>
+        {cpfFiltro && (
+          <button
+            type="button"
+            className="cis-filtro flex items-center gap-2 w-fit wrap-anywhere"
+            aria-pressed="true"
+            onClick={limparFiltroDePaciente}
+            title="Mostrar as consultas de todos os pacientes"
+          >
+            Paciente: {nomeDoPacienteFiltrado}
+            <FaTimes className="shrink-0" aria-hidden="true" />
+            <span className="sr-only">(remover filtro)</span>
+          </button>
+        )}
         <div
           className="flex flex-wrap gap-2"
           role="group"
@@ -197,7 +229,9 @@ export default function ConsultasList() {
                   titulo="Nenhuma consulta encontrada."
                   dica={
                     lista.length === 0
-                      ? "Os agendamentos feitos na Agenda aparecem aqui."
+                      ? cpfFiltro
+                        ? "Este paciente ainda não tem consultas."
+                        : "Os agendamentos feitos na Agenda aparecem aqui."
                       : "Tente buscar por outro nome ou mudar o filtro."
                   }
                 />

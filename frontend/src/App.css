@@ -84,6 +84,10 @@
     @apply w-full rounded-lg border p-3;
   }
 
+  .cis-rotulo-campo {
+    @apply text-sm font-semibold text-(--cis-navy);
+  }
+
   .cis-login-input {
     @apply w-full px-4 py-2.5 pr-10 border border-(--cis-border) rounded-lg shadow-sm focus:border-(--cis-orange) bg-white text-(--cis-ink) placeholder-(--cis-muted) text-base transition;
   }

@@ -3,6 +3,7 @@ import {
   FaPrescriptionBottleAlt,
   FaNotesMedical,
   FaFolderOpen,
+  FaTooth,
 } from "react-icons/fa";
 
 const tabs = [
@@ -12,6 +13,7 @@ const tabs = [
     label: "Prescrições",
     icon: <FaPrescriptionBottleAlt />,
   },
+  { key: "procedimentos", label: "Procedimentos", icon: <FaTooth /> },
   { key: "prontuario", label: "Prontuário", icon: <FaNotesMedical /> },
   { key: "arquivos", label: "Arquivos", icon: <FaFolderOpen /> },
 ];

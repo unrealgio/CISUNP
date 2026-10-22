@@ -6,12 +6,11 @@ import PacienteTabs from "../components/PacienteTabs";
 import PacienteInfoCard from "../components/PacienteInfoCard";
 import PacienteResumoCards from "../components/PacienteResumoCards";
 import TabPrescricoes from "../components/TabPrescricoes";
+import TabProcedimentos from "../components/TabProcedimentos";
 import TabProntuario from "../components/TabProntuario";
 import TabArquivos from "../components/TabArquivos";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 import { ErrorMessage, LoadingMessage } from "../components/StatusMessage";
-
-const resumoPadrao = { consultas: 0, procedimentos: 0, exames: 0, faltas: 0 };
 
 // RECRIA A PÁGINA DO ZERO QUANDO O CPF DA URL MUDA
 export default function PacientePage() {
@@ -21,7 +20,10 @@ export default function PacientePage() {
 
 function ConteudoPaciente({ cpf }) {
   const [activeTab, setActiveTab] = useState("info");
-  const [arquivos, setArquivos] = useState([]);
+  const [novoProcedimento, setNovoProcedimento] = useState({
+    aberto: false,
+    vez: 0,
+  });
   const navigate = useNavigate();
 
   const buscaPaciente = useBuscarDados(
@@ -33,11 +35,13 @@ function ConteudoPaciente({ cpf }) {
     buscaPaciente.carregando && !buscaPaciente.dados
       ? undefined
       : buscaPaciente.dados?.patient
-        ? {
-            ...buscaPaciente.dados,
-            resumo: buscaPaciente.dados.resumo || resumoPadrao,
-          }
+        ? buscaPaciente.dados
         : null;
+
+  const buscaResumo = useBuscarDados(
+    `/api/pacientes/${encodeURIComponent(cpf)}/resumo`,
+    "Erro ao carregar o resumo do paciente.",
+  );
 
   const buscaPrescricoes = useBuscarDados(
     `/api/prescricoes?cpf=${encodeURIComponent(cpf)}`,
@@ -50,6 +54,23 @@ function ConteudoPaciente({ cpf }) {
 
   function handleAddPrescricao(nova) {
     buscaPrescricoes.alterarDados((prev) => [nova, ...(prev || [])]);
+  }
+
+  function trocarAba(aba) {
+    setActiveTab(aba);
+    setNovoProcedimento((atual) => ({ ...atual, aberto: false }));
+  }
+
+  // BOTÕES DOS CARDS DE RESUMO
+  function handleCardAction(card) {
+    const consultasDoPaciente = `/consultas?cpf=${encodeURIComponent(cpf)}`;
+    if (card === "consultas") navigate(consultasDoPaciente);
+    if (card === "faltas") navigate(`${consultasDoPaciente}&status=faltou`);
+    if (card === "exames") trocarAba("arquivos");
+    if (card === "procedimentos") {
+      setActiveTab("procedimentos");
+      setNovoProcedimento((atual) => ({ aberto: true, vez: atual.vez + 1 }));
+    }
   }
 
   if (paciente === undefined) {
@@ -83,7 +104,7 @@ function ConteudoPaciente({ cpf }) {
       <Header />
       <Menu active="pacientes" />
       <div className="bg-linear-to-br from-(--cis-soft-blue) to-(--cis-soft-gray) min-h-screen px-2 md:px-8 py-6">
-        <PacienteTabs active={activeTab} onTabChange={setActiveTab} />
+        <PacienteTabs active={activeTab} onTabChange={trocarAba} />
         <div className="mt-4">
           <PacienteInfoCard
             paciente={paciente}
@@ -92,7 +113,15 @@ function ConteudoPaciente({ cpf }) {
               navigate("/buscar-paciente", { replace: true })
             }
           />
-          <PacienteResumoCards resumo={paciente.resumo} />
+          {buscaResumo.erro && (
+            <ErrorMessage compacto className="mb-2">
+              {buscaResumo.erro}
+            </ErrorMessage>
+          )}
+          <PacienteResumoCards
+            resumo={buscaResumo.dados}
+            onAction={handleCardAction}
+          />
         </div>
         {activeTab === "prescricoes" && (
           <TabPrescricoes
@@ -102,9 +131,17 @@ function ConteudoPaciente({ cpf }) {
             onAdd={handleAddPrescricao}
           />
         )}
+        {activeTab === "procedimentos" && (
+          <TabProcedimentos
+            key={novoProcedimento.vez}
+            cpf={cpf}
+            iniciarComFormulario={novoProcedimento.aberto}
+            onAlterado={buscaResumo.recarregar}
+          />
+        )}
         {activeTab === "prontuario" && <TabProntuario cpf={cpf} />}
         {activeTab === "arquivos" && (
-          <TabArquivos arquivos={arquivos} setArquivos={setArquivos} />
+          <TabArquivos cpf={cpf} onAlterado={buscaResumo.recarregar} />
         )}
       </div>
     </>

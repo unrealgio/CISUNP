@@ -5,6 +5,7 @@ const {
   validateChangePassword,
   validatePacienteBody,
   validatePrescricaoBody,
+  validateProcedimentoBody,
   validateStatusBody,
 } = require("../src/middleware/validation");
 const { rodarMiddleware } = require("./ajudantes");
@@ -99,8 +100,14 @@ describe("validatePrescricaoBody", () => {
 });
 
 describe("validateStatusBody", () => {
-  test("aceita os quatro status", () => {
-    for (const status of ["pendente", "confirmada", "realizada", "cancelada"]) {
+  test("aceita os cinco status", () => {
+    for (const status of [
+      "pendente",
+      "confirmada",
+      "realizada",
+      "faltou",
+      "cancelada",
+    ]) {
       const { chamouNext } = rodarMiddleware(validateStatusBody, {
         body: { status },
       });
@@ -113,6 +120,41 @@ describe("validateStatusBody", () => {
       const { res } = rodarMiddleware(validateStatusBody, { body });
       assert.equal(res.statusCode, 400);
     }
+  });
+});
+
+describe("validateProcedimentoBody", () => {
+  const procedimento = {
+    cpf: "12345678901",
+    tipo: "Restauração",
+    status: "planejado",
+  };
+
+  test("aceita dentes permanentes e de leite na numeração FDI", () => {
+    for (const dente of ["11", "18", "36", "48", "51", "85"]) {
+      const { chamouNext } = rodarMiddleware(validateProcedimentoBody, {
+        body: { ...procedimento, dente },
+      });
+      assert.equal(chamouNext, true, dente);
+    }
+  });
+
+  test("recusa dentes que não existem na numeração FDI", () => {
+    for (const dente of ["10", "19", "49", "56", "91", "3"]) {
+      const { res } = rodarMiddleware(validateProcedimentoBody, {
+        body: { ...procedimento, dente },
+      });
+      assert.equal(res.statusCode, 400, dente);
+    }
+  });
+
+  test("recusa status desconhecido", () => {
+    const { res } = rodarMiddleware(validateProcedimentoBody, {
+      body: { ...procedimento, status: "feito" },
+    });
+    assert.deepEqual(res.corpo.details, [
+      "Status deve ser: planejado, realizado.",
+    ]);
   });
 });
 

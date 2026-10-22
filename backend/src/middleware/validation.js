@@ -1,4 +1,9 @@
 const { STATUS_AGENDAMENTO } = require("../utils/statusAgendamento");
+const { STATUS_PROCEDIMENTO } = require("../utils/statusProcedimento");
+const {
+  CATEGORIAS_ARQUIVO,
+  EXTENSOES_PERMITIDAS,
+} = require("../utils/arquivos");
 
 function fail(res, errors) {
   return res.status(400).json({ error: "Dados inválidos.", details: errors });
@@ -223,6 +228,56 @@ function validateProntuarioBody(req, res, next) {
   return errors.length ? fail(res, errors) : next();
 }
 
+// DENTE NA NUMERAÇÃO FDI: 11 A 48 (PERMANENTES) OU 51 A 85 (DE LEITE)
+function isDente(value) {
+  return typeof value === "string" && /^([1-4][1-8]|[5-8][1-5])$/.test(value);
+}
+
+function validateProcedimentoBody(req, res, next) {
+  const body = req.body || {};
+  const { cpf, tipo, dente, data, status } = body;
+  const errors = [];
+
+  if (!isCpf(cpf)) errors.push("CPF deve conter 11 números.");
+  if (typeof tipo !== "string" || tipo.trim().length < 2 || tipo.length > 120) {
+    errors.push("Procedimento deve ter entre 2 e 120 caracteres.");
+  }
+  if (dente && !isDente(dente)) {
+    errors.push("Dente deve seguir a numeração FDI (ex.: 11, 36, 85).");
+  }
+  if (data && !isDate(data)) {
+    errors.push("Data deve estar no formato AAAA-MM-DD.");
+  }
+  if (!STATUS_PROCEDIMENTO.includes(status)) {
+    errors.push(`Status deve ser: ${STATUS_PROCEDIMENTO.join(", ")}.`);
+  } else if (status === "realizado" && !data) {
+    errors.push("Informe a data do procedimento realizado.");
+  }
+  validarTamanhos(body, { observacao: "Observação" }, errors);
+
+  return errors.length ? fail(res, errors) : next();
+}
+
+function validateArquivoUpload(req, res, next) {
+  const { cpf, categoria, nome } = req.query;
+  const errors = [];
+
+  if (!isCpf(cpf)) errors.push("CPF deve conter 11 números.");
+  if (!CATEGORIAS_ARQUIVO.includes(categoria)) {
+    errors.push(`Categoria deve ser: ${CATEGORIAS_ARQUIVO.join(", ")}.`);
+  }
+  if (typeof nome !== "string" || !nome.trim() || nome.length > 255) {
+    errors.push("Nome do arquivo deve ter entre 1 e 255 caracteres.");
+  }
+  if (!EXTENSOES_PERMITIDAS[req.get("Content-Type")]) {
+    errors.push("Envie um PDF ou uma imagem (PNG, JPG ou WEBP).");
+  } else if (!Buffer.isBuffer(req.body) || req.body.length === 0) {
+    errors.push("O arquivo está vazio.");
+  }
+
+  return errors.length ? fail(res, errors) : next();
+}
+
 module.exports = {
   validateLogin,
   validateChangePassword,
@@ -237,4 +292,6 @@ module.exports = {
   validateStatusBody,
   validatePrescricaoBody,
   validateProntuarioBody,
+  validateProcedimentoBody,
+  validateArquivoUpload,
 };

@@ -12,6 +12,7 @@ router.use(authenticateToken);
 
 router.get("/todos", pacienteController.listarTodos);
 router.get("/:cpf", validateCpfParam, pacienteController.buscarPorCpf);
+router.get("/:cpf/resumo", validateCpfParam, pacienteController.resumo);
 router.post("/", validatePacienteBody, pacienteController.criar);
 router.delete("/:cpf", validateCpfParam, pacienteController.excluir);
 router.put("/:cpf", validatePacienteUpdate, pacienteController.atualizar);

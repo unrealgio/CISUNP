@@ -1,6 +1,8 @@
 const { Op } = require("sequelize");
 const Paciente = require("../models/Paciente");
 const Agendamentos = require("../models/Agendamentos");
+const Procedimento = require("../models/Procedimento");
+const Arquivo = require("../models/Arquivo");
 const sequelize = require("../../config/database");
 const { hojeLocal } = require("../utils/datas");
 
@@ -26,6 +28,43 @@ exports.buscarPorCpf = async (req, res) => {
   } catch (err) {
     console.error("Erro ao buscar paciente:", err);
     res.status(500).json({ error: "Erro ao buscar paciente." });
+  }
+};
+
+// NÚMEROS DOS CARDS DE RESUMO DA FICHA DO PACIENTE
+exports.resumo = async (req, res) => {
+  const { cpf } = req.params;
+  try {
+    const paciente = await Paciente.findOne({ where: { cpf } });
+    if (!paciente)
+      return res.status(404).json({ error: "Paciente não encontrado." });
+
+    const [
+      consultas,
+      faltas,
+      cancelamentos,
+      procedimentos,
+      procedimentosPlanejados,
+      exames,
+    ] = await Promise.all([
+      Agendamentos.count({ where: { cpf, status: "realizada" } }),
+      Agendamentos.count({ where: { cpf, status: "faltou" } }),
+      Agendamentos.count({ where: { cpf, status: "cancelada" } }),
+      Procedimento.count({ where: { cpf, status: "realizado" } }),
+      Procedimento.count({ where: { cpf, status: "planejado" } }),
+      Arquivo.count({ where: { cpf, categoria: "exame" } }),
+    ]);
+    res.json({
+      consultas,
+      faltas,
+      cancelamentos,
+      procedimentos,
+      procedimentosPlanejados,
+      exames,
+    });
+  } catch (err) {
+    console.error("Erro ao montar o resumo do paciente:", err);
+    res.status(500).json({ error: "Erro ao carregar o resumo do paciente." });
   }
 };
 

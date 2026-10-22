@@ -104,6 +104,28 @@ describe("status dos agendamentos (consultas)", () => {
     assert.equal(corpo.error, "Já existe um agendamento neste horário.");
   });
 
+  test("falta mantém o horário ocupado (diferente de cancelar)", async () => {
+    const faltou = await api.chamar("POST", "/api/agendamentos", {
+      ...consulta,
+      time: "15:00",
+    });
+    const { status, corpo } = await api.chamar(
+      "PATCH",
+      `/api/agendamentos/${faltou.corpo.id}/status`,
+      { status: "faltou" },
+    );
+    assert.equal(status, 200);
+    assert.equal(corpo.status, "faltou");
+
+    const novo = await api.chamar("POST", "/api/agendamentos", {
+      ...consulta,
+      time: "15:00",
+    });
+    assert.equal(novo.status, 409);
+
+    await api.chamar("DELETE", `/api/agendamentos/${faltou.corpo.id}`);
+  });
+
   test("a lista de consultas inclui as canceladas", async () => {
     const todos = await buscarTodos();
     assert.deepEqual(todos.map((item) => item.status).sort(), [
