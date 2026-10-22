@@ -5,6 +5,15 @@ export function dataLocalISO(date = new Date()) {
   return `${date.getFullYear()}-${mes}-${dia}`;
 }
 
+// DIZ SE UM HORÁRIO ("AAAA-MM-DD" + "HH:MM") JÁ PASSOU
+export function horarioPassado(dataISO, hora, agora = new Date()) {
+  const hoje = dataLocalISO(agora);
+  const horaAtual = `${String(agora.getHours()).padStart(2, "0")}:${String(
+    agora.getMinutes(),
+  ).padStart(2, "0")}`;
+  return dataISO < hoje || (dataISO === hoje && hora < horaAtual);
+}
+
 // CONVERTE "AAAA-MM-DD" PARA "DD/MM/AAAA"
 export function formatarDataISO(iso) {
   if (!iso) return "";

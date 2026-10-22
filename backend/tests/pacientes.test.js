@@ -54,6 +54,40 @@ describe("pacientes", () => {
     assert.equal(corpo.phone, "84999990000");
   });
 
+  test("busca sugestões por parte do nome, sem diferenciar maiúsculas", async () => {
+    await api.chamar("POST", "/api/pacientes", {
+      cpf: "22233344455",
+      patient: "Mariana Souza",
+    });
+    const { status, corpo } = await api.chamar(
+      "GET",
+      "/api/pacientes/busca?q=MARI",
+    );
+    assert.equal(status, 200);
+    assert.deepEqual(
+      corpo.map((p) => p.patient),
+      ["Maria Teste", "Mariana Souza"],
+    );
+  });
+
+  test("busca sugestões pelo início do CPF", async () => {
+    const { corpo } = await api.chamar("GET", "/api/pacientes/busca?q=222");
+    assert.deepEqual(
+      corpo.map((p) => p.cpf),
+      ["22233344455"],
+    );
+  });
+
+  test("busca trata % e _ como texto comum", async () => {
+    const { corpo } = await api.chamar("GET", "/api/pacientes/busca?q=%25%25");
+    assert.deepEqual(corpo, []);
+  });
+
+  test("busca exige pelo menos 2 caracteres", async () => {
+    const { status } = await api.chamar("GET", "/api/pacientes/busca?q=a");
+    assert.equal(status, 400);
+  });
+
   test("responde 404 para CPF não cadastrado", async () => {
     const { status } = await api.chamar("GET", "/api/pacientes/99999999999");
     assert.equal(status, 404);

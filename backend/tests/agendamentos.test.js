@@ -37,6 +37,33 @@ describe("agendamentos", () => {
     idCriado = corpo.id;
   });
 
+  test("recusa agendamento em data que já passou", async () => {
+    const { status, corpo } = await api.chamar("POST", "/api/agendamentos", {
+      ...agendamento,
+      date: "2020-01-10",
+    });
+    assert.equal(status, 400);
+    assert.deepEqual(corpo.details, [
+      "Não é possível agendar em data ou horário que já passou.",
+    ]);
+  });
+
+  test("recusa agendamento hoje em horário que já passou", async () => {
+    const agora = new Date();
+    if (agora.getHours() === 0 && agora.getMinutes() === 0) return;
+    const hoje = [
+      agora.getFullYear(),
+      String(agora.getMonth() + 1).padStart(2, "0"),
+      String(agora.getDate()).padStart(2, "0"),
+    ].join("-");
+    const { status } = await api.chamar("POST", "/api/agendamentos", {
+      ...agendamento,
+      date: hoje,
+      time: "00:00",
+    });
+    assert.equal(status, 400);
+  });
+
   test("recusa outro agendamento no mesmo horário com 409", async () => {
     const { status, corpo } = await api.chamar("POST", "/api/agendamentos", {
       ...agendamento,
@@ -154,6 +181,7 @@ describe("agendamentos", () => {
   test("corrigir o nome no cadastro muda o nome em todas as consultas", async () => {
     await api.chamar("PUT", "/api/pacientes/55566677788", {
       patient: "João Corrigido",
+      idade: "40",
     });
     const { corpo } = await api.chamar(
       "GET",
@@ -163,6 +191,7 @@ describe("agendamentos", () => {
     for (const item of corpo) {
       assert.equal(item.patient, "João Corrigido");
       assert.equal(item.cpf, "55566677788");
+      assert.equal(item.idade, 40);
     }
   });
 
@@ -177,6 +206,7 @@ describe("agendamentos", () => {
     assert.equal(status, 201);
     assert.equal(corpo.pacienteId, null);
     assert.equal(corpo.cpf, null);
+    assert.equal(corpo.idade, null);
     assert.equal(corpo.patient, "Visitante Avulso");
     assert.equal(corpo.phone, "84900000000");
 

@@ -18,6 +18,7 @@ export function useBuscarDados(
   const chave = `${url}#${recarga}#${versao}`;
 
   useEffect(() => {
+    if (!url) return;
     let cancelado = false;
     apiFetch(url)
       .then(async (res) => {
@@ -62,7 +63,7 @@ export function useBuscarDados(
     dados: mesmaUrl ? resultado.dados : null,
     erro: mesmaUrl ? resultado.erro : "",
     status: mesmaUrl ? resultado.status : null,
-    carregando: resultado.chave !== chave,
+    carregando: Boolean(url) && resultado.chave !== chave,
     recarregar,
     alterarDados,
   };

@@ -1,11 +1,29 @@
 import { useState, useEffect, useRef } from "react";
-import { MdEdit, MdDelete, MdSave, MdClose } from "react-icons/md";
+import { MdEdit, MdSave, MdClose, MdEventBusy } from "react-icons/md";
 import { ErrorMessage } from "./StatusMessage";
+import BuscaPaciente from "./BuscaPaciente";
+import AcoesStatus from "./AcoesStatus";
+import { STATUS } from "../utils/statusAgendamento";
+
+function Campo({ rotulo, children }) {
+  return (
+    <>
+      <dt className="text-sm font-semibold text-(--cis-muted)">{rotulo}</dt>
+      <dd className="min-w-0 text-(--cis-ink) wrap-anywhere">{children}</dd>
+    </>
+  );
+}
+
+function Vazio({ children }) {
+  return <span className="text-(--cis-muted)">{children}</span>;
+}
 
 export default function Details({
   schedule,
   onSave,
-  onDelete,
+  onCancelar,
+  onMudarStatus,
+  onFechar,
   editField,
   setEditField,
 }) {
@@ -57,6 +75,13 @@ export default function Details({
     }
   }
 
+  function selecionarPaciente(paciente) {
+    setPatient(paciente.patient);
+    setCpf(paciente.cpf);
+    setPhone(paciente.phone || "");
+    if (!medico.trim()) setMedico(paciente.medico || "");
+  }
+
   async function handleSave() {
     if (!patient.trim()) {
       setError("O nome do paciente é obrigatório!");
@@ -79,8 +104,8 @@ export default function Details({
     }
   }
 
-  function handleDelete() {
-    onDelete && onDelete(schedule);
+  function handleCancelarConsulta() {
+    onCancelar && onCancelar(schedule);
     setEditField("");
   }
 
@@ -89,135 +114,165 @@ export default function Details({
     setEditField("");
   }
 
+  // NA EDIÇÃO, O X FECHA SÓ A EDIÇÃO; FORA DELA, FECHA O PAINEL
+  function handleFechar() {
+    if (editMode) handleCancel();
+    else onFechar && onFechar();
+  }
+
+  const editandoTudo = editMode && !editField;
+
   return (
-    <div className="cis-panel p-4 mt-4 w-full relative">
-      {/* BOTÃO DE FECHAR A EDIÇÃO */}
-      {editMode && (
-        <div className="flex justify-end -mt-1 -mr-1 mb-1">
-          <button
-            type="button"
-            className="p-1 rounded-lg text-(--cis-muted) hover:text-(--cis-navy) hover:bg-(--cis-blue-soft) transition"
-            onClick={handleCancel}
-            aria-label="Fechar edição"
-            title="Fechar edição"
-          >
-            <MdClose size={20} />
-          </button>
+    <div className="cis-panel p-4 mt-4 w-full">
+      <div className="flex items-start gap-2 mb-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-wide text-(--cis-muted)">
+            {schedule.time} · {schedule.date}
+          </p>
+          {!editMode && (
+            <p className="text-lg font-bold text-(--cis-navy) wrap-anywhere">
+              {schedule.patient}
+            </p>
+          )}
+          {schedule.id && schedule.status && (
+            <span
+              className="mt-1 inline-block px-2 py-0.5 rounded text-xs font-semibold"
+              style={{
+                background: `var(--cis-status-${schedule.status}-bg)`,
+                color: `var(--cis-status-${schedule.status}-text)`,
+              }}
+            >
+              {STATUS[schedule.status]?.rotulo || schedule.status}
+            </span>
+          )}
         </div>
-      )}
+        <button
+          type="button"
+          className="cis-icon-button cis-icone-neutro shrink-0"
+          onClick={handleFechar}
+          aria-label={editMode ? "Fechar edição" : "Fechar detalhes"}
+          title={editMode ? "Fechar edição" : "Fechar detalhes"}
+        >
+          <MdClose size={20} />
+        </button>
+      </div>
+
       {error && (
         <ErrorMessage compacto className="mb-2">
           {error}
         </ErrorMessage>
       )}
-      <div className="mb-2">
-        <span className="font-bold">Paciente:</span>{" "}
-        {editMode && (editField === "patient" || !editField) ? (
-          <input
-            ref={patientRef}
-            type="text"
-            className="cis-input max-w-full"
-            value={patient}
-            maxLength={120}
-            onChange={(e) => setPatient(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        ) : (
-          schedule.patient
+
+      <dl className="grid grid-cols-[auto_1fr] items-center gap-x-3 gap-y-2 border-t border-(--cis-border) pt-3">
+        {editMode && (editField === "patient" || !editField) && (
+          <Campo rotulo="Paciente">
+            <BuscaPaciente
+              inputRef={patientRef}
+              value={patient}
+              onChange={setPatient}
+              onSelecionar={selecionarPaciente}
+              onKeyDown={handleKeyDown}
+            />
+          </Campo>
         )}
-      </div>
-      <div className="mb-2">
-        <span className="font-bold">CPF:</span>{" "}
-        {editMode && !editField ? (
-          <input
-            type="text"
-            className="cis-input max-w-full"
-            inputMode="numeric"
-            maxLength={11}
-            value={cpf}
-            onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
+        <Campo rotulo="CPF">
+          {editandoTudo ? (
+            <input
+              type="text"
+              className="cis-input"
+              inputMode="numeric"
+              maxLength={11}
+              value={cpf}
+              onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
+            />
+          ) : (
+            schedule.cpf || <Vazio>Não informado</Vazio>
+          )}
+        </Campo>
+        <Campo rotulo="Médico">
+          {editMode && (editField === "medico" || !editField) ? (
+            <input
+              ref={medicoRef}
+              type="text"
+              className="cis-input"
+              value={medico}
+              maxLength={255}
+              onChange={(e) => setMedico(e.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+          ) : (
+            schedule.medico || <Vazio>Não informado</Vazio>
+          )}
+        </Campo>
+        <Campo rotulo="Telefone">
+          {editandoTudo ? (
+            <input
+              type="text"
+              className="cis-input"
+              value={phone}
+              maxLength={255}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          ) : (
+            schedule.phone || <Vazio>Não informado</Vazio>
+          )}
+        </Campo>
+        <Campo rotulo="Observações">
+          {editandoTudo ? (
+            <textarea
+              className="cis-input"
+              value={notes}
+              maxLength={255}
+              rows={2}
+              onChange={(e) => setNotes(e.target.value)}
+            />
+          ) : (
+            schedule.notes || <Vazio>Nenhuma</Vazio>
+          )}
+        </Campo>
+      </dl>
+
+      {!editMode && schedule.id && (
+        <div className="mt-4 border-t border-(--cis-border) pt-3">
+          <AcoesStatus
+            consulta={{
+              id: schedule.id,
+              status: schedule.status,
+              date: schedule.dateISO,
+            }}
+            onEscolher={(status) =>
+              onMudarStatus && onMudarStatus(schedule, status)
+            }
           />
-        ) : (
-          schedule.cpf || (
-            <span className="text-(--cis-muted)">Não informado</span>
-          )
-        )}
-      </div>
-      <div className="mb-2">
-        <span className="font-bold">Horário:</span> {schedule.time} -{" "}
-        {schedule.date}
-      </div>
-      <div className="mb-2">
-        <span className="font-bold">Médico:</span>{" "}
-        {editMode && (editField === "medico" || !editField) ? (
-          <input
-            ref={medicoRef}
-            type="text"
-            className="cis-input max-w-full"
-            value={medico}
-            maxLength={255}
-            onChange={(e) => setMedico(e.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        ) : (
-          schedule.medico || (
-            <span className="text-(--cis-muted) italic">Disponível</span>
-          )
-        )}
-      </div>
-      <div className="mb-2">
-        <span className="font-bold">Telefone:</span>{" "}
-        {editMode && !editField ? (
-          <input
-            type="text"
-            className="cis-campo-compacto"
-            value={phone}
-            maxLength={255}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        ) : (
-          schedule.phone || (
-            <span className="text-(--cis-muted)">Não informado</span>
-          )
-        )}
-      </div>
-      <div className="mb-2">
-        <span className="font-bold">Observações:</span>{" "}
-        {editMode && !editField ? (
-          <textarea
-            className="cis-input"
-            value={notes}
-            maxLength={255}
-            onChange={(e) => setNotes(e.target.value)}
-          />
-        ) : (
-          schedule.notes || <span className="text-(--cis-muted)">Nenhuma</span>
-        )}
-      </div>
-      <div className="flex gap-2 mt-2">
+        </div>
+      )}
+
+      <div className="mt-4 flex flex-col gap-2">
         {editMode ? (
+          <button
+            className="cis-primary-button flex items-center justify-center gap-1"
+            onClick={handleSave}
+          >
+            <MdSave /> Salvar
+          </button>
+        ) : (
           <>
             <button
-              className="cis-primary-button flex items-center gap-1"
-              onClick={handleSave}
+              className="cis-primary-button flex items-center justify-center gap-1 text-sm"
+              onClick={iniciarEdicao}
             >
-              <MdSave /> Salvar
+              <MdEdit /> Editar
             </button>
+            {schedule.id && (
+              <button
+                className="cis-danger-soft-button flex items-center justify-center gap-1 py-[0.6rem] text-sm"
+                onClick={handleCancelarConsulta}
+              >
+                <MdEventBusy /> Cancelar consulta
+              </button>
+            )}
           </>
-        ) : (
-          <button
-            className="cis-primary-button flex items-center gap-1"
-            onClick={iniciarEdicao}
-          >
-            <MdEdit /> Editar
-          </button>
         )}
-        <button
-          className="cis-danger-button flex items-center gap-1"
-          onClick={handleDelete}
-        >
-          <MdDelete /> Excluir
-        </button>
       </div>
     </div>
   );

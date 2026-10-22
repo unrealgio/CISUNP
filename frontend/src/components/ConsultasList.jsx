@@ -17,34 +17,9 @@ import { apiFetch, mensagemDeErro } from "../api";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 import { dataLocalISO, formatarDataISO } from "../utils/date";
 import { ErrorMessage, EstadoVazio, LoadingMessage } from "./StatusMessage";
-
-const STATUS = {
-  pendente: {
-    rotulo: "Pendente",
-    plural: "Pendentes",
-    acao: "Voltar para pendente",
-  },
-  confirmada: {
-    rotulo: "Confirmada",
-    plural: "Confirmadas",
-    acao: "Confirmar",
-  },
-  realizada: {
-    rotulo: "Realizada",
-    plural: "Realizadas",
-    acao: "Marcar como realizada",
-  },
-  faltou: {
-    rotulo: "Faltou",
-    plural: "Faltas",
-    acao: "Marcar falta",
-  },
-  cancelada: {
-    rotulo: "Cancelada",
-    plural: "Canceladas",
-    acao: "Cancelar consulta",
-  },
-};
+import { STATUS } from "../utils/statusAgendamento";
+import { formatarCpf } from "../utils/cpf";
+import AcoesStatus from "./AcoesStatus";
 
 function ordenarConsultas(lista) {
   const hoje = dataLocalISO();
@@ -56,6 +31,101 @@ function ordenarConsultas(lista) {
     .filter((c) => c.date < hoje)
     .sort((a, b) => chave(b).localeCompare(chave(a)));
   return [...futuras, ...passadas];
+}
+
+function plural(quantidade, singular, varios) {
+  return `${quantidade} ${quantidade === 1 ? singular : varios}`;
+}
+
+// HISTÓRICO DO PACIENTE CALCULADO COM AS CONSULTAS JÁ CARREGADAS (SEM REQUISIÇÃO EXTRA)
+function historicoDoPaciente(todas, consulta, hoje) {
+  const doPaciente = todas.filter((c) => c.cpf === consulta.cpf);
+  const contar = (status) =>
+    doPaciente.filter((c) => c.status === status).length;
+  const chave = (c) => `${c.date} ${c.time}`;
+  const outras = doPaciente.filter((c) => c.id !== consulta.id);
+
+  const proxima = outras
+    .filter(
+      (c) => c.date >= hoje && ["pendente", "confirmada"].includes(c.status),
+    )
+    .sort((a, b) => chave(a).localeCompare(chave(b)))[0];
+  const ultima = outras
+    .filter((c) => c.status === "realizada")
+    .sort((a, b) => chave(b).localeCompare(chave(a)))[0];
+
+  const partes = [
+    [contar("realizada"), "realizada", "realizadas"],
+    [contar("faltou"), "falta", "faltas"],
+    [contar("cancelada"), "cancelada", "canceladas"],
+  ]
+    .filter(([quantidade]) => quantidade > 0)
+    .map(([quantidade, singular, varios]) =>
+      plural(quantidade, singular, varios),
+    );
+
+  return {
+    resumo: partes.length ? partes.join(" · ") : "Nenhuma consulta concluída",
+    proxima,
+    ultima,
+  };
+}
+
+function Linha({ rotulo, children, empilhado = false }) {
+  if (empilhado) {
+    return (
+      <div className="min-w-0">
+        <dt className="text-xs font-semibold text-(--cis-muted)">{rotulo}</dt>
+        <dd>{children}</dd>
+      </div>
+    );
+  }
+  return (
+    <>
+      <dt className="font-semibold text-(--cis-muted)">{rotulo}</dt>
+      <dd className="min-w-0">{children}</dd>
+    </>
+  );
+}
+
+function TituloBloco({ children }) {
+  return (
+    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-(--cis-muted)">
+      {children}
+    </p>
+  );
+}
+
+function Vazio({ children }) {
+  return <span className="text-(--cis-muted)">{children}</span>;
+}
+
+function HistoricoDoPaciente({ todas, consulta }) {
+  const historico = historicoDoPaciente(todas, consulta, dataLocalISO());
+  const outra = historico.proxima || historico.ultima;
+  return (
+    <>
+      <Linha rotulo="Histórico" empilhado>
+        {historico.resumo}
+      </Linha>
+      <Linha
+        empilhado
+        rotulo={
+          historico.proxima
+            ? "Próxima consulta"
+            : historico.ultima
+              ? "Última consulta"
+              : "Outras consultas"
+        }
+      >
+        {outra ? (
+          `${formatarDataISO(outra.date)} às ${outra.time}`
+        ) : (
+          <Vazio>Nenhuma marcada</Vazio>
+        )}
+      </Linha>
+    </>
+  );
 }
 
 export default function ConsultasList() {
@@ -280,48 +350,84 @@ export default function ConsultasList() {
                   </div>
                   {/* DETALHES EXPANDIDOS DAS CONSULTAS */}
                   {expanded === c.id && (
-                    <div className="mt-3 p-3 rounded bg-(--cis-background) border border-(--cis-border) text-(--cis-ink) text-sm flex flex-col gap-2">
-                      <p>
-                        <strong>Observações:</strong>{" "}
-                        {c.notes || (
-                          <span className="text-(--cis-muted)">Nenhuma</span>
-                        )}
-                      </p>
-                      {c.phone && (
-                        <p className="flex items-center gap-2">
-                          <FaPhone className="shrink-0" /> {c.phone}
-                        </p>
-                      )}
-                      {c.cpf && (
-                        <Link
-                          to={`/paciente/${c.cpf}`}
-                          className="text-(--cis-blue) underline w-fit"
-                          onClick={(e) => e.stopPropagation()}
+                    <div
+                      className="mt-3 p-3 rounded-lg bg-(--cis-background) border border-(--cis-border) text-(--cis-ink) text-sm flex flex-col gap-3 cursor-default"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="@container">
+                        <div
+                          className={`grid gap-3 ${
+                            c.cpf ? "@md:grid-cols-2 @md:gap-5" : ""
+                          }`}
                         >
-                          Ver ficha do paciente
-                        </Link>
-                      )}
-                      <div className="flex flex-wrap gap-2 pt-2 border-t border-(--cis-border)">
-                        {Object.keys(STATUS)
-                          .filter((status) => status !== c.status)
-                          .map((status) => (
-                            <button
-                              key={status}
-                              type="button"
-                              className={`${
-                                status === "cancelada"
-                                  ? "cis-danger-soft-button px-4 py-2"
-                                  : "cis-secondary-button"
-                              } text-sm`}
-                              disabled={alterando === c.id}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                mudarStatus(c, status);
-                              }}
-                            >
-                              {STATUS[status].acao}
-                            </button>
-                          ))}
+                          <section className="min-w-0">
+                            <TituloBloco>Paciente</TituloBloco>
+                            <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5">
+                              {c.cpf ? (
+                                <>
+                                  <Linha rotulo="CPF">
+                                    {formatarCpf(c.cpf)}
+                                  </Linha>
+                                  <Linha rotulo="Idade">
+                                    {c.idade != null ? (
+                                      `${c.idade} anos`
+                                    ) : (
+                                      <Vazio>Não informada</Vazio>
+                                    )}
+                                  </Linha>
+                                </>
+                              ) : (
+                                <Linha rotulo="Cadastro">
+                                  <span className="inline-block px-2 py-0.5 rounded text-xs font-semibold bg-(--cis-orange-soft) text-(--cis-orange-text)">
+                                    Avulso (sem cadastro)
+                                  </span>
+                                </Linha>
+                              )}
+                              <Linha rotulo="Telefone">
+                                {c.phone ? (
+                                  <span className="flex items-center gap-2">
+                                    <FaPhone className="shrink-0 text-(--cis-muted)" />
+                                    {c.phone}
+                                  </span>
+                                ) : (
+                                  <Vazio>Não informado</Vazio>
+                                )}
+                              </Linha>
+                            </dl>
+                            {c.cpf && (
+                              <Link
+                                to={`/paciente/${c.cpf}`}
+                                className="mt-2 inline-block text-(--cis-blue) underline"
+                              >
+                                Ver ficha do paciente
+                              </Link>
+                            )}
+                          </section>
+                          {c.cpf && (
+                            <section className="min-w-0 border-t border-(--cis-border) pt-3 @md:border-t-0 @md:border-l @md:pt-0 @md:pl-5">
+                              <TituloBloco>Consultas</TituloBloco>
+                              <dl className="flex flex-col gap-2">
+                                <HistoricoDoPaciente
+                                  todas={todas}
+                                  consulta={c}
+                                />
+                              </dl>
+                            </section>
+                          )}
+                        </div>
+                      </div>
+                      <dl className="grid grid-cols-[auto_1fr] gap-x-3 border-t border-(--cis-border) pt-3">
+                        <Linha rotulo="Observações">
+                          {c.notes || <Vazio>Nenhuma</Vazio>}
+                        </Linha>
+                      </dl>
+                      <div className="pt-3 border-t border-(--cis-border)">
+                        <AcoesStatus
+                          consulta={c}
+                          incluirCancelar
+                          desativado={alterando === c.id}
+                          onEscolher={(status) => mudarStatus(c, status)}
+                        />
                       </div>
                       {erroStatus?.id === c.id && (
                         <ErrorMessage compacto>

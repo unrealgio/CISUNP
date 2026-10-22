@@ -6,4 +6,12 @@ function hojeLocal() {
   return `${agora.getFullYear()}-${mes}-${dia}`;
 }
 
-module.exports = { hojeLocal };
+// HORA ATUAL NO FORMATO HH:MM, NO FUSO DO SERVIDOR
+function horaLocal() {
+  const agora = new Date();
+  const hora = String(agora.getHours()).padStart(2, "0");
+  const minuto = String(agora.getMinutes()).padStart(2, "0");
+  return `${hora}:${minuto}`;
+}
+
+module.exports = { hojeLocal, horaLocal };

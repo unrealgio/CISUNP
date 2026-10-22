@@ -17,6 +17,29 @@ exports.listarTodos = async (req, res) => {
   }
 };
 
+// SUGESTÕES PARA O CAMPO DE PACIENTE DA AGENDA: PARTE DO NOME OU INÍCIO DO CPF
+exports.buscar = async (req, res) => {
+  const termo = req.query.q.trim();
+  const apenasNumeros = termo.replace(/\D/g, "");
+  const termoLiteral = termo.replace(/[\\%_]/g, "\\$&");
+  const condicoes = [{ patient: { [Op.iLike]: `%${termoLiteral}%` } }];
+  if (apenasNumeros.length >= 2) {
+    condicoes.push({ cpf: { [Op.startsWith]: apenasNumeros } });
+  }
+  try {
+    const pacientes = await Paciente.findAll({
+      where: { [Op.or]: condicoes },
+      attributes: ["id", "patient", "cpf", "phone", "medico"],
+      order: [["patient", "ASC"]],
+      limit: 8,
+    });
+    res.json(pacientes);
+  } catch (err) {
+    console.error("Erro ao buscar pacientes:", err);
+    res.status(500).json({ error: "Erro ao buscar pacientes." });
+  }
+};
+
 // FAZ A BUSCA DE UM PACIENTE PELO CPF
 exports.buscarPorCpf = async (req, res) => {
   const { cpf } = req.params;

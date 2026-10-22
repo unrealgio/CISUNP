@@ -43,7 +43,7 @@ describe("resumo do paciente", () => {
       const { corpo } = await api.chamar("POST", "/api/agendamentos", {
         cpf,
         patient: "Paciente Resumo",
-        date: "2026-09-10",
+        date: "2099-09-10",
         time: `1${indice}:00`,
       });
       await api.chamar("PATCH", `/api/agendamentos/${corpo.id}/status`, {

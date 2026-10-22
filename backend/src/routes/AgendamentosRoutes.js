@@ -8,6 +8,7 @@ const {
   validateIntervaloQuery,
   validateAgendamentoBody,
   validateStatusBody,
+  validateAgendamentoFuturo,
   validateCpfQuery,
   validateIdParam,
 } = require("../middleware/validation");
@@ -21,7 +22,12 @@ router.get(
   validateIntervaloQuery,
   agendamentosController.diasComAgendamento,
 );
-router.post("/", validateAgendamentoBody, agendamentosController.criar);
+router.post(
+  "/",
+  validateAgendamentoBody,
+  validateAgendamentoFuturo,
+  agendamentosController.criar,
+);
 router.put(
   "/:id",
   validateIdParam,

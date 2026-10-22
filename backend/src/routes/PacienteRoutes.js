@@ -6,11 +6,13 @@ const {
   validateCpfParam,
   validatePacienteBody,
   validatePacienteUpdate,
+  validateBuscaPacienteQuery,
 } = require("../middleware/validation");
 
 router.use(authenticateToken);
 
 router.get("/todos", pacienteController.listarTodos);
+router.get("/busca", validateBuscaPacienteQuery, pacienteController.buscar);
 router.get("/:cpf", validateCpfParam, pacienteController.buscarPorCpf);
 router.get("/:cpf/resumo", validateCpfParam, pacienteController.resumo);
 router.post("/", validatePacienteBody, pacienteController.criar);

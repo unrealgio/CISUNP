@@ -11,18 +11,19 @@ const incluirPaciente = {
   model: Paciente,
   as: "paciente",
   paranoid: false,
-  attributes: ["patient", "cpf", "phone"],
+  attributes: ["patient", "cpf", "phone", "idade"],
 };
 
 // RESPONDE NO FORMATO DE SEMPRE: NOME, CPF E TELEFONE VÊM DO CADASTRO OU DO PRÓPRIO AGENDAMENTO (AVULSO)
 function comDadosDoPaciente(agendamento) {
   const { paciente, ...dados } = agendamento.toJSON();
-  if (!paciente) return { ...dados, cpf: null };
+  if (!paciente) return { ...dados, cpf: null, idade: null };
   return {
     ...dados,
     patient: paciente.patient,
     cpf: paciente.cpf,
     phone: paciente.phone,
+    idade: paciente.idade,
   };
 }
 

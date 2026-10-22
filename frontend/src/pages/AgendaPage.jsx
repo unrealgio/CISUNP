@@ -6,7 +6,7 @@ import List from "../components/List";
 import Details from "../components/Details";
 import { apiFetch, mensagemDeErro } from "../api";
 import { LoadingMessage } from "../components/StatusMessage";
-import { dataLocalISO } from "../utils/date";
+import { dataLocalISO, horarioPassado } from "../utils/date";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 
 const fixedTimes = [
@@ -49,10 +49,13 @@ export default function AgendaPage() {
         phone: item.phone || "",
         notes: item.notes || "",
         medico: item.medico || "",
+        status: item.status,
       };
     });
     return map;
   }, [agendamentos.dados]);
+
+  const dataSelecionada = dataLocalISO(selectedDate);
 
   // MONTA OS DADOS DE UM HORÁRIO DA LISTA A PARTIR DOS AGENDAMENTOS CARREGADOS
   function montarHorario(time) {
@@ -64,7 +67,10 @@ export default function AgendaPage() {
       phone: patients[time]?.phone || "",
       notes: patients[time]?.notes || "",
       medico: patients[time]?.medico || "",
+      status: patients[time]?.status,
       date: selectedDate.toLocaleDateString("pt-BR"),
+      dateISO: dataSelecionada,
+      passado: horarioPassado(dataSelecionada, time),
     };
   }
 
@@ -142,32 +148,43 @@ export default function AgendaPage() {
     return salvarAgendamento(updated, () => setEditField(""));
   }
 
-  function handleDeleteAgendamento(item) {
-    if (!item.id) return;
-    if (saving) return;
+  // MUDA O STATUS PELA AGENDA; CANCELAR LIBERA O HORÁRIO, MAS MANTÉM O HISTÓRICO
+  async function mudarStatus(item, status) {
+    if (!item.id || saving) return;
     if (
+      status === "cancelada" &&
       !window.confirm(
-        `Excluir o agendamento de ${item.patient} às ${item.time}?`,
+        `Cancelar a consulta de ${item.patient} às ${item.time}? O horário ficará livre na agenda.`,
       )
     )
       return;
 
     setAgendaError("");
     setSaving(true);
-    apiFetch(`/api/agendamentos/${item.id}`, {
-      method: "DELETE",
-    })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok)
-          throw new Error(mensagemDeErro(data, "Erro ao excluir agendamento."));
-        agendamentos.recarregar();
+    try {
+      const res = await apiFetch(`/api/agendamentos/${item.id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      const data = await res.json();
+      if (!res.ok)
+        throw new Error(mensagemDeErro(data, "Erro ao alterar o status."));
+      agendamentos.recarregar();
+      if (status === "cancelada") {
         setVersaoAgenda((v) => v + 1);
         setSelectedTime(null);
         setEditField("");
-      })
-      .catch((error) => setAgendaError(error.message))
-      .finally(() => setSaving(false));
+      }
+    } catch (error) {
+      setAgendaError(error.message);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  function cancelarAgendamento(item) {
+    return mudarStatus(item, "cancelada");
   }
 
   function handleSelect(item, field = "") {
@@ -198,7 +215,7 @@ export default function AgendaPage() {
             selected={selectedSchedule}
             onSelect={handleSelect}
             currentDate={selectedDate}
-            onDelete={handleDeleteAgendamento}
+            onCancelar={cancelarAgendamento}
             onSavePatient={handleSavePatient}
           />
         </div>
@@ -212,7 +229,12 @@ export default function AgendaPage() {
             key={`${selectedTime}|${editField}`}
             schedule={selectedSchedule}
             onSave={handleSaveDetails}
-            onDelete={handleDeleteAgendamento}
+            onCancelar={cancelarAgendamento}
+            onMudarStatus={mudarStatus}
+            onFechar={() => {
+              setSelectedTime(null);
+              setEditField("");
+            }}
             editField={editField}
             setEditField={setEditField}
           />

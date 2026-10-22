@@ -1,4 +1,5 @@
 const { STATUS_AGENDAMENTO } = require("../utils/statusAgendamento");
+const { hojeLocal, horaLocal } = require("../utils/datas");
 const { STATUS_PROCEDIMENTO } = require("../utils/statusProcedimento");
 const {
   CATEGORIAS_ARQUIVO,
@@ -183,6 +184,23 @@ function validateAgendamentoBody(req, res, next) {
   return errors.length ? fail(res, errors) : next();
 }
 
+// SÓ NA CRIAÇÃO: EDITAR UMA CONSULTA ANTIGA (EX.: OBSERVAÇÕES) CONTINUA PERMITIDO
+function validateAgendamentoFuturo(req, res, next) {
+  const { date, time } = req.body;
+  const hoje = hojeLocal();
+  const passou = date < hoje || (date === hoje && time < horaLocal());
+  return passou
+    ? fail(res, ["Não é possível agendar em data ou horário que já passou."])
+    : next();
+}
+
+function validateBuscaPacienteQuery(req, res, next) {
+  const { q } = req.query;
+  return typeof q === "string" && q.trim().length >= 2 && q.length <= 120
+    ? next()
+    : fail(res, ["Digite pelo menos 2 caracteres para buscar."]);
+}
+
 function validateStatusBody(req, res, next) {
   const { status } = req.body || {};
   return STATUS_AGENDAMENTO.includes(status)
@@ -290,6 +308,8 @@ module.exports = {
   validateIntervaloQuery,
   validateAgendamentoBody,
   validateStatusBody,
+  validateAgendamentoFuturo,
+  validateBuscaPacienteQuery,
   validatePrescricaoBody,
   validateProntuarioBody,
   validateProcedimentoBody,

@@ -102,6 +102,18 @@
     @apply rounded-[0.55rem] border border-(--cis-orange) bg-(--cis-orange-soft) px-4 py-2 font-bold text-(--cis-orange-text) transition hover:bg-(--cis-orange) hover:text-(--cis-on-orange) disabled:cursor-not-allowed disabled:opacity-60;
   }
 
+  /* OPÇÃO DO SELETOR DE STATUS: AS CORES VÊM DE --cor, --fundo E --texto (DEFINIDAS NO JSX) */
+  .cis-opcao-status {
+    @apply flex items-center justify-center gap-2 rounded-[0.55rem] border border-(--cis-border) bg-(--cis-surface) px-3 py-[0.55rem] text-sm font-semibold text-(--cis-ink) transition hover:bg-(--cis-blue-soft) disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-(--cis-surface);
+  }
+
+  .cis-opcao-status[aria-pressed="true"] {
+    background: var(--fundo);
+    border-color: var(--cor);
+    box-shadow: inset 0 0 0 1px var(--cor);
+    color: var(--texto);
+  }
+
   .cis-filtro {
     @apply rounded-full border border-(--cis-border) bg-(--cis-surface) px-3 py-1.5 text-sm font-semibold text-(--cis-ink) transition hover:bg-(--cis-blue-soft);
   }

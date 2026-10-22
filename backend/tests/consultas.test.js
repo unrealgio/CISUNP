@@ -2,6 +2,7 @@ const { prepararBanco, fecharBanco } = require("./banco");
 const { describe, test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 const { iniciarServidor } = require("./ajudantes");
+const Agendamentos = require("../src/models/Agendamentos");
 
 describe("status dos agendamentos (consultas)", () => {
   let api;
@@ -139,10 +140,14 @@ describe("status dos agendamentos (consultas)", () => {
       ...consulta,
       time: "11:00",
     });
-    const passado = await api.chamar("POST", "/api/agendamentos", {
-      ...consulta,
-      date: "2020-01-15",
-    });
+    const paciente = await api.chamar("GET", "/api/pacientes/44455566677");
+    const passado = {
+      corpo: await Agendamentos.create({
+        time: consulta.time,
+        date: "2020-01-15",
+        pacienteId: paciente.corpo.id,
+      }),
+    };
     const realizado = await api.chamar("POST", "/api/agendamentos", {
       ...consulta,
       time: "12:00",

@@ -47,9 +47,9 @@
   --cis-status-realizada: var(--cis-blue);
   --cis-status-realizada-bg: var(--cis-blue-soft);
   --cis-status-realizada-text: var(--cis-navy);
-  --cis-status-faltou: var(--cis-steel);
-  --cis-status-faltou-bg: var(--cis-border);
-  --cis-status-faltou-text: var(--cis-ink);
+  --cis-status-faltou: #8b5cf6;
+  --cis-status-faltou-bg: #ede9fe;
+  --cis-status-faltou-text: #5b21b6;
 }
 
 * {
