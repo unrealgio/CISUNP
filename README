@@ -18,7 +18,7 @@ O sistema centraliza informações de pacientes, agenda, prescrições e prontu�
 
 - Autenticação JWT e alteração de senha no primeiro acesso.
 - Cadastro, busca, edição e exclusão de pacientes (a exclusão preserva o histórico de agendamentos, prescrições e prontuários).
-- Agenda de consultas com prevenção de horários duplicados. Agendar com CPF cadastra o paciente ou atualiza nome e telefone de quem já está cadastrado; sem CPF, a consulta fica avulsa, sem cadastro.
+- Agenda de consultas com prevenção de horários duplicados, busca de paciente cadastrado enquanto se digita o nome, status de cada consulta com ações rápidas (confirmar, realizada, falta) e cancelamento que preserva o histórico. Não é possível agendar em data ou horário que já passou. Agendar com CPF cadastra o paciente ou atualiza nome e telefone de quem já está cadastrado; sem CPF, a consulta fica avulsa, sem cadastro.
 - Banco normalizado: as tabelas se ligam ao paciente por chave estrangeira (`pacienteId`), e o CPF, o nome e o telefone ficam guardados só no cadastro do paciente.
 - Página de consultas com status (pendente, confirmada, realizada, faltou, cancelada), filtro por status e por paciente, e busca. Cancelar uma consulta libera o horário na agenda; uma falta mantém o horário registrado.
 - Ficha do paciente com resumo calculado no banco: consultas realizadas, procedimentos, exames, faltas e cancelamentos.
@@ -184,7 +184,7 @@ A cada execução, as tabelas do `cis_test` são apagadas e recriadas pelas migr
 - `POST /api/login`
 - `GET /api/session`
 - `POST /api/change-password`
-- `GET|POST|PUT|DELETE /api/pacientes` e `GET /api/pacientes/:cpf/resumo`
+- `GET|POST|PUT|DELETE /api/pacientes`, `GET /api/pacientes/:cpf/resumo` e `GET /api/pacientes/busca?q=...`
 - `GET|POST|PUT|DELETE /api/agendamentos` e `PATCH /api/agendamentos/:id/status`
 - `GET|POST /api/prescricoes`
 - `GET|POST /api/prontuarios`
