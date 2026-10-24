@@ -63,10 +63,7 @@ exports.diasComAgendamento = async (req, res) => {
 
 // COM CPF: CRIA O PACIENTE OU ATUALIZA NOME E TELEFONE (O MÉDICO SÓ PREENCHE SE ESTIVER VAZIO)
 // SEM CPF: AGENDAMENTO AVULSO, SEM CADASTRO
-async function sincronizarPaciente(
-  { cpf, patient, phone, medico },
-  transaction,
-) {
+async function sincronizarPaciente({ cpf, patient, phone, medico }, transaction) {
   if (!cpf) return null;
   const nome = patient.trim();
   const telefone = telefoneParaSalvar(phone);
@@ -104,9 +101,7 @@ function camposDoAgendamento(body, paciente) {
 async function responderErroAoSalvar(res, transaction, err) {
   if (transaction && !transaction.finished) await transaction.rollback();
   if (err.name === "SequelizeUniqueConstraintError") {
-    return res
-      .status(409)
-      .json({ error: "Já existe um agendamento neste horário." });
+    return res.status(409).json({ error: "Já existe um agendamento neste horário." });
   }
   console.error("Erro ao salvar agendamento:", err);
   res.status(500).json({ error: "Erro ao salvar agendamento." });
@@ -124,16 +119,11 @@ exports.criar = async (req, res) => {
     });
     if (ocupado) {
       await transaction.rollback();
-      return res
-        .status(409)
-        .json({ error: "Já existe um agendamento neste horário." });
+      return res.status(409).json({ error: "Já existe um agendamento neste horário." });
     }
 
     const paciente = await sincronizarPaciente(req.body, transaction);
-    const agendamento = await Agendamentos.create(
-      camposDoAgendamento(req.body, paciente),
-      { transaction },
-    );
+    const agendamento = await Agendamentos.create(camposDoAgendamento(req.body, paciente), { transaction });
     await transaction.commit();
     await agendamento.reload({ include: [incluirPaciente] });
     res.status(201).json(comDadosDoPaciente(agendamento));
@@ -204,8 +194,7 @@ exports.excluir = async (req, res) => {
   const { id } = req.params;
   try {
     const deleted = await Agendamentos.destroy({ where: { id } });
-    if (!deleted)
-      return res.status(404).json({ error: "Agendamento não encontrado." });
+    if (!deleted) return res.status(404).json({ error: "Agendamento não encontrado." });
     res.json({ success: true });
   } catch (err) {
     console.error("Erro ao excluir agendamento:", err);

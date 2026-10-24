@@ -12,9 +12,7 @@ const EXTENSOES_PERMITIDAS = {
 const TAMANHO_MAXIMO = 10 * 1024 * 1024;
 
 // OS TESTES TROCAM A PASTA PARA NÃO MISTURAR ARQUIVOS DE TESTE COM OS REAIS
-const PASTA_ARQUIVOS =
-  process.env.PASTA_ARQUIVOS ||
-  path.join(__dirname, "..", "..", "uploads", "arquivos");
+const PASTA_ARQUIVOS = process.env.PASTA_ARQUIVOS || path.join(__dirname, "..", "..", "uploads", "arquivos");
 
 module.exports = {
   CATEGORIAS_ARQUIVO,

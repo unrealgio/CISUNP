@@ -46,8 +46,7 @@ exports.buscarPorCpf = async (req, res) => {
   const { cpf } = req.params;
   try {
     const paciente = await Paciente.findOne({ where: { cpf } });
-    if (!paciente)
-      return res.status(404).json({ error: "Paciente não encontrado." });
+    if (!paciente) return res.status(404).json({ error: "Paciente não encontrado." });
     res.json(paciente);
   } catch (err) {
     console.error("Erro ao buscar paciente:", err);
@@ -60,18 +59,10 @@ exports.resumo = async (req, res) => {
   const { cpf } = req.params;
   try {
     const paciente = await Paciente.findOne({ where: { cpf } });
-    if (!paciente)
-      return res.status(404).json({ error: "Paciente não encontrado." });
+    if (!paciente) return res.status(404).json({ error: "Paciente não encontrado." });
 
     const pacienteId = paciente.id;
-    const [
-      consultas,
-      faltas,
-      cancelamentos,
-      procedimentos,
-      procedimentosPlanejados,
-      exames,
-    ] = await Promise.all([
+    const [consultas, faltas, cancelamentos, procedimentos, procedimentosPlanejados, exames] = await Promise.all([
       Agendamentos.count({ where: { pacienteId, status: "realizada" } }),
       Agendamentos.count({ where: { pacienteId, status: "faltou" } }),
       Agendamentos.count({ where: { pacienteId, status: "cancelada" } }),
@@ -97,8 +88,7 @@ exports.resumo = async (req, res) => {
 function camposDoPaciente(body) {
   const { patient, phone, medico, endereco, notes } = body;
   // IDADE VAZIA VIRA NULL, PQ O POSTGRES NÃO ACEITA CAMPO VAZIO
-  const idade =
-    body.idade === "" || body.idade == null ? null : Number(body.idade);
+  const idade = body.idade === "" || body.idade == null ? null : Number(body.idade);
   return {
     patient: patient.trim(),
     phone: telefoneParaSalvar(phone),
@@ -129,9 +119,7 @@ exports.criar = async (req, res) => {
     res.status(201).json(paciente);
   } catch (err) {
     if (err.name === "SequelizeUniqueConstraintError") {
-      return res
-        .status(409)
-        .json({ error: "Já existe um paciente com este CPF." });
+      return res.status(409).json({ error: "Já existe um paciente com este CPF." });
     }
     console.error("Erro ao salvar paciente:", err);
     res.status(500).json({ error: "Erro ao salvar paciente." });
@@ -174,8 +162,7 @@ exports.atualizar = async (req, res) => {
   const { cpf } = req.params;
   try {
     const paciente = await Paciente.findOne({ where: { cpf } });
-    if (!paciente)
-      return res.status(404).json({ error: "Paciente não encontrado." });
+    if (!paciente) return res.status(404).json({ error: "Paciente não encontrado." });
     await paciente.update(camposDoPaciente(req.body));
     res.json(paciente);
   } catch (err) {

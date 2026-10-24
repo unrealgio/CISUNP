@@ -3,9 +3,7 @@ const os = require("os");
 const path = require("path");
 const fs = require("fs");
 
-process.env.PASTA_ARQUIVOS = fs.mkdtempSync(
-  path.join(os.tmpdir(), "cis-arquivos-"),
-);
+process.env.PASTA_ARQUIVOS = fs.mkdtempSync(path.join(os.tmpdir(), "cis-arquivos-"));
 
 const { describe, test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
@@ -65,9 +63,7 @@ describe("arquivos do paciente", () => {
     const res = await enviar("texto", "text/plain");
     const corpo = await res.json();
     assert.equal(res.status, 400);
-    assert.deepEqual(corpo.details, [
-      "Envie um PDF ou uma imagem (PNG, JPG ou WEBP).",
-    ]);
+    assert.deepEqual(corpo.details, ["Envie um PDF ou uma imagem (PNG, JPG ou WEBP)."]);
   });
 
   test("recusa arquivo para CPF sem cadastro com 404", async () => {
@@ -93,10 +89,7 @@ describe("arquivos do paciente", () => {
   });
 
   test("lista os arquivos do paciente sem o caminho", async () => {
-    const { status, corpo } = await api.chamar(
-      "GET",
-      "/api/arquivos?cpf=12312312312",
-    );
+    const { status, corpo } = await api.chamar("GET", "/api/arquivos?cpf=12312312312");
     assert.equal(status, 200);
     assert.equal(corpo.length, 1);
     assert.equal(corpo[0].caminho, undefined);
@@ -124,10 +117,7 @@ describe("arquivos do paciente", () => {
     assert.equal(status, 200);
     assert.equal(fs.readdirSync(pasta).length, 0);
 
-    const download = await api.chamar(
-      "GET",
-      `/api/arquivos/${idEnviado}/download`,
-    );
+    const download = await api.chamar("GET", `/api/arquivos/${idEnviado}/download`);
     assert.equal(download.status, 404);
   });
 });

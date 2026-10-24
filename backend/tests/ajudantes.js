@@ -3,11 +3,7 @@ const { JWT_SECRET } = require("../config/auth");
 const app = require("../app");
 
 function gerarTokenDeTeste(dados = {}, opcoes = { expiresIn: "5m" }) {
-  return jwt.sign(
-    { id: 1, email: "teste@cis.com", trocarSenha: false, ...dados },
-    JWT_SECRET,
-    opcoes,
-  );
+  return jwt.sign({ id: 1, email: "teste@cis.com", trocarSenha: false, ...dados }, JWT_SECRET, opcoes);
 }
 
 function iniciarServidor() {
@@ -15,12 +11,7 @@ function iniciarServidor() {
     const servidor = app.listen(0, () => {
       const url = `http://localhost:${servidor.address().port}`;
 
-      async function chamar(
-        metodo,
-        caminho,
-        corpo,
-        token = gerarTokenDeTeste(),
-      ) {
+      async function chamar(metodo, caminho, corpo, token = gerarTokenDeTeste()) {
         const headers = { "Content-Type": "application/json" };
         if (token) headers.Authorization = `Bearer ${token}`;
         const res = await fetch(`${url}${caminho}`, {

@@ -19,10 +19,7 @@ describe("resumo do paciente", () => {
   });
 
   test("responde 404 para paciente inexistente", async () => {
-    const { status } = await api.chamar(
-      "GET",
-      "/api/pacientes/00000000000/resumo",
-    );
+    const { status } = await api.chamar("GET", "/api/pacientes/00000000000/resumo");
     assert.equal(status, 404);
   });
 
@@ -32,13 +29,7 @@ describe("resumo do paciente", () => {
       patient: "Paciente Resumo",
     });
 
-    const statusDasConsultas = [
-      "realizada",
-      "realizada",
-      "faltou",
-      "cancelada",
-      "pendente",
-    ];
+    const statusDasConsultas = ["realizada", "realizada", "faltou", "cancelada", "pendente"];
     for (const [indice, status] of statusDasConsultas.entries()) {
       const { corpo } = await api.chamar("POST", "/api/agendamentos", {
         cpf,
@@ -72,10 +63,7 @@ describe("resumo do paciente", () => {
     await Arquivo.create({ ...arquivo, categoria: "exame" });
     await Arquivo.create({ ...arquivo, categoria: "documento" });
 
-    const { status, corpo } = await api.chamar(
-      "GET",
-      `/api/pacientes/${cpf}/resumo`,
-    );
+    const { status, corpo } = await api.chamar("GET", `/api/pacientes/${cpf}/resumo`);
     assert.equal(status, 200);
     assert.deepEqual(corpo, {
       consultas: 2,

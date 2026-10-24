@@ -25,31 +25,20 @@ describe("pacientes", () => {
   };
 
   test("cria um paciente com 201 e remove espaços do nome", async () => {
-    const { status, corpo } = await api.chamar(
-      "POST",
-      "/api/pacientes",
-      paciente,
-    );
+    const { status, corpo } = await api.chamar("POST", "/api/pacientes", paciente);
     assert.equal(status, 201);
     assert.equal(corpo.patient, "Maria Teste");
     assert.equal(corpo.idade, 30);
   });
 
   test("recusa CPF já cadastrado com 409", async () => {
-    const { status, corpo } = await api.chamar(
-      "POST",
-      "/api/pacientes",
-      paciente,
-    );
+    const { status, corpo } = await api.chamar("POST", "/api/pacientes", paciente);
     assert.equal(status, 409);
     assert.equal(corpo.error, "Já existe um paciente com este CPF.");
   });
 
   test("busca o paciente pelo CPF", async () => {
-    const { status, corpo } = await api.chamar(
-      "GET",
-      "/api/pacientes/11122233344",
-    );
+    const { status, corpo } = await api.chamar("GET", "/api/pacientes/11122233344");
     assert.equal(status, 200);
     assert.equal(corpo.phone, "84999990000");
   });
@@ -59,10 +48,7 @@ describe("pacientes", () => {
       cpf: "22233344455",
       patient: "Mariana Souza",
     });
-    const { status, corpo } = await api.chamar(
-      "GET",
-      "/api/pacientes/busca?q=MARI",
-    );
+    const { status, corpo } = await api.chamar("GET", "/api/pacientes/busca?q=MARI");
     assert.equal(status, 200);
     assert.deepEqual(
       corpo.map((p) => p.patient),
@@ -89,25 +75,21 @@ describe("pacientes", () => {
   });
 
   test("guarda o telefone só com os dígitos, mesmo enviado com máscara", async () => {
-    const { status, corpo } = await api.chamar(
-      "PUT",
-      "/api/pacientes/22233344455",
-      { patient: "Mariana Souza", phone: "(84) 3201-1234" },
-    );
+    const { status, corpo } = await api.chamar("PUT", "/api/pacientes/22233344455", {
+      patient: "Mariana Souza",
+      phone: "(84) 3201-1234",
+    });
     assert.equal(status, 200);
     assert.equal(corpo.phone, "8432011234");
   });
 
   test("recusa telefone inválido com 400", async () => {
-    const { status, corpo } = await api.chamar(
-      "PUT",
-      "/api/pacientes/22233344455",
-      { patient: "Mariana Souza", phone: "849912313123" },
-    );
+    const { status, corpo } = await api.chamar("PUT", "/api/pacientes/22233344455", {
+      patient: "Mariana Souza",
+      phone: "849912313123",
+    });
     assert.equal(status, 400);
-    assert.deepEqual(corpo.details, [
-      "Telefone deve ter DDD + número (10 ou 11 dígitos).",
-    ]);
+    assert.deepEqual(corpo.details, ["Telefone deve ter DDD + número (10 ou 11 dígitos)."]);
   });
 
   test("responde 404 para CPF não cadastrado", async () => {
@@ -116,11 +98,10 @@ describe("pacientes", () => {
   });
 
   test("atualiza o paciente e transforma idade vazia em null", async () => {
-    const { status, corpo } = await api.chamar(
-      "PUT",
-      "/api/pacientes/11122233344",
-      { patient: "Maria Atualizada", idade: "" },
-    );
+    const { status, corpo } = await api.chamar("PUT", "/api/pacientes/11122233344", {
+      patient: "Maria Atualizada",
+      idade: "",
+    });
     assert.equal(status, 200);
     assert.equal(corpo.patient, "Maria Atualizada");
     assert.equal(corpo.idade, null);

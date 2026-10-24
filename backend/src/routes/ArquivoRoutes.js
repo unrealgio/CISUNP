@@ -3,21 +3,12 @@ const router = express.Router();
 const arquivoController = require("../controllers/arquivoController");
 const { authenticateToken } = require("../middleware/middleware");
 const { carregarPaciente } = require("../middleware/paciente");
-const {
-  validateCpfQuery,
-  validateIdParam,
-  validateArquivoUpload,
-} = require("../middleware/validation");
+const { validateCpfQuery, validateIdParam, validateArquivoUpload } = require("../middleware/validation");
 const { EXTENSOES_PERMITIDAS, TAMANHO_MAXIMO } = require("../utils/arquivos");
 
 router.use(authenticateToken);
 
-router.get(
-  "/",
-  validateCpfQuery,
-  carregarPaciente,
-  arquivoController.listarPorCpf,
-);
+router.get("/", validateCpfQuery, carregarPaciente, arquivoController.listarPorCpf);
 router.post(
   "/",
   express.raw({
@@ -33,9 +24,7 @@ router.delete("/:id", validateIdParam, arquivoController.excluir);
 
 router.use((err, req, res, next) => {
   if (err.type === "entity.too.large") {
-    return res
-      .status(413)
-      .json({ error: "O arquivo deve ter no máximo 10 MB." });
+    return res.status(413).json({ error: "O arquivo deve ter no máximo 10 MB." });
   }
   next(err);
 });

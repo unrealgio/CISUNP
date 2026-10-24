@@ -1,9 +1,4 @@
-const {
-  apagarTabelas,
-  rodarMigrations,
-  fecharBanco,
-  sequelize,
-} = require("./banco");
+const { apagarTabelas, rodarMigrations, fecharBanco, sequelize } = require("./banco");
 const { describe, test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 
@@ -31,9 +26,7 @@ describe("migration dos telefones (só dígitos)", () => {
   after(fecharBanco);
 
   const telefoneDe = async (nome) =>
-    (
-      await consultar(`SELECT phone FROM pacientes WHERE patient = '${nome}'`)
-    )[0].phone;
+    (await consultar(`SELECT phone FROM pacientes WHERE patient = '${nome}'`))[0].phone;
 
   test("guarda só os dígitos dos telefones válidos", async () => {
     assert.equal(await telefoneDe("Com máscara"), "84999990000");

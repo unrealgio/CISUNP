@@ -1,11 +1,4 @@
-import {
-  FaUserMd,
-  FaFileMedical,
-  FaHeartbeat,
-  FaBan,
-  FaPlus,
-  FaListUl,
-} from "react-icons/fa";
+import { FaUserMd, FaFileMedical, FaHeartbeat, FaBan, FaPlus, FaListUl } from "react-icons/fa";
 
 function plural(quantidade, singular, varios) {
   return `${quantidade} ${quantidade === 1 ? singular : varios}`;
@@ -27,8 +20,7 @@ const cards = [
     action: "Novo procedimento",
     actionIcon: <FaPlus />,
     valor: (resumo) => resumo.procedimentos,
-    detalhe: (resumo) =>
-      plural(resumo.procedimentosPlanejados, "planejado", "planejados"),
+    detalhe: (resumo) => plural(resumo.procedimentosPlanejados, "planejado", "planejados"),
   },
   {
     key: "exames",
@@ -46,11 +38,7 @@ const cards = [
     actionIcon: <FaListUl />,
     valor: (resumo) => resumo.faltas + resumo.cancelamentos,
     detalhe: (resumo) =>
-      `${plural(resumo.faltas, "falta", "faltas")} · ${plural(
-        resumo.cancelamentos,
-        "cancelamento",
-        "cancelamentos",
-      )}`,
+      `${plural(resumo.faltas, "falta", "faltas")} · ${plural(resumo.cancelamentos, "cancelamento", "cancelamentos")}`,
   },
 ];
 
@@ -62,15 +50,11 @@ export default function PacienteResumoCards({ resumo, onAction }) {
           key={card.key}
           className="cis-panel flex-1 p-4 flex flex-col items-center transition-all duration-200 hover:-translate-y-0.5"
         >
-          <div className="text-2xl md:text-3xl mb-2 text-(--cis-blue)">
-            {card.icon}
-          </div>
+          <div className="text-2xl md:text-3xl mb-2 text-(--cis-blue)">{card.icon}</div>
           <div className="text-xl md:text-2xl font-bold mb-1 text-(--cis-navy)">
             {resumo ? card.valor(resumo) : "—"}
           </div>
-          <div className="text-sm md:text-base text-(--cis-muted) text-center">
-            {card.label}
-          </div>
+          <div className="text-sm md:text-base text-(--cis-muted) text-center">{card.label}</div>
           <div className="text-xs text-(--cis-muted) mb-2 min-h-4">
             {resumo && card.detalhe ? card.detalhe(resumo) : ""}
           </div>

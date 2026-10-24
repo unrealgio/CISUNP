@@ -4,9 +4,7 @@
 function cpfValido(base) {
   const digitos = base.split("").map(Number);
   for (const tamanho of [9, 10]) {
-    const soma = digitos
-      .slice(0, tamanho)
-      .reduce((total, d, i) => total + d * (tamanho + 1 - i), 0);
+    const soma = digitos.slice(0, tamanho).reduce((total, d, i) => total + d * (tamanho + 1 - i), 0);
     const resto = (soma * 10) % 11;
     digitos.push(resto === 10 ? 0 : resto);
   }
@@ -25,42 +23,10 @@ function dia(deslocamento) {
 const MEDICOS = ["Dra. Ana Lima", "Dr. Bruno Costa", "Dra. Carla Mendes"];
 
 const PACIENTES = [
-  [
-    "Ana Beatriz Rocha",
-    "529982247",
-    "84991234567",
-    28,
-    "Rua das Flores, 120 - Natal/RN",
-    0,
-    "Alergia a penicilina.",
-  ],
-  [
-    "Bruno Henrique Alves",
-    "123456780",
-    "84987654321",
-    35,
-    "Av. Prudente de Morais, 900 - Natal/RN",
-    1,
-    null,
-  ],
-  [
-    "Camila Duarte",
-    "987654321",
-    "8432011234",
-    42,
-    "Rua Mossoró, 55 - Natal/RN",
-    2,
-    "Hipertensa.",
-  ],
-  [
-    "Diego Martins",
-    "111444777",
-    "84996543210",
-    19,
-    "Rua Apodi, 300 - Natal/RN",
-    0,
-    null,
-  ],
+  ["Ana Beatriz Rocha", "529982247", "84991234567", 28, "Rua das Flores, 120 - Natal/RN", 0, "Alergia a penicilina."],
+  ["Bruno Henrique Alves", "123456780", "84987654321", 35, "Av. Prudente de Morais, 900 - Natal/RN", 1, null],
+  ["Camila Duarte", "987654321", "8432011234", 42, "Rua Mossoró, 55 - Natal/RN", 2, "Hipertensa."],
+  ["Diego Martins", "111444777", "84996543210", 19, "Rua Apodi, 300 - Natal/RN", 0, null],
   [
     "Eduarda Nogueira",
     "222555888",
@@ -70,42 +36,10 @@ const PACIENTES = [
     1,
     "Usa aparelho ortodôntico.",
   ],
-  [
-    "Felipe Araújo",
-    "333666999",
-    "8432225566",
-    63,
-    "Rua Seridó, 48 - Natal/RN",
-    2,
-    null,
-  ],
-  [
-    "Gabriela Pires",
-    "444777111",
-    "84991112233",
-    24,
-    "Rua Jaguarari, 712 - Natal/RN",
-    0,
-    null,
-  ],
-  [
-    "Henrique Castro",
-    "555888222",
-    "84993334455",
-    38,
-    "Av. Salgado Filho, 2100 - Natal/RN",
-    1,
-    "Diabético tipo 2.",
-  ],
-  [
-    "Isabela Moura",
-    "666999333",
-    "84995556677",
-    31,
-    "Rua Potengi, 80 - Natal/RN",
-    2,
-    null,
-  ],
+  ["Felipe Araújo", "333666999", "8432225566", 63, "Rua Seridó, 48 - Natal/RN", 2, null],
+  ["Gabriela Pires", "444777111", "84991112233", 24, "Rua Jaguarari, 712 - Natal/RN", 0, null],
+  ["Henrique Castro", "555888222", "84993334455", 38, "Av. Salgado Filho, 2100 - Natal/RN", 1, "Diabético tipo 2."],
+  ["Isabela Moura", "666999333", "84995556677", 31, "Rua Potengi, 80 - Natal/RN", 2, null],
   [
     "João Pedro Lins",
     "777111444",
@@ -115,24 +49,8 @@ const PACIENTES = [
     0,
     "Paciente infantil; vir com responsável.",
   ],
-  [
-    "Larissa Teixeira",
-    "888222555",
-    "8432334455",
-    46,
-    "Av. Engenheiro Roberto Freire, 3000 - Natal/RN",
-    1,
-    null,
-  ],
-  [
-    "Marcos Vinícius Barros",
-    "999333666",
-    "84992221100",
-    57,
-    "Rua Mipibu, 230 - Natal/RN",
-    2,
-    null,
-  ],
+  ["Larissa Teixeira", "888222555", "8432334455", 46, "Av. Engenheiro Roberto Freire, 3000 - Natal/RN", 1, null],
+  ["Marcos Vinícius Barros", "999333666", "84992221100", 57, "Rua Mipibu, 230 - Natal/RN", 2, null],
 ].map(([patient, base, phone, idade, endereco, medico, notes]) => ({
   patient,
   cpf: cpfValido(base),
@@ -162,14 +80,7 @@ const CONSULTAS = [
   [11, 1, "15:30", "pendente", 2, null],
   [3, 2, "14:00", "confirmada", 0, null],
   [4, 3, "16:00", "pendente", 1, null],
-  [
-    "Patrícia Souza",
-    3,
-    "17:30",
-    "pendente",
-    1,
-    "Primeira consulta, sem cadastro.",
-  ],
+  ["Patrícia Souza", 3, "17:30", "pendente", 1, "Primeira consulta, sem cadastro."],
   [7, 5, "12:30", "pendente", 1, "Remarcação da falta."],
   [8, 6, "13:30", "confirmada", 2, "Tratamento de canal (46)."],
   [1, 7, "15:00", "pendente", 1, null],
@@ -210,26 +121,14 @@ async function apagarDemonstracao(queryInterface, transaction) {
     .map((nome) => `'${nome}'`)
     .join(", ");
   const ids = `SELECT id FROM pacientes WHERE cpf IN (${cpfs})`;
-  for (const tabela of [
-    "agendamentos",
-    "prescricoes",
-    "procedimentos",
-    "prontuarios",
-    "arquivos",
-  ]) {
-    await queryInterface.sequelize.query(
-      `DELETE FROM ${tabela} WHERE "pacienteId" IN (${ids})`,
-      { transaction },
-    );
+  for (const tabela of ["agendamentos", "prescricoes", "procedimentos", "prontuarios", "arquivos"]) {
+    await queryInterface.sequelize.query(`DELETE FROM ${tabela} WHERE "pacienteId" IN (${ids})`, { transaction });
   }
   await queryInterface.sequelize.query(
     `DELETE FROM agendamentos WHERE "pacienteId" IS NULL AND patient IN (${avulsos})`,
     { transaction },
   );
-  await queryInterface.sequelize.query(
-    `DELETE FROM pacientes WHERE cpf IN (${cpfs})`,
-    { transaction },
-  );
+  await queryInterface.sequelize.query(`DELETE FROM pacientes WHERE cpf IN (${cpfs})`, { transaction });
 }
 
 module.exports = {
@@ -266,42 +165,36 @@ module.exports = {
 
       await queryInterface.bulkInsert(
         "procedimentos",
-        PROCEDIMENTOS.map(
-          ([indice, tipo, dente, status, dias, observacao]) => ({
-            pacienteId: idDoPaciente(indice),
-            tipo,
-            dente,
-            status,
-            data: dias === null ? null : dia(dias),
-            observacao,
-            createdAt: agora,
-            updatedAt: agora,
-          }),
-        ),
+        PROCEDIMENTOS.map(([indice, tipo, dente, status, dias, observacao]) => ({
+          pacienteId: idDoPaciente(indice),
+          tipo,
+          dente,
+          status,
+          data: dias === null ? null : dia(dias),
+          observacao,
+          createdAt: agora,
+          updatedAt: agora,
+        })),
         { transaction },
       );
 
       await queryInterface.bulkInsert(
         "prescricoes",
-        PRESCRICOES.map(
-          ([indice, medicamento, dose, frequencia, observacao]) => ({
-            pacienteId: idDoPaciente(indice),
-            medicamento,
-            dose,
-            frequencia,
-            observacao,
-            createdAt: agora,
-            updatedAt: agora,
-          }),
-        ),
+        PRESCRICOES.map(([indice, medicamento, dose, frequencia, observacao]) => ({
+          pacienteId: idDoPaciente(indice),
+          medicamento,
+          dose,
+          frequencia,
+          observacao,
+          createdAt: agora,
+          updatedAt: agora,
+        })),
         { transaction },
       );
     });
   },
 
   async down(queryInterface) {
-    await queryInterface.sequelize.transaction((transaction) =>
-      apagarDemonstracao(queryInterface, transaction),
-    );
+    await queryInterface.sequelize.transaction((transaction) => apagarDemonstracao(queryInterface, transaction));
   },
 };

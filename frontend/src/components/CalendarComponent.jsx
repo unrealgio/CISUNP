@@ -23,25 +23,15 @@ function nomeDoMes(date) {
 }
 
 function diaDaSemanaCurto(date) {
-  return date
-    .toLocaleDateString("pt-BR", { weekday: "short" })
-    .replace(".", "")
-    .slice(0, 3);
+  return date.toLocaleDateString("pt-BR", { weekday: "short" }).replace(".", "").slice(0, 3);
 }
 
-export default function CalendarComponent({
-  value,
-  onChange,
-  atualizacao = 0,
-}) {
-  const [mesVisivel, setMesVisivel] = useState(() =>
-    chaveDoMes(value || new Date()),
-  );
+export default function CalendarComponent({ value, onChange, atualizacao = 0 }) {
+  const [mesVisivel, setMesVisivel] = useState(() => chaveDoMes(value || new Date()));
 
   // ACOMPANHA O MÊS DA DATA SELECIONADA
   const mesSelecionado = value ? chaveDoMes(value) : null;
-  const [mesSelecionadoAnterior, setMesSelecionadoAnterior] =
-    useState(mesSelecionado);
+  const [mesSelecionadoAnterior, setMesSelecionadoAnterior] = useState(mesSelecionado);
   if (mesSelecionado !== mesSelecionadoAnterior) {
     setMesSelecionadoAnterior(mesSelecionado);
     if (mesSelecionado) setMesVisivel(mesSelecionado);
@@ -58,10 +48,7 @@ export default function CalendarComponent({
     "Erro ao carregar dias com agendamento.",
     atualizacao,
   );
-  const diasMarcados = useMemo(
-    () => new Set(Array.isArray(dias.dados) ? dias.dados : []),
-    [dias.dados],
-  );
+  const diasMarcados = useMemo(() => new Set(Array.isArray(dias.dados) ? dias.dados : []), [dias.dados]);
 
   function irParaHoje() {
     const hoje = new Date();
@@ -77,9 +64,7 @@ export default function CalendarComponent({
         value={value}
         onChange={onChange}
         activeStartDate={dataDaChave(mesVisivel)}
-        onActiveStartDateChange={({ activeStartDate }) =>
-          activeStartDate && setMesVisivel(chaveDoMes(activeStartDate))
-        }
+        onActiveStartDateChange={({ activeStartDate }) => activeStartDate && setMesVisivel(chaveDoMes(activeStartDate))}
         minDetail="month"
         navigationLabel={({ date }) => nomeDoMes(date)}
         formatShortWeekday={(locale, date) => diaDaSemanaCurto(date)}

@@ -17,35 +17,11 @@ router.use(authenticateToken);
 
 router.get("/", validateAgendamentoQuery, agendamentosController.buscarPorData);
 router.get("/todos", agendamentosController.listarTodos);
-router.get(
-  "/dias",
-  validateIntervaloQuery,
-  agendamentosController.diasComAgendamento,
-);
-router.post(
-  "/",
-  validateAgendamentoBody,
-  validateAgendamentoFuturo,
-  agendamentosController.criar,
-);
-router.put(
-  "/:id",
-  validateIdParam,
-  validateAgendamentoBody,
-  agendamentosController.atualizar,
-);
-router.patch(
-  "/:id/status",
-  validateIdParam,
-  validateStatusBody,
-  agendamentosController.atualizarStatus,
-);
+router.get("/dias", validateIntervaloQuery, agendamentosController.diasComAgendamento);
+router.post("/", validateAgendamentoBody, validateAgendamentoFuturo, agendamentosController.criar);
+router.put("/:id", validateIdParam, validateAgendamentoBody, agendamentosController.atualizar);
+router.patch("/:id/status", validateIdParam, validateStatusBody, agendamentosController.atualizarStatus);
 router.delete("/:id", validateIdParam, agendamentosController.excluir);
-router.get(
-  "/futuros",
-  validateCpfQuery,
-  carregarPaciente,
-  agendamentosController.futurosPorPaciente,
-);
+router.get("/futuros", validateCpfQuery, carregarPaciente, agendamentosController.futurosPorPaciente);
 
 module.exports = router;

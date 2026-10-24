@@ -8,9 +8,7 @@ export function dataLocalISO(date = new Date()) {
 // DIZ SE UM HORÁRIO ("AAAA-MM-DD" + "HH:MM") JÁ PASSOU
 export function horarioPassado(dataISO, hora, agora = new Date()) {
   const hoje = dataLocalISO(agora);
-  const horaAtual = `${String(agora.getHours()).padStart(2, "0")}:${String(
-    agora.getMinutes(),
-  ).padStart(2, "0")}`;
+  const horaAtual = `${String(agora.getHours()).padStart(2, "0")}:${String(agora.getMinutes()).padStart(2, "0")}`;
   return dataISO < hoje || (dataISO === hoje && hora < horaAtual);
 }
 

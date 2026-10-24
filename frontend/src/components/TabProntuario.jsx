@@ -150,11 +150,7 @@ export default function TabProntuario({ cpf }) {
       {toast && (
         <div
           className={`fixed top-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-lg shadow-lg flex items-center gap-2
-            ${
-              toast.type === "info"
-                ? "bg-(--cis-unp-orange) text-(--cis-on-orange)"
-                : "bg-(--cis-success) text-white"
-            }
+            ${toast.type === "info" ? "bg-(--cis-unp-orange) text-(--cis-on-orange)" : "bg-(--cis-success) text-white"}
             animate-toast`}
         >
           <FaCheckCircle />
@@ -162,8 +158,7 @@ export default function TabProntuario({ cpf }) {
         </div>
       )}
       <h2 className="text-2xl font-bold mb-6 text-(--cis-unp-blue) flex items-center gap-2 animate-slide-in">
-        <FaNotesMedical className="text-(--cis-unp-steel)" /> Prontuário
-        Odontológico
+        <FaNotesMedical className="text-(--cis-unp-steel)" /> Prontuário Odontológico
       </h2>
       {erro && (
         <div className="bg-(--cis-danger-soft) border border-(--cis-danger-line) text-(--cis-danger) rounded-lg p-4 mb-4 text-center font-semibold">
@@ -332,9 +327,7 @@ export default function TabProntuario({ cpf }) {
         <div className="bg-(--cis-soft-gray) rounded-lg p-4 border shadow mb-4 space-y-2">
           <div className="flex gap-4 flex-wrap">
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Higiene:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Higiene:</label>
               <select
                 name="higiene"
                 value={exame.higiene}
@@ -347,9 +340,7 @@ export default function TabProntuario({ cpf }) {
               </select>
             </div>
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Halitose:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Halitose:</label>
               <select
                 name="halitose"
                 value={exame.halitose}
@@ -362,9 +353,7 @@ export default function TabProntuario({ cpf }) {
               </select>
             </div>
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Tártaro:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Tártaro:</label>
               <select
                 name="tartaro"
                 value={exame.tartaro}
@@ -379,9 +368,7 @@ export default function TabProntuario({ cpf }) {
           </div>
           <div className="flex gap-4 flex-wrap">
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Gengiva:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Gengiva:</label>
               <select
                 name="gengiva"
                 value={exame.gengiva}
@@ -394,9 +381,7 @@ export default function TabProntuario({ cpf }) {
               </select>
             </div>
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Mucosa:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Mucosa:</label>
               <select
                 name="mucosa"
                 value={exame.mucosa}
@@ -410,9 +395,7 @@ export default function TabProntuario({ cpf }) {
           </div>
           <div className="flex gap-4 flex-wrap">
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Língua:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Língua:</label>
               <input
                 name="lingua"
                 value={exame.lingua}
@@ -421,9 +404,7 @@ export default function TabProntuario({ cpf }) {
               />
             </div>
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Palato:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Palato:</label>
               <input
                 name="palato"
                 value={exame.palato}
@@ -432,9 +413,7 @@ export default function TabProntuario({ cpf }) {
               />
             </div>
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Assoalho Bucal:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Assoalho Bucal:</label>
               <input
                 name="assoalhoBucal"
                 value={exame.assoalhoBucal}
@@ -443,9 +422,7 @@ export default function TabProntuario({ cpf }) {
               />
             </div>
             <div>
-              <label className="font-semibold text-(--cis-unp-blue)">
-                Lábios:
-              </label>
+              <label className="font-semibold text-(--cis-unp-blue)">Lábios:</label>
               <input
                 name="labios"
                 value={exame.labios}

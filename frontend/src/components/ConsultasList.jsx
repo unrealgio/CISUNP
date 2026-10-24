@@ -25,12 +25,8 @@ import AcoesStatus from "./AcoesStatus";
 function ordenarConsultas(lista) {
   const hoje = dataLocalISO();
   const chave = (c) => `${c.date} ${c.time}`;
-  const futuras = lista
-    .filter((c) => c.date >= hoje)
-    .sort((a, b) => chave(a).localeCompare(chave(b)));
-  const passadas = lista
-    .filter((c) => c.date < hoje)
-    .sort((a, b) => chave(b).localeCompare(chave(a)));
+  const futuras = lista.filter((c) => c.date >= hoje).sort((a, b) => chave(a).localeCompare(chave(b)));
+  const passadas = lista.filter((c) => c.date < hoje).sort((a, b) => chave(b).localeCompare(chave(a)));
   return [...futuras, ...passadas];
 }
 
@@ -41,19 +37,14 @@ function plural(quantidade, singular, varios) {
 // HISTÓRICO DO PACIENTE CALCULADO COM AS CONSULTAS JÁ CARREGADAS (SEM REQUISIÇÃO EXTRA)
 function historicoDoPaciente(todas, consulta, hoje) {
   const doPaciente = todas.filter((c) => c.cpf === consulta.cpf);
-  const contar = (status) =>
-    doPaciente.filter((c) => c.status === status).length;
+  const contar = (status) => doPaciente.filter((c) => c.status === status).length;
   const chave = (c) => `${c.date} ${c.time}`;
   const outras = doPaciente.filter((c) => c.id !== consulta.id);
 
   const proxima = outras
-    .filter(
-      (c) => c.date >= hoje && ["pendente", "confirmada"].includes(c.status),
-    )
+    .filter((c) => c.date >= hoje && ["pendente", "confirmada"].includes(c.status))
     .sort((a, b) => chave(a).localeCompare(chave(b)))[0];
-  const ultima = outras
-    .filter((c) => c.status === "realizada")
-    .sort((a, b) => chave(b).localeCompare(chave(a)))[0];
+  const ultima = outras.filter((c) => c.status === "realizada").sort((a, b) => chave(b).localeCompare(chave(a)))[0];
 
   const partes = [
     [contar("realizada"), "realizada", "realizadas"],
@@ -61,9 +52,7 @@ function historicoDoPaciente(todas, consulta, hoje) {
     [contar("cancelada"), "cancelada", "canceladas"],
   ]
     .filter(([quantidade]) => quantidade > 0)
-    .map(([quantidade, singular, varios]) =>
-      plural(quantidade, singular, varios),
-    );
+    .map(([quantidade, singular, varios]) => plural(quantidade, singular, varios));
 
   return {
     resumo: partes.length ? partes.join(" · ") : "Nenhuma consulta concluída",
@@ -90,11 +79,7 @@ function Linha({ rotulo, children, empilhado = false }) {
 }
 
 function TituloBloco({ children }) {
-  return (
-    <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-(--cis-muted)">
-      {children}
-    </p>
-  );
+  return <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-(--cis-muted)">{children}</p>;
 }
 
 function Vazio({ children }) {
@@ -111,29 +96,16 @@ function HistoricoDoPaciente({ todas, consulta }) {
       </Linha>
       <Linha
         empilhado
-        rotulo={
-          historico.proxima
-            ? "Próxima consulta"
-            : historico.ultima
-              ? "Última consulta"
-              : "Outras consultas"
-        }
+        rotulo={historico.proxima ? "Próxima consulta" : historico.ultima ? "Última consulta" : "Outras consultas"}
       >
-        {outra ? (
-          `${formatarDataISO(outra.date)} às ${outra.time}`
-        ) : (
-          <Vazio>Nenhuma marcada</Vazio>
-        )}
+        {outra ? `${formatarDataISO(outra.date)} às ${outra.time}` : <Vazio>Nenhuma marcada</Vazio>}
       </Linha>
     </>
   );
 }
 
 export default function ConsultasList() {
-  const consultas = useBuscarDados(
-    "/api/agendamentos/todos",
-    "Erro ao carregar consultas.",
-  );
+  const consultas = useBuscarDados("/api/agendamentos/todos", "Erro ao carregar consultas.");
   const [searchParams, setSearchParams] = useSearchParams();
   const cpfFiltro = searchParams.get("cpf");
   const [search, setSearch] = useState("");
@@ -147,29 +119,19 @@ export default function ConsultasList() {
   const itemsPerPage = 12;
 
   const todas = Array.isArray(consultas.dados) ? consultas.dados : [];
-  const lista = ordenarConsultas(
-    cpfFiltro ? todas.filter((c) => c.cpf === cpfFiltro) : todas,
-  );
-  const nomeDoPacienteFiltrado = cpfFiltro
-    ? lista[0]?.patient || `CPF ${cpfFiltro}`
-    : "";
-  const contagem = lista.reduce(
-    (total, c) => ({ ...total, [c.status]: (total[c.status] || 0) + 1 }),
-    { todas: lista.length },
-  );
+  const lista = ordenarConsultas(cpfFiltro ? todas.filter((c) => c.cpf === cpfFiltro) : todas);
+  const nomeDoPacienteFiltrado = cpfFiltro ? lista[0]?.patient || `CPF ${cpfFiltro}` : "";
+  const contagem = lista.reduce((total, c) => ({ ...total, [c.status]: (total[c.status] || 0) + 1 }), {
+    todas: lista.length,
+  });
 
   // FILTRO POR STATUS E NOME DO PACIENTE
   const filteredConsultas = lista.filter(
-    (c) =>
-      (filtro === "todas" || c.status === filtro) &&
-      c.patient.toLowerCase().includes(search.toLowerCase()),
+    (c) => (filtro === "todas" || c.status === filtro) && c.patient.toLowerCase().includes(search.toLowerCase()),
   );
 
   const totalPages = Math.ceil(filteredConsultas.length / itemsPerPage);
-  const paginatedConsultas = filteredConsultas.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage,
-  );
+  const paginatedConsultas = filteredConsultas.slice((page - 1) * itemsPerPage, page * itemsPerPage);
 
   function handleSearch(e) {
     setSearch(e.target.value);
@@ -199,13 +161,7 @@ export default function ConsultasList() {
   }
 
   async function mudarStatus(consulta, status) {
-    if (
-      status === "cancelada" &&
-      !window.confirm(
-        "Cancelar esta consulta? O horário ficará livre na agenda.",
-      )
-    )
-      return;
+    if (status === "cancelada" && !window.confirm("Cancelar esta consulta? O horário ficará livre na agenda.")) return;
     setAlterando(consulta.id);
     setErroStatus(null);
     try {
@@ -222,9 +178,7 @@ export default function ConsultasList() {
         });
         return;
       }
-      consultas.alterarDados((prev) =>
-        prev.map((c) => (c.id === data.id ? data : c)),
-      );
+      consultas.alterarDados((prev) => prev.map((c) => (c.id === data.id ? data : c)));
     } catch {
       setErroStatus({
         id: consulta.id,
@@ -237,9 +191,7 @@ export default function ConsultasList() {
 
   return (
     <div className="w-full px-2 md:px-8 py-6">
-      <h2 className="text-2xl font-bold text-(--cis-unp-blue) mb-6">
-        Consultas
-      </h2>
+      <h2 className="text-2xl font-bold text-(--cis-unp-blue) mb-6">Consultas</h2>
       <div className="flex flex-col gap-4 mb-6">
         <div className="relative w-full max-w-md">
           <input
@@ -265,11 +217,7 @@ export default function ConsultasList() {
             <span className="sr-only">(remover filtro)</span>
           </button>
         )}
-        <div
-          className="flex flex-wrap gap-2"
-          role="group"
-          aria-label="Filtrar por status"
-        >
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Filtrar por status">
           {["todas", ...Object.keys(STATUS)].map((chave) => (
             <button
               key={chave}
@@ -278,8 +226,7 @@ export default function ConsultasList() {
               aria-pressed={filtro === chave}
               onClick={() => escolherFiltro(chave)}
             >
-              {chave === "todas" ? "Todas" : STATUS[chave].plural} (
-              {contagem[chave] || 0})
+              {chave === "todas" ? "Todas" : STATUS[chave].plural} ({contagem[chave] || 0})
             </button>
           ))}
         </div>
@@ -321,9 +268,7 @@ export default function ConsultasList() {
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <FaUser className="text-(--cis-unp-blue) shrink-0" />
-                    <span className="font-bold text-lg text-(--cis-unp-blue) min-w-0">
-                      {c.patient}
-                    </span>
+                    <span className="font-bold text-lg text-(--cis-unp-blue) min-w-0">{c.patient}</span>
                     <span
                       className="ml-auto px-2 py-1 rounded text-xs font-semibold shrink-0"
                       style={{
@@ -333,9 +278,7 @@ export default function ConsultasList() {
                     >
                       {STATUS[c.status]?.rotulo || c.status}
                     </span>
-                    <span className="ml-2 shrink-0">
-                      {expanded === c.id ? <FaChevronUp /> : <FaChevronDown />}
-                    </span>
+                    <span className="ml-2 shrink-0">{expanded === c.id ? <FaChevronUp /> : <FaChevronDown />}</span>
                   </div>
                   <div className="flex items-center gap-2 text-(--cis-ink)">
                     <FaCalendarAlt /> {formatarDataISO(c.date)}
@@ -343,11 +286,7 @@ export default function ConsultasList() {
                   </div>
                   <div className="flex items-center gap-2 text-(--cis-ink)">
                     <FaUserMd className="shrink-0" />
-                    {c.medico || (
-                      <span className="text-(--cis-muted)">
-                        Médico não informado
-                      </span>
-                    )}
+                    {c.medico || <span className="text-(--cis-muted)">Médico não informado</span>}
                   </div>
                   {/* DETALHES EXPANDIDOS DAS CONSULTAS */}
                   {expanded === c.id && (
@@ -356,25 +295,15 @@ export default function ConsultasList() {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div className="@container">
-                        <div
-                          className={`grid gap-3 ${
-                            c.cpf ? "@md:grid-cols-2 @md:gap-5" : ""
-                          }`}
-                        >
+                        <div className={`grid gap-3 ${c.cpf ? "@md:grid-cols-2 @md:gap-5" : ""}`}>
                           <section className="min-w-0">
                             <TituloBloco>Paciente</TituloBloco>
                             <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1.5">
                               {c.cpf ? (
                                 <>
-                                  <Linha rotulo="CPF">
-                                    {formatarCpf(c.cpf)}
-                                  </Linha>
+                                  <Linha rotulo="CPF">{formatarCpf(c.cpf)}</Linha>
                                   <Linha rotulo="Idade">
-                                    {c.idade != null ? (
-                                      `${c.idade} anos`
-                                    ) : (
-                                      <Vazio>Não informada</Vazio>
-                                    )}
+                                    {c.idade != null ? `${c.idade} anos` : <Vazio>Não informada</Vazio>}
                                   </Linha>
                                 </>
                               ) : (
@@ -396,10 +325,7 @@ export default function ConsultasList() {
                               </Linha>
                             </dl>
                             {c.cpf && (
-                              <Link
-                                to={`/paciente/${c.cpf}`}
-                                className="mt-2 inline-block text-(--cis-blue) underline"
-                              >
+                              <Link to={`/paciente/${c.cpf}`} className="mt-2 inline-block text-(--cis-blue) underline">
                                 Ver ficha do paciente
                               </Link>
                             )}
@@ -408,19 +334,14 @@ export default function ConsultasList() {
                             <section className="min-w-0 border-t border-(--cis-border) pt-3 @md:border-t-0 @md:border-l @md:pt-0 @md:pl-5">
                               <TituloBloco>Consultas</TituloBloco>
                               <dl className="flex flex-col gap-2">
-                                <HistoricoDoPaciente
-                                  todas={todas}
-                                  consulta={c}
-                                />
+                                <HistoricoDoPaciente todas={todas} consulta={c} />
                               </dl>
                             </section>
                           )}
                         </div>
                       </div>
                       <dl className="grid grid-cols-[auto_1fr] gap-x-3 border-t border-(--cis-border) pt-3">
-                        <Linha rotulo="Observações">
-                          {c.notes || <Vazio>Nenhuma</Vazio>}
-                        </Linha>
+                        <Linha rotulo="Observações">{c.notes || <Vazio>Nenhuma</Vazio>}</Linha>
                       </dl>
                       <div className="pt-3 border-t border-(--cis-border)">
                         <AcoesStatus
@@ -430,11 +351,7 @@ export default function ConsultasList() {
                           onEscolher={(status) => mudarStatus(c, status)}
                         />
                       </div>
-                      {erroStatus?.id === c.id && (
-                        <ErrorMessage compacto>
-                          {erroStatus.mensagem}
-                        </ErrorMessage>
-                      )}
+                      {erroStatus?.id === c.id && <ErrorMessage compacto>{erroStatus.mensagem}</ErrorMessage>}
                     </div>
                   )}
                 </div>

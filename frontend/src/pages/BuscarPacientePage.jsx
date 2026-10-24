@@ -13,11 +13,7 @@ import Header from "../components/Header";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 import Menu from "../components/Menu";
 import AddPaciente from "../components/AddPaciente";
-import {
-  ErrorMessage,
-  EstadoVazio,
-  LoadingMessage,
-} from "../components/StatusMessage";
+import { ErrorMessage, EstadoVazio, LoadingMessage } from "../components/StatusMessage";
 import { useNavigate } from "react-router-dom";
 import { formatarCpf } from "../utils/cpf";
 import { apenasDigitos, formatarTelefone } from "../utils/telefone";
@@ -44,9 +40,7 @@ function campoConfere(chave, valor, termo) {
 
 // FILTRA OS PACIENTES PELOS CAMPOS DE BUSCA PREENCHIDOS
 function filtrarPacientes(pacientes, filtro) {
-  return pacientes.filter((p) =>
-    Object.entries(filtro).every(([k, v]) => campoConfere(k, p[k], v)),
-  );
+  return pacientes.filter((p) => Object.entries(filtro).every(([k, v]) => campoConfere(k, p[k], v)));
 }
 
 export default function BuscarPacientePage() {
@@ -58,10 +52,7 @@ export default function BuscarPacientePage() {
   const itemsPerPage = 10;
   const navigate = useNavigate();
 
-  const pacientes = useBuscarDados(
-    "/api/pacientes/todos",
-    "Erro ao carregar pacientes.",
-  );
+  const pacientes = useBuscarDados("/api/pacientes/todos", "Erro ao carregar pacientes.");
   const todosPacientes = Array.isArray(pacientes.dados) ? pacientes.dados : [];
   const loading = pacientes.carregando;
   const erro = pacientes.erro;
@@ -85,9 +76,7 @@ export default function BuscarPacientePage() {
     setShowAdd(false);
   }
 
-  const totalPages = Array.isArray(resultados)
-    ? Math.ceil(resultados.length / itemsPerPage)
-    : 0;
+  const totalPages = Array.isArray(resultados) ? Math.ceil(resultados.length / itemsPerPage) : 0;
   const paginatedResults = Array.isArray(resultados)
     ? resultados.slice((page - 1) * itemsPerPage, page * itemsPerPage)
     : [];
@@ -98,24 +87,14 @@ export default function BuscarPacientePage() {
       <Menu active="pacientes" />
       <div className="bg-(--cis-background) min-h-screen px-2 md:px-8 py-6">
         {showAdd ? (
-          <AddPaciente
-            onAdd={handleAddPaciente}
-            onCancel={() => setShowAdd(false)}
-          />
+          <AddPaciente onAdd={handleAddPaciente} onCancel={() => setShowAdd(false)} />
         ) : (
           <>
-            <form
-              className="cis-panel flex flex-wrap gap-4 bg-(--cis-surface) p-4 md:p-5 mb-6"
-              onSubmit={handleBuscar}
-            >
+            <form className="cis-panel flex flex-wrap gap-4 bg-(--cis-surface) p-4 md:p-5 mb-6" onSubmit={handleBuscar}>
               <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border-b border-(--cis-border) pb-4">
                 <div>
-                  <h1 className="text-xl md:text-2xl font-bold text-(--cis-navy)">
-                    Buscar pacientes
-                  </h1>
-                  <p className="text-sm text-(--cis-muted) mt-1">
-                    Consulte e acesse os dados cadastrais da clínica.
-                  </p>
+                  <h1 className="text-xl md:text-2xl font-bold text-(--cis-navy)">Buscar pacientes</h1>
+                  <p className="text-sm text-(--cis-muted) mt-1">Consulte e acesse os dados cadastrais da clínica.</p>
                 </div>
                 <button
                   type="button"
@@ -141,10 +120,7 @@ export default function BuscarPacientePage() {
                 </div>
               ))}
               <div className="flex items-end">
-                <button
-                  type="submit"
-                  className="cis-primary-button text-sm flex items-center gap-2"
-                >
+                <button type="submit" className="cis-primary-button text-sm flex items-center gap-2">
                   <FaSearch /> Buscar
                 </button>
               </div>
@@ -193,16 +169,10 @@ export default function BuscarPacientePage() {
                         }}
                         title="Ver detalhes do paciente"
                       >
-                        <td className="py-3 px-4 font-semibold text-(--cis-blue) hover:underline">
-                          {p.patient}
-                        </td>
+                        <td className="py-3 px-4 font-semibold text-(--cis-blue) hover:underline">{p.patient}</td>
+                        <td className="py-2 px-4 whitespace-nowrap">{formatarCpf(p.cpf)}</td>
                         <td className="py-2 px-4 whitespace-nowrap">
-                          {formatarCpf(p.cpf)}
-                        </td>
-                        <td className="py-2 px-4 whitespace-nowrap">
-                          {formatarTelefone(p.phone) || (
-                            <span className="text-(--cis-muted)">—</span>
-                          )}
+                          {formatarTelefone(p.phone) || <span className="text-(--cis-muted)">—</span>}
                         </td>
                         <td className="py-2 px-4">{p.medico}</td>
                       </tr>

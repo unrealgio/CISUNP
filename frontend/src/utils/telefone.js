@@ -17,7 +17,5 @@ export function mascaraTelefone(valor) {
 // PARA EXIBIR: SÓ FORMATA SE FOR UM TELEFONE COMPLETO; SENÃO MOSTRA COMO ESTÁ
 export function formatarTelefone(valor) {
   const digitos = apenasDigitos(valor);
-  return digitos.length === 10 || digitos.length === 11
-    ? mascaraTelefone(digitos)
-    : valor || "";
+  return digitos.length === 10 || digitos.length === 11 ? mascaraTelefone(digitos) : valor || "";
 }

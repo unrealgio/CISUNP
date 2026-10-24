@@ -22,10 +22,7 @@ app.use("/api/prescricoes", prescricaoRoutes);
 app.use("/api/prontuarios", prontuarioRoutes);
 app.use("/api/procedimentos", procedimentoRoutes);
 app.use("/api/arquivos", arquivoRoutes);
-app.use(
-  "/uploads/prontuarios",
-  express.static(path.join(__dirname, "uploads/prontuarios")),
-);
+app.use("/uploads/prontuarios", express.static(path.join(__dirname, "uploads/prontuarios")));
 
 app.get("/", (req, res) => {
   res.send("RUNNING BACKEND");

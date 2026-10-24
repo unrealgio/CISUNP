@@ -1,9 +1,4 @@
-const {
-  apagarTabelas,
-  rodarMigrations,
-  fecharBanco,
-  sequelize,
-} = require("./banco");
+const { apagarTabelas, rodarMigrations, fecharBanco, sequelize } = require("./banco");
 const { describe, test, before, after } = require("node:test");
 const assert = require("node:assert/strict");
 
@@ -37,14 +32,11 @@ describe("migration pacienteId (dados antigos ligados pelo CPF)", () => {
     await fecharBanco();
   });
 
-  const pacientePorCpf = async (cpf) =>
-    (await consultar(`SELECT * FROM pacientes WHERE cpf = '${cpf}'`))[0];
+  const pacientePorCpf = async (cpf) => (await consultar(`SELECT * FROM pacientes WHERE cpf = '${cpf}'`))[0];
 
   test("liga o agendamento ao cadastro e usa o nome e o telefone de lá", async () => {
     const maria = await pacientePorCpf("11111111111");
-    const [agendamento] = await consultar(
-      `SELECT * FROM agendamentos WHERE time = '13:00'`,
-    );
+    const [agendamento] = await consultar(`SELECT * FROM agendamentos WHERE time = '13:00'`);
     assert.equal(agendamento.pacienteId, maria.id);
     assert.equal(agendamento.patient, null);
     assert.equal(agendamento.phone, null);
@@ -53,9 +45,7 @@ describe("migration pacienteId (dados antigos ligados pelo CPF)", () => {
   });
 
   test("agendamento sem CPF continua avulso, com nome e telefone próprios", async () => {
-    const [avulso] = await consultar(
-      `SELECT * FROM agendamentos WHERE time = '13:30'`,
-    );
+    const [avulso] = await consultar(`SELECT * FROM agendamentos WHERE time = '13:30'`);
     assert.equal(avulso.pacienteId, null);
     assert.equal(avulso.patient, "Pessoa Avulsa");
     assert.equal(avulso.phone, "84933334444");
@@ -102,21 +92,13 @@ describe("migration pacienteId (dados antigos ligados pelo CPF)", () => {
   });
 
   test("desfazer a migration devolve o CPF e o nome às tabelas", async () => {
-    rodarMigrations(
-      "db:migrate:undo:all",
-      "--to",
-      "20261023000000-paciente-id.js",
-    );
+    rodarMigrations("db:migrate:undo:all", "--to", "20261023000000-paciente-id.js");
 
-    const [agendamento] = await consultar(
-      `SELECT * FROM agendamentos WHERE time = '13:00'`,
-    );
+    const [agendamento] = await consultar(`SELECT * FROM agendamentos WHERE time = '13:00'`);
     assert.equal(agendamento.cpf, "11111111111");
     assert.equal(agendamento.patient, "Maria Cadastro");
 
-    const prescricoes = await consultar(
-      `SELECT cpf FROM prescricoes ORDER BY cpf`,
-    );
+    const prescricoes = await consultar(`SELECT cpf FROM prescricoes ORDER BY cpf`);
     assert.deepEqual(
       prescricoes.map((p) => p.cpf),
       ["11111111111", "33333333333"],

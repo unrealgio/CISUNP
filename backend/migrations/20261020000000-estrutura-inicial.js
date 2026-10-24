@@ -66,13 +66,7 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    for (const tabela of [
-      "prontuarios",
-      "prescricoes",
-      "agendamentos",
-      "pacientes",
-      "users",
-    ]) {
+    for (const tabela of ["prontuarios", "prescricoes", "agendamentos", "pacientes", "users"]) {
       await queryInterface.dropTable(tabela);
     }
   },

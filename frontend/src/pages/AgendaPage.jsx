@@ -75,8 +75,7 @@ export default function AgendaPage() {
   }
 
   const schedules = fixedTimes.map(montarHorario);
-  const selectedSchedule =
-    schedules.find((item) => item.time === selectedTime) || null;
+  const selectedSchedule = schedules.find((item) => item.time === selectedTime) || null;
 
   function handleChangeDate(date) {
     setSelectedDate(date);
@@ -92,27 +91,21 @@ export default function AgendaPage() {
     setAgendaError("");
     setSaving(true);
     try {
-      const res = await apiFetch(
-        agendamento.id
-          ? `/api/agendamentos/${agendamento.id}`
-          : "/api/agendamentos",
-        {
-          method: agendamento.id ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            time: agendamento.time,
-            date: dataLocalISO(selectedDate),
-            patient: agendamento.patient,
-            cpf: agendamento.cpf || "",
-            phone: agendamento.phone || "",
-            medico: agendamento.medico || "",
-            notes: agendamento.notes || "",
-          }),
-        },
-      );
+      const res = await apiFetch(agendamento.id ? `/api/agendamentos/${agendamento.id}` : "/api/agendamentos", {
+        method: agendamento.id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          time: agendamento.time,
+          date: dataLocalISO(selectedDate),
+          patient: agendamento.patient,
+          cpf: agendamento.cpf || "",
+          phone: agendamento.phone || "",
+          medico: agendamento.medico || "",
+          notes: agendamento.notes || "",
+        }),
+      });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao salvar agendamento."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao salvar agendamento."));
       agendamentos.recarregar();
       setVersaoAgenda((v) => v + 1);
       onSuccess && onSuccess();
@@ -125,14 +118,7 @@ export default function AgendaPage() {
     }
   }
 
-  function handleSavePatient(
-    item,
-    patientName,
-    medicoName = "",
-    cpf = "",
-    phone = "",
-    notes = "",
-  ) {
+  function handleSavePatient(item, patientName, medicoName = "", cpf = "", phone = "", notes = "") {
     return salvarAgendamento({
       id: item.id,
       time: item.time,
@@ -153,9 +139,7 @@ export default function AgendaPage() {
     if (!item.id || saving) return;
     if (
       status === "cancelada" &&
-      !window.confirm(
-        `Cancelar a consulta de ${item.patient} às ${item.time}? O horário ficará livre na agenda.`,
-      )
+      !window.confirm(`Cancelar a consulta de ${item.patient} às ${item.time}? O horário ficará livre na agenda.`)
     )
       return;
 
@@ -168,8 +152,7 @@ export default function AgendaPage() {
         body: JSON.stringify({ status }),
       });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao alterar o status."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao alterar o status."));
       agendamentos.recarregar();
       if (status === "cancelada") {
         setVersaoAgenda((v) => v + 1);
@@ -203,11 +186,7 @@ export default function AgendaPage() {
           {erroExibido}
         </div>
       )}
-      {(loading || saving) && (
-        <LoadingMessage>
-          {loading ? "Carregando" : "Salvando alterações"}
-        </LoadingMessage>
-      )}
+      {(loading || saving) && <LoadingMessage>{loading ? "Carregando" : "Salvando alterações"}</LoadingMessage>}
       <div className="flex gap-6 p-6">
         <div className="flex-1">
           <List
@@ -220,11 +199,7 @@ export default function AgendaPage() {
           />
         </div>
         <div className="flex flex-col gap-4 w-85">
-          <CalendarComponent
-            value={selectedDate}
-            onChange={handleChangeDate}
-            atualizacao={versaoAgenda}
-          />
+          <CalendarComponent value={selectedDate} onChange={handleChangeDate} atualizacao={versaoAgenda} />
           <Details
             key={`${selectedTime}|${editField}`}
             schedule={selectedSchedule}

@@ -16,10 +16,7 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.removeIndex(
-      "agendamentos",
-      "agendamentos_horario_ativo",
-    );
+    await queryInterface.removeIndex("agendamentos", "agendamentos_horario_ativo");
     await queryInterface.removeColumn("agendamentos", "status");
     await queryInterface.addIndex("agendamentos", ["date", "time"], {
       unique: true,

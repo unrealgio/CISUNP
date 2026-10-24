@@ -1,12 +1,5 @@
 import { useState } from "react";
-import {
-  FaFileDownload,
-  FaFilePdf,
-  FaFileImage,
-  FaUpload,
-  FaFolderOpen,
-  FaTrash,
-} from "react-icons/fa";
+import { FaFileDownload, FaFilePdf, FaFileImage, FaUpload, FaFolderOpen, FaTrash } from "react-icons/fa";
 import { apiFetch, mensagemDeErro } from "../api";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 import { ErrorMessage, EstadoVazio, LoadingMessage } from "./StatusMessage";
@@ -18,12 +11,7 @@ const CATEGORIAS = {
   outro: { rotulo: "Outro", plural: "Outros" },
 };
 
-const TIPOS_PERMITIDOS = [
-  "application/pdf",
-  "image/png",
-  "image/jpeg",
-  "image/webp",
-];
+const TIPOS_PERMITIDOS = ["application/pdf", "image/png", "image/jpeg", "image/webp"];
 const TAMANHO_MAXIMO = 10 * 1024 * 1024;
 
 function formatarTamanho(bytes) {
@@ -32,20 +20,12 @@ function formatarTamanho(bytes) {
 }
 
 function getFileIcon(tipoMime) {
-  if (tipoMime === "application/pdf")
-    return <FaFilePdf className="text-(--cis-danger) text-2xl shrink-0" />;
+  if (tipoMime === "application/pdf") return <FaFilePdf className="text-(--cis-danger) text-2xl shrink-0" />;
   return <FaFileImage className="text-(--cis-blue) text-2xl shrink-0" />;
 }
 
-export default function TabArquivos({
-  cpf,
-  categoriaInicial = "exame",
-  onAlterado,
-}) {
-  const arquivos = useBuscarDados(
-    `/api/arquivos?cpf=${encodeURIComponent(cpf)}`,
-    "Erro ao carregar arquivos.",
-  );
+export default function TabArquivos({ cpf, categoriaInicial = "exame", onAlterado }) {
+  const arquivos = useBuscarDados(`/api/arquivos?cpf=${encodeURIComponent(cpf)}`, "Erro ao carregar arquivos.");
   const [categoria, setCategoria] = useState(categoriaInicial);
   const [filtro, setFiltro] = useState("todos");
   const [enviando, setEnviando] = useState(false);
@@ -53,8 +33,7 @@ export default function TabArquivos({
   const [erro, setErro] = useState("");
 
   const lista = Array.isArray(arquivos.dados) ? arquivos.dados : [];
-  const filtrados =
-    filtro === "todos" ? lista : lista.filter((a) => a.categoria === filtro);
+  const filtrados = filtro === "todos" ? lista : lista.filter((a) => a.categoria === filtro);
 
   async function handleFileUpload(e) {
     const file = e.target.files[0];
@@ -84,8 +63,7 @@ export default function TabArquivos({
         body: file,
       });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao enviar arquivo."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao enviar arquivo."));
       arquivos.alterarDados((prev) => [data, ...(prev || [])]);
       onAlterado && onAlterado();
     } catch (error) {
@@ -126,8 +104,7 @@ export default function TabArquivos({
         method: "DELETE",
       });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao excluir arquivo."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao excluir arquivo."));
       arquivos.alterarDados((prev) => prev.filter((a) => a.id !== arquivo.id));
       onAlterado && onAlterado();
     } catch (error) {
@@ -173,22 +150,14 @@ export default function TabArquivos({
             accept=".pdf,.png,.jpg,.jpeg,.webp"
           />
         </label>
-        <span className="text-xs text-(--cis-muted)">
-          PDF ou imagem, até 10 MB.
-        </span>
+        <span className="text-xs text-(--cis-muted)">PDF ou imagem, até 10 MB.</span>
       </div>
 
       {erro && <ErrorMessage className="mb-4">{erro}</ErrorMessage>}
-      {arquivos.erro && (
-        <ErrorMessage className="mb-4">{arquivos.erro}</ErrorMessage>
-      )}
+      {arquivos.erro && <ErrorMessage className="mb-4">{arquivos.erro}</ErrorMessage>}
 
       {lista.length > 0 && (
-        <div
-          className="flex flex-wrap gap-2 mb-4"
-          role="group"
-          aria-label="Filtrar por categoria"
-        >
+        <div className="flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por categoria">
           {["todos", ...Object.keys(CATEGORIAS)].map((chave) => (
             <button
               key={chave}
@@ -198,10 +167,7 @@ export default function TabArquivos({
               onClick={() => setFiltro(chave)}
             >
               {chave === "todos" ? "Todos" : CATEGORIAS[chave].plural} (
-              {chave === "todos"
-                ? lista.length
-                : lista.filter((a) => a.categoria === chave).length}
-              )
+              {chave === "todos" ? lista.length : lista.filter((a) => a.categoria === chave).length})
             </button>
           ))}
         </div>
@@ -212,11 +178,7 @@ export default function TabArquivos({
       ) : filtrados.length === 0 ? (
         <EstadoVazio
           icone={<FaFolderOpen />}
-          titulo={
-            lista.length === 0
-              ? "Nenhum arquivo disponível"
-              : "Nenhum arquivo nesta categoria"
-          }
+          titulo={lista.length === 0 ? "Nenhum arquivo disponível" : "Nenhum arquivo nesta categoria"}
           dica="Envie exames, radiografias ou documentos do paciente."
         />
       ) : (
@@ -230,8 +192,7 @@ export default function TabArquivos({
               <div className="min-w-0 flex-1 wrap-anywhere">
                 <p className="font-semibold text-(--cis-navy)">{arq.nome}</p>
                 <p className="text-sm text-(--cis-muted)">
-                  {CATEGORIAS[arq.categoria]?.rotulo || arq.categoria} ·{" "}
-                  {formatarTamanho(arq.tamanho)} ·{" "}
+                  {CATEGORIAS[arq.categoria]?.rotulo || arq.categoria} · {formatarTamanho(arq.tamanho)} ·{" "}
                   {formatarDataHora(arq.createdAt)}
                 </p>
               </div>

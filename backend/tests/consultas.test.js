@@ -25,46 +25,31 @@ describe("status dos agendamentos (consultas)", () => {
     cpf: "44455566677",
   };
 
-  const buscarTodos = async () =>
-    (await api.chamar("GET", "/api/agendamentos/todos")).corpo;
+  const buscarTodos = async () => (await api.chamar("GET", "/api/agendamentos/todos")).corpo;
 
   test("agendamento novo começa como pendente", async () => {
-    const { status, corpo } = await api.chamar(
-      "POST",
-      "/api/agendamentos",
-      consulta,
-    );
+    const { status, corpo } = await api.chamar("POST", "/api/agendamentos", consulta);
     assert.equal(status, 201);
     assert.equal(corpo.status, "pendente");
     idCriado = corpo.id;
   });
 
   test("muda o status para confirmada", async () => {
-    const { status, corpo } = await api.chamar(
-      "PATCH",
-      `/api/agendamentos/${idCriado}/status`,
-      { status: "confirmada" },
-    );
+    const { status, corpo } = await api.chamar("PATCH", `/api/agendamentos/${idCriado}/status`, {
+      status: "confirmada",
+    });
     assert.equal(status, 200);
     assert.equal(corpo.status, "confirmada");
   });
 
   test("recusa status inválido com 400", async () => {
-    const { status, corpo } = await api.chamar(
-      "PATCH",
-      `/api/agendamentos/${idCriado}/status`,
-      { status: "atrasada" },
-    );
+    const { status, corpo } = await api.chamar("PATCH", `/api/agendamentos/${idCriado}/status`, { status: "atrasada" });
     assert.equal(status, 400);
     assert.match(corpo.details[0], /Status deve ser/);
   });
 
   test("responde 404 para agendamento inexistente", async () => {
-    const { status } = await api.chamar(
-      "PATCH",
-      "/api/agendamentos/999999/status",
-      { status: "confirmada" },
-    );
+    const { status } = await api.chamar("PATCH", "/api/agendamentos/999999/status", { status: "confirmada" });
     assert.equal(status, 404);
   });
 
@@ -73,14 +58,8 @@ describe("status dos agendamentos (consultas)", () => {
       status: "cancelada",
     });
     const doDia = await api.chamar("GET", "/api/agendamentos?date=2099-05-10");
-    const dias = await api.chamar(
-      "GET",
-      "/api/agendamentos/dias?inicio=2099-05-01&fim=2099-05-31",
-    );
-    const futuros = await api.chamar(
-      "GET",
-      "/api/agendamentos/futuros?cpf=44455566677",
-    );
+    const dias = await api.chamar("GET", "/api/agendamentos/dias?inicio=2099-05-01&fim=2099-05-31");
+    const futuros = await api.chamar("GET", "/api/agendamentos/futuros?cpf=44455566677");
     assert.deepEqual(doDia.corpo, []);
     assert.deepEqual(dias.corpo, []);
     assert.deepEqual(futuros.corpo, []);
@@ -96,11 +75,7 @@ describe("status dos agendamentos (consultas)", () => {
   });
 
   test("reabrir a consulta cancelada num horário já ocupado responde 409", async () => {
-    const { status, corpo } = await api.chamar(
-      "PATCH",
-      `/api/agendamentos/${idCriado}/status`,
-      { status: "pendente" },
-    );
+    const { status, corpo } = await api.chamar("PATCH", `/api/agendamentos/${idCriado}/status`, { status: "pendente" });
     assert.equal(status, 409);
     assert.equal(corpo.error, "Já existe um agendamento neste horário.");
   });
@@ -110,11 +85,9 @@ describe("status dos agendamentos (consultas)", () => {
       ...consulta,
       time: "15:00",
     });
-    const { status, corpo } = await api.chamar(
-      "PATCH",
-      `/api/agendamentos/${faltou.corpo.id}/status`,
-      { status: "faltou" },
-    );
+    const { status, corpo } = await api.chamar("PATCH", `/api/agendamentos/${faltou.corpo.id}/status`, {
+      status: "faltou",
+    });
     assert.equal(status, 200);
     assert.equal(corpo.status, "faltou");
 
@@ -129,10 +102,7 @@ describe("status dos agendamentos (consultas)", () => {
 
   test("a lista de consultas inclui as canceladas", async () => {
     const todos = await buscarTodos();
-    assert.deepEqual(todos.map((item) => item.status).sort(), [
-      "cancelada",
-      "pendente",
-    ]);
+    assert.deepEqual(todos.map((item) => item.status).sort(), ["cancelada", "pendente"]);
   });
 
   test("excluir o paciente cancela só os agendamentos futuros em aberto", async () => {
@@ -152,11 +122,7 @@ describe("status dos agendamentos (consultas)", () => {
       ...consulta,
       time: "12:00",
     });
-    await api.chamar(
-      "PATCH",
-      `/api/agendamentos/${realizado.corpo.id}/status`,
-      { status: "realizada" },
-    );
+    await api.chamar("PATCH", `/api/agendamentos/${realizado.corpo.id}/status`, { status: "realizada" });
 
     const exclusao = await api.chamar("DELETE", "/api/pacientes/44455566677");
     assert.equal(exclusao.status, 200);

@@ -22,8 +22,7 @@
   --cis-success: #15803d;
   --cis-orange-hover: #e68a1a;
   --cis-blue-hover: #d5e6ed;
-  --cis-shadow:
-    0 1px 3px rgba(18, 48, 74, 0.06), 0 12px 32px rgba(18, 48, 74, 0.07);
+  --cis-shadow: 0 1px 3px rgba(18, 48, 74, 0.06), 0 12px 32px rgba(18, 48, 74, 0.07);
 
   /* UNP */
   --cis-unp-blue: var(--cis-blue);

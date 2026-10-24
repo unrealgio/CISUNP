@@ -45,16 +45,12 @@ export default function Menu({ active = "agenda" }) {
         >
           <span
             className={`transition-transform duration-200 ${
-              active === item.key
-                ? "text-(--cis-orange-text)"
-                : "text-(--cis-muted) group-hover:text-(--cis-blue)"
+              active === item.key ? "text-(--cis-orange-text)" : "text-(--cis-muted) group-hover:text-(--cis-blue)"
             }`}
           >
             {item.icon}
           </span>
-          <span className="font-semibold text-sm md:text-base tracking-wide transition-colors">
-            {item.label}
-          </span>
+          <span className="font-semibold text-sm md:text-base tracking-wide transition-colors">{item.label}</span>
         </Link>
       ))}
     </nav>

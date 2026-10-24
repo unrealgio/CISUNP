@@ -4,12 +4,7 @@ import { apiFetch, mensagemDeErro } from "../api";
 import { ErrorMessage, EstadoVazio } from "./StatusMessage";
 import { formatarDataHora } from "../utils/date";
 
-export default function TabPrescricoes({
-  prescricoes,
-  cpf,
-  erroCarregamento,
-  onAdd,
-}) {
+export default function TabPrescricoes({ prescricoes, cpf, erroCarregamento, onAdd }) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     medicamento: "",
@@ -37,8 +32,7 @@ export default function TabPrescricoes({
         body: JSON.stringify({ ...form, cpf }),
       });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao salvar prescrição."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao salvar prescrição."));
 
       onAdd && onAdd(data);
       setShowForm(false);
@@ -99,11 +93,7 @@ export default function TabPrescricoes({
             placeholder="Observação"
             className="cis-input"
           />
-          <button
-            type="submit"
-            className="cis-primary-button"
-            disabled={loading}
-          >
+          <button type="submit" className="cis-primary-button" disabled={loading}>
             {loading ? "Salvando..." : "Salvar"}
           </button>
         </form>
@@ -126,9 +116,7 @@ export default function TabPrescricoes({
                 <p>
                   <strong>Medicamento:</strong> {p.medicamento}
                 </p>
-                <p className="text-sm text-(--cis-muted)">
-                  Prescrita em {formatarDataHora(p.createdAt)}
-                </p>
+                <p className="text-sm text-(--cis-muted)">Prescrita em {formatarDataHora(p.createdAt)}</p>
                 <p>
                   <strong>Dose:</strong> {p.dose}
                 </p>

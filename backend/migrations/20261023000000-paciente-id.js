@@ -1,16 +1,10 @@
-const TABELAS_DO_PACIENTE = [
-  "prescricoes",
-  "prontuarios",
-  "procedimentos",
-  "arquivos",
-];
+const TABELAS_DO_PACIENTE = ["prescricoes", "prontuarios", "procedimentos", "arquivos"];
 const TODAS = ["agendamentos", ...TABELAS_DO_PACIENTE];
 
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      const sql = (texto) =>
-        queryInterface.sequelize.query(texto, { transaction });
+      const sql = (texto) => queryInterface.sequelize.query(texto, { transaction });
 
       // CPF SEM CADASTRO VIRA PACIENTE (USA O NOME DO AGENDAMENTO MAIS RECENTE, SE HOUVER)
       for (const tabela of TABELAS_DO_PACIENTE) {
@@ -77,9 +71,7 @@ module.exports = {
       `);
 
       for (const tabela of TABELAS_DO_PACIENTE) {
-        await sql(
-          `ALTER TABLE ${tabela} ALTER COLUMN "pacienteId" SET NOT NULL`,
-        );
+        await sql(`ALTER TABLE ${tabela} ALTER COLUMN "pacienteId" SET NOT NULL`);
       }
       for (const tabela of TODAS) {
         await queryInterface.removeColumn(tabela, "cpf", { transaction });
@@ -90,16 +82,10 @@ module.exports = {
 
   async down(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (transaction) => {
-      const sql = (texto) =>
-        queryInterface.sequelize.query(texto, { transaction });
+      const sql = (texto) => queryInterface.sequelize.query(texto, { transaction });
 
       for (const tabela of TODAS) {
-        await queryInterface.addColumn(
-          tabela,
-          "cpf",
-          { type: Sequelize.STRING, allowNull: true },
-          { transaction },
-        );
+        await queryInterface.addColumn(tabela, "cpf", { type: Sequelize.STRING, allowNull: true }, { transaction });
         await sql(`
           UPDATE ${tabela} t SET cpf = p.cpf
           FROM pacientes p WHERE p.id = t."pacienteId"
@@ -110,9 +96,7 @@ module.exports = {
         UPDATE agendamentos a SET patient = p.patient, phone = p.phone
         FROM pacientes p WHERE p.id = a."pacienteId"
       `);
-      await sql(
-        `ALTER TABLE agendamentos DROP CONSTRAINT agendamentos_paciente_ou_nome`,
-      );
+      await sql(`ALTER TABLE agendamentos DROP CONSTRAINT agendamentos_paciente_ou_nome`);
       await sql(`ALTER TABLE agendamentos ALTER COLUMN patient SET NOT NULL`);
 
       for (const tabela of TABELAS_DO_PACIENTE) {

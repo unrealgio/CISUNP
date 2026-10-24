@@ -4,14 +4,7 @@ import { formatarCpf } from "../utils/cpf";
 import { formatarTelefone } from "../utils/telefone";
 
 // CAMPO DE NOME DO PACIENTE COM SUGESTÕES DOS PACIENTES CADASTRADOS
-export default function BuscaPaciente({
-  value,
-  onChange,
-  onSelecionar,
-  onKeyDown,
-  inputRef,
-  autoFocus = false,
-}) {
+export default function BuscaPaciente({ value, onChange, onSelecionar, onKeyDown, inputRef, autoFocus = false }) {
   const [termo, setTermo] = useState("");
   const [aberta, setAberta] = useState(false);
   const [ativo, setAtivo] = useState(-1);
@@ -20,9 +13,7 @@ export default function BuscaPaciente({
 
   const termoLimpo = termo.trim();
   const busca = useBuscarDados(
-    termoLimpo.length >= 2
-      ? `/api/pacientes/busca?q=${encodeURIComponent(termoLimpo)}`
-      : null,
+    termoLimpo.length >= 2 ? `/api/pacientes/busca?q=${encodeURIComponent(termoLimpo)}` : null,
     "Erro ao buscar pacientes.",
   );
   const sugestoes = aberta && Array.isArray(busca.dados) ? busca.dados : [];
@@ -100,18 +91,14 @@ export default function BuscaPaciente({
               id={`${idLista}-${indice}`}
               role="option"
               aria-selected={indice === ativo}
-              className={`cursor-pointer px-3 py-2 ${
-                indice === ativo ? "bg-(--cis-blue-soft)" : ""
-              }`}
+              className={`cursor-pointer px-3 py-2 ${indice === ativo ? "bg-(--cis-blue-soft)" : ""}`}
               onMouseDown={(e) => {
                 e.preventDefault();
                 escolher(paciente);
               }}
               onMouseEnter={() => setAtivo(indice)}
             >
-              <span className="block font-semibold text-(--cis-navy) wrap-anywhere">
-                {paciente.patient}
-              </span>
+              <span className="block font-semibold text-(--cis-navy) wrap-anywhere">{paciente.patient}</span>
               <span className="block text-xs text-(--cis-muted)">
                 CPF {formatarCpf(paciente.cpf)}
                 {paciente.phone ? ` · ${formatarTelefone(paciente.phone)}` : ""}

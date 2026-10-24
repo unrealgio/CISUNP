@@ -60,21 +60,14 @@ export default function Login() {
     >
       <div className="absolute inset-0 bg-(--cis-navy) opacity-75"></div>
       <div className="relative z-10 w-full max-w-md md:max-w-lg mx-4 bg-(--cis-surface)/95 border border-white/60 rounded-2xl shadow-2xl p-7 md:p-9 flex flex-col items-center">
-        <img
-          src="/img/Unp_Final_Logo.png"
-          alt="Logo UnP"
-          className="h-14 md:h-16 mb-2"
-        />
+        <img src="/img/Unp_Final_Logo.png" alt="Logo UnP" className="h-14 md:h-16 mb-2" />
         <h2 className="text-center text-(--cis-navy) font-semibold mb-1 text-base md:text-lg tracking-wide">
           CIS - Centro Integrado de Saúde
         </h2>
         <form className="w-full mt-4" onSubmit={handleSubmit}>
           {/* USUÁRIO */}
           <div className="mb-4">
-            <label
-              className="block text-(--cis-ink) text-sm font-semibold mb-1"
-              htmlFor="usuario"
-            >
+            <label className="block text-(--cis-ink) text-sm font-semibold mb-1" htmlFor="usuario">
               Usuário <span className="text-(--cis-danger)">*</span>
             </label>
             <div className="relative">
@@ -93,10 +86,7 @@ export default function Login() {
           </div>
           {/* SENHA */}
           <div className="mb-4">
-            <label
-              className="block text-(--cis-ink) text-sm font-semibold mb-1"
-              htmlFor="senha"
-            >
+            <label className="block text-(--cis-ink) text-sm font-semibold mb-1" htmlFor="senha">
               Senha <span className="text-(--cis-danger)">*</span>
             </label>
             <div className="relative">
@@ -135,24 +125,9 @@ export default function Login() {
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5 text-white"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="white"
-                    strokeWidth="4"
-                    fill="none"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="white"
-                    d="M4 12a8 8 0 018-8v8z"
-                  />
+                <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="white" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="white" d="M4 12a8 8 0 018-8v8z" />
                 </svg>
                 Acessando...
               </span>
@@ -162,12 +137,7 @@ export default function Login() {
           </button>
         </form>
       </div>
-      {showChangePassword && (
-        <PassChange
-          senhaAtual={senhaAtual}
-          onSenhaAlterada={handleSenhaAlterada}
-        />
-      )}
+      {showChangePassword && <PassChange senhaAtual={senhaAtual} onSenhaAlterada={handleSenhaAlterada} />}
     </div>
   );
 }

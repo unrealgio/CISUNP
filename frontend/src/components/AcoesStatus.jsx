@@ -6,12 +6,7 @@ const OPCOES = ["pendente", "confirmada", "realizada", "faltou"];
 
 // SELETOR DE STATUS DA AGENDA E DA PÁGINA CONSULTAS: AS QUATRO OPÇÕES FICAM SEMPRE NO MESMO LUGAR
 // E A ATUAL APARECE DESTACADA COM A COR DO PRÓPRIO STATUS
-export default function AcoesStatus({
-  consulta,
-  onEscolher,
-  desativado = false,
-  incluirCancelar = false,
-}) {
+export default function AcoesStatus({ consulta, onEscolher, desativado = false, incluirCancelar = false }) {
   const hoje = dataLocalISO();
   const podeCancelar = incluirCancelar && consulta.status !== "cancelada";
 
@@ -28,11 +23,7 @@ export default function AcoesStatus({
       >
         Status da consulta
       </p>
-      <div
-        className="grid grid-cols-2 gap-2"
-        role="group"
-        aria-labelledby={`status-${consulta.id ?? consulta.date}`}
-      >
+      <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby={`status-${consulta.id ?? consulta.date}`}>
         {OPCOES.map((status) => {
           const atual = consulta.status === status;
           const disponivel = statusDisponivel(status, consulta, hoje);
@@ -48,11 +39,7 @@ export default function AcoesStatus({
               }}
               aria-pressed={atual}
               disabled={desativado || !disponivel}
-              title={
-                disponivel
-                  ? undefined
-                  : "Disponível a partir do dia da consulta"
-              }
+              title={disponivel ? undefined : "Disponível a partir do dia da consulta"}
               onClick={(e) => escolher(e, status)}
             >
               {atual ? (

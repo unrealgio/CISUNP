@@ -12,10 +12,7 @@ export default function CampoTelefone({
 
   function handleChange(e) {
     let digitos = apenasDigitos(e.target.value);
-    if (
-      e.target.value.length < exibido.length &&
-      digitos === apenasDigitos(value)
-    ) {
+    if (e.target.value.length < exibido.length && digitos === apenasDigitos(value)) {
       digitos = digitos.slice(0, -1);
     }
     onChange(digitos.slice(0, 11));

@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  FaTooth,
-  FaPlus,
-  FaCheck,
-  FaEdit,
-  FaTrash,
-  FaClipboardList,
-  FaCheckCircle,
-} from "react-icons/fa";
+import { FaTooth, FaPlus, FaCheck, FaEdit, FaTrash, FaClipboardList, FaCheckCircle } from "react-icons/fa";
 import { apiFetch, mensagemDeErro } from "../api";
 import { useBuscarDados } from "../hooks/useBuscarDados";
 import { ErrorMessage, EstadoVazio, LoadingMessage } from "./StatusMessage";
@@ -45,11 +37,7 @@ function formDoProcedimento(p) {
   };
 }
 
-export default function TabProcedimentos({
-  cpf,
-  iniciarComFormulario = false,
-  onAlterado,
-}) {
+export default function TabProcedimentos({ cpf, iniciarComFormulario = false, onAlterado }) {
   const procedimentos = useBuscarDados(
     `/api/procedimentos?cpf=${encodeURIComponent(cpf)}`,
     "Erro ao carregar procedimentos.",
@@ -97,17 +85,13 @@ export default function TabProcedimentos({
     setErro("");
     setSalvando(true);
     try {
-      const res = await apiFetch(
-        id ? `/api/procedimentos/${id}` : "/api/procedimentos",
-        {
-          method: id ? "PUT" : "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ ...dados, cpf }),
-        },
-      );
+      const res = await apiFetch(id ? `/api/procedimentos/${id}` : "/api/procedimentos", {
+        method: id ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...dados, cpf }),
+      });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao salvar procedimento."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao salvar procedimento."));
       procedimentos.recarregar();
       onAlterado && onAlterado();
       return true;
@@ -145,8 +129,7 @@ export default function TabProcedimentos({
         method: "DELETE",
       });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao excluir procedimento."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao excluir procedimento."));
       if (editandoId === p.id) fecharFormulario();
       procedimentos.recarregar();
       onAlterado && onAlterado();
@@ -163,26 +146,17 @@ export default function TabProcedimentos({
       <li
         key={p.id}
         className={`rounded-lg border border-(--cis-border) border-l-4 p-4 flex gap-4 items-start ${
-          planejado
-            ? "border-l-(--cis-orange) bg-(--cis-orange-soft)"
-            : "border-l-(--cis-blue) bg-(--cis-blue-soft)"
+          planejado ? "border-l-(--cis-orange) bg-(--cis-orange-soft)" : "border-l-(--cis-blue) bg-(--cis-blue-soft)"
         }`}
       >
         <FaTooth
-          className={`text-2xl shrink-0 mt-1 ${
-            planejado ? "text-(--cis-orange-text)" : "text-(--cis-blue)"
-          }`}
+          className={`text-2xl shrink-0 mt-1 ${planejado ? "text-(--cis-orange-text)" : "text-(--cis-blue)"}`}
           aria-hidden="true"
         />
         <div className="min-w-0 flex-1 wrap-anywhere">
           <p className="font-semibold text-(--cis-navy)">
             {p.tipo}
-            {p.dente && (
-              <span className="font-normal text-(--cis-muted)">
-                {" "}
-                · dente {p.dente}
-              </span>
-            )}
+            {p.dente && <span className="font-normal text-(--cis-muted)"> · dente {p.dente}</span>}
           </p>
           <p className="text-sm text-(--cis-muted)">
             {p.data
@@ -233,11 +207,7 @@ export default function TabProcedimentos({
     <div className="cis-panel p-6 mt-6 animate-fade-in">
       <h2 className="text-xl font-bold mb-4 text-(--cis-navy) flex items-center gap-2">
         <FaTooth className="text-(--cis-orange-text) shrink-0" /> Procedimentos
-        <button
-          className="cis-soft-button ml-auto flex items-center gap-1"
-          onClick={abrirNovo}
-          disabled={salvando}
-        >
+        <button className="cis-soft-button ml-auto flex items-center gap-1" onClick={abrirNovo} disabled={salvando}>
           <FaPlus /> Adicionar
         </button>
       </h2>
@@ -287,21 +257,14 @@ export default function TabProcedimentos({
           </label>
           <label className="flex flex-col gap-1">
             <span className="cis-rotulo-campo">Situação</span>
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="cis-input"
-            >
+            <select name="status" value={form.status} onChange={handleChange} className="cis-input">
               <option value="planejado">Planejado</option>
               <option value="realizado">Realizado</option>
             </select>
           </label>
           <label className="flex flex-col gap-1">
             <span className="cis-rotulo-campo">
-              {form.status === "realizado"
-                ? "Data"
-                : "Data prevista (opcional)"}
+              {form.status === "realizado" ? "Data" : "Data prevista (opcional)"}
             </span>
             <input
               type="date"
@@ -324,19 +287,10 @@ export default function TabProcedimentos({
             />
           </label>
           <div className="md:col-span-2 flex gap-2">
-            <button
-              type="submit"
-              className="cis-primary-button"
-              disabled={salvando}
-            >
+            <button type="submit" className="cis-primary-button" disabled={salvando}>
               {salvando ? "Salvando..." : "Salvar"}
             </button>
-            <button
-              type="button"
-              className="cis-secondary-button"
-              onClick={fecharFormulario}
-              disabled={salvando}
-            >
+            <button type="button" className="cis-secondary-button" onClick={fecharFormulario} disabled={salvando}>
               Cancelar
             </button>
           </div>
@@ -358,11 +312,7 @@ export default function TabProcedimentos({
               <FaClipboardList /> Plano de tratamento ({planejados.length})
             </h3>
             {planejados.length === 0 ? (
-              <EstadoVazio
-                compacto
-                icone={<FaClipboardList />}
-                titulo="Nenhum procedimento planejado."
-              />
+              <EstadoVazio compacto icone={<FaClipboardList />} titulo="Nenhum procedimento planejado." />
             ) : (
               <ul className="space-y-3">{planejados.map(renderItem)}</ul>
             )}
@@ -372,11 +322,7 @@ export default function TabProcedimentos({
               <FaCheckCircle /> Realizados ({realizados.length})
             </h3>
             {realizados.length === 0 ? (
-              <EstadoVazio
-                compacto
-                icone={<FaCheckCircle />}
-                titulo="Nenhum procedimento realizado ainda."
-              />
+              <EstadoVazio compacto icone={<FaCheckCircle />} titulo="Nenhum procedimento realizado ainda." />
             ) : (
               <ul className="space-y-3">{realizados.map(renderItem)}</ul>
             )}

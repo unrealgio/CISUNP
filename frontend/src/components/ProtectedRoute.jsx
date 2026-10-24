@@ -6,9 +6,7 @@ import SessaoExpirada from "./SessaoExpirada";
 
 export default function ProtectedRoute({ children }) {
   // SEM TOKEN, JÁ COMEÇA COMO NÃO AUTORIZADO, COM TOKEN, AGUARDA A VALIDAÇÃO
-  const [authorized, setAuthorized] = useState(() =>
-    localStorage.getItem("token") ? null : false,
-  );
+  const [authorized, setAuthorized] = useState(() => (localStorage.getItem("token") ? null : false));
 
   useEffect(() => {
     const token = localStorage.getItem("token");

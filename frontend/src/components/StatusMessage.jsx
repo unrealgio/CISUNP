@@ -5,8 +5,7 @@ export function LoadingMessage({ children = "Carregando" }) {
 // CAIXA DE ERRO: PADRÃO (DESTAQUE) OU COMPACTA (DENTRO DE FORMULÁRIOS)
 // className: ESPAÇAMENTO OU POSIÇÃO EXTRA (EX.: "mb-2")
 const estilosErro = {
-  padrao:
-    "rounded-lg bg-(--cis-danger-soft) px-4 py-3 text-center font-semibold text-(--cis-danger)",
+  padrao: "rounded-lg bg-(--cis-danger-soft) px-4 py-3 text-center font-semibold text-(--cis-danger)",
   compacto:
     "rounded-lg bg-(--cis-danger-soft) border border-(--cis-danger-line) text-(--cis-danger) text-sm px-3 py-2 text-center",
 };

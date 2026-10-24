@@ -31,11 +31,7 @@ function formDoPaciente(paciente) {
   };
 }
 
-export default function PacienteInfoCard({
-  paciente,
-  onPacienteAtualizado,
-  onPacienteExcluido,
-}) {
+export default function PacienteInfoCard({ paciente, onPacienteAtualizado, onPacienteExcluido }) {
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState(() => formDoPaciente(paciente));
   const [loading, setLoading] = useState(false);
@@ -63,8 +59,7 @@ export default function PacienteInfoCard({
         body: JSON.stringify(form),
       });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao atualizar paciente."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao atualizar paciente."));
 
       setEditing(false);
       onPacienteAtualizado && onPacienteAtualizado();
@@ -90,8 +85,7 @@ export default function PacienteInfoCard({
         method: "DELETE",
       });
       const data = await res.json();
-      if (!res.ok)
-        throw new Error(mensagemDeErro(data, "Erro ao excluir paciente."));
+      if (!res.ok) throw new Error(mensagemDeErro(data, "Erro ao excluir paciente."));
       onPacienteExcluido && onPacienteExcluido();
     } catch (error) {
       setOperationError(error.message);
@@ -115,10 +109,7 @@ export default function PacienteInfoCard({
     <div className="cis-panel p-6 flex flex-col md:flex-row gap-6 items-start mb-4">
       {operationError && <ErrorMessage>{operationError}</ErrorMessage>}
       <div className="flex flex-col items-center min-w-30 wrap-anywhere">
-        <FaUserCircle
-          className="text-(--cis-blue) bg-(--cis-blue-soft) rounded-full"
-          size={72}
-        />
+        <FaUserCircle className="text-(--cis-blue) bg-(--cis-blue-soft) rounded-full" size={72} />
         <div className="mt-2 text-(--cis-ink) text-center">
           <div className="font-bold text-lg text-(--cis-navy)">
             {editing ? (
@@ -163,11 +154,7 @@ export default function PacienteInfoCard({
                 onChange={(phone) => setForm({ ...form, phone })}
               />
             ) : (
-              formatarTelefone(paciente.phone) || (
-                <span className="text-(--cis-muted)">
-                  Telefone não informado
-                </span>
-              )
+              formatarTelefone(paciente.phone) || <span className="text-(--cis-muted)">Telefone não informado</span>
             )}
           </div>
           <div className="flex items-center justify-center gap-1 text-sm">
@@ -205,11 +192,7 @@ export default function PacienteInfoCard({
                 ))
               ) : (
                 <li>
-                  <EstadoVazio
-                    compacto
-                    icone={<FaRegCalendar />}
-                    titulo="Nenhum agendamento futuro"
-                  />
+                  <EstadoVazio compacto icone={<FaRegCalendar />} titulo="Nenhum agendamento futuro" />
                 </li>
               )}
             </ul>
@@ -223,8 +206,7 @@ export default function PacienteInfoCard({
               <span className="font-semibold">{formatarCpf(paciente.cpf)}</span>
             </span>
             <span className="flex items-center gap-2">
-              <FaMapMarkerAlt className="text-(--cis-muted)" />{" "}
-              <span>Endereço:</span>{" "}
+              <FaMapMarkerAlt className="text-(--cis-muted)" /> <span>Endereço:</span>{" "}
               {editing ? (
                 <input
                   type="text"
@@ -253,9 +235,7 @@ export default function PacienteInfoCard({
                 rows={2}
               />
             ) : (
-              paciente.notes || (
-                <span className="text-(--cis-muted)">Nenhuma observação</span>
-              )
+              paciente.notes || <span className="text-(--cis-muted)">Nenhuma observação</span>
             )}
           </div>
         </div>
@@ -268,8 +248,7 @@ export default function PacienteInfoCard({
                 disabled={loading}
                 title="Salvar"
               >
-                <FaCheck className="text-lg" />{" "}
-                {loading ? "Salvando..." : "Salvar"}
+                <FaCheck className="text-lg" /> {loading ? "Salvando..." : "Salvar"}
               </button>
               <button
                 className="cis-secondary-button flex items-center gap-1"
@@ -296,8 +275,7 @@ export default function PacienteInfoCard({
                 title="Excluir paciente"
                 disabled={loading}
               >
-                <FaTrash className="text-lg" />{" "}
-                {loading ? "Excluindo" : "Excluir"}
+                <FaTrash className="text-lg" /> {loading ? "Excluindo" : "Excluir"}
               </button>
             </>
           )}

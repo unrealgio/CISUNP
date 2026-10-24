@@ -1,13 +1,5 @@
 import { useState } from "react";
-import {
-  FaUserPlus,
-  FaSave,
-  FaUserMd,
-  FaUsers,
-  FaIdCard,
-  FaPhone,
-  FaHome,
-} from "react-icons/fa";
+import { FaUserPlus, FaSave, FaUserMd, FaUsers, FaIdCard, FaPhone, FaHome } from "react-icons/fa";
 import { apiFetch, mensagemDeErro } from "../api";
 import { ErrorMessage } from "./StatusMessage";
 import CampoTelefone from "./CampoTelefone";
@@ -49,12 +41,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
         return;
       }
       if (!res.ok) {
-        setErro(
-          mensagemDeErro(
-            data,
-            "Erro ao cadastrar paciente. Verifique os dados.",
-          ),
-        );
+        setErro(mensagemDeErro(data, "Erro ao cadastrar paciente. Verifique os dados."));
         return;
       }
       if (onAdd) onAdd(data);
@@ -117,10 +104,7 @@ export default function AddPaciente({ onAdd, onCancel }) {
             <label className="cis-label">
               <FaPhone /> Telefone:
             </label>
-            <CampoTelefone
-              value={form.phone}
-              onChange={(phone) => setForm({ ...form, phone })}
-            />
+            <CampoTelefone value={form.phone} onChange={(phone) => setForm({ ...form, phone })} />
           </div>
           <div className="space-y-1">
             <label className="cis-label">
@@ -183,30 +167,17 @@ export default function AddPaciente({ onAdd, onCancel }) {
             </ErrorMessage>
           )}
           <div className="md:col-span-2 flex gap-3 justify-end mt-2">
-            <button
-              type="button"
-              className="cis-secondary-button"
-              onClick={onCancel}
-              disabled={loading}
-            >
+            <button type="button" className="cis-secondary-button" onClick={onCancel} disabled={loading}>
               Cancelar
             </button>
-            <button
-              type="submit"
-              className="cis-primary-button flex items-center gap-2"
-              disabled={loading}
-            >
+            <button type="submit" className="cis-primary-button flex items-center gap-2" disabled={loading}>
               <FaSave /> {loading ? "Salvando..." : "Salvar"}
             </button>
           </div>
         </form>
       </div>
       <div className="hidden md:flex flex-col justify-center items-center w-64 bg-(--cis-blue-soft) rounded-xl p-6">
-        <img
-          src="/img/Unp_Final_Logo.png"
-          alt="Logo clínica"
-          className="w-28 mb-5"
-        />
+        <img src="/img/Unp_Final_Logo.png" alt="Logo clínica" className="w-28 mb-5" />
         <p className="text-(--cis-navy) text-base font-semibold text-center leading-relaxed">
           Preencha todos os dados do paciente para cadastrá-lo.
         </p>

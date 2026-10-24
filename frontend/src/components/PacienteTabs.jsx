@@ -1,10 +1,4 @@
-import {
-  FaIdCard,
-  FaPrescriptionBottleAlt,
-  FaNotesMedical,
-  FaFolderOpen,
-  FaTooth,
-} from "react-icons/fa";
+import { FaIdCard, FaPrescriptionBottleAlt, FaNotesMedical, FaFolderOpen, FaTooth } from "react-icons/fa";
 
 const tabs = [
   { key: "info", label: "Informações Pessoais", icon: <FaIdCard /> },

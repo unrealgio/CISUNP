@@ -55,14 +55,7 @@ describe("validateAgendamentoBody", () => {
   });
 
   test("aceita telefone fixo e celular, com ou sem máscara, e vazio", () => {
-    for (const phone of [
-      "84999990000",
-      "(84) 99999-0000",
-      "8432011234",
-      "(84) 3201-1234",
-      "",
-      undefined,
-    ]) {
+    for (const phone of ["84999990000", "(84) 99999-0000", "8432011234", "(84) 3201-1234", "", undefined]) {
       const { chamouNext } = rodarMiddleware(validateAgendamentoBody, {
         body: { ...agendamento, phone },
       });
@@ -71,21 +64,11 @@ describe("validateAgendamentoBody", () => {
   });
 
   test("recusa telefone sem DDD, com dígitos a mais ou com letras", () => {
-    for (const phone of [
-      "99999000",
-      "849912313123",
-      "04999990000",
-      "8419999000",
-      "aaaa",
-    ]) {
+    for (const phone of ["99999000", "849912313123", "04999990000", "8419999000", "aaaa"]) {
       const { res } = rodarMiddleware(validateAgendamentoBody, {
         body: { ...agendamento, phone },
       });
-      assert.deepEqual(
-        res.corpo?.details,
-        ["Telefone deve ter DDD + número (10 ou 11 dígitos)."],
-        phone,
-      );
+      assert.deepEqual(res.corpo?.details, ["Telefone deve ter DDD + número (10 ou 11 dígitos)."], phone);
     }
   });
 
@@ -133,13 +116,7 @@ describe("validatePrescricaoBody", () => {
 
 describe("validateStatusBody", () => {
   test("aceita os cinco status", () => {
-    for (const status of [
-      "pendente",
-      "confirmada",
-      "realizada",
-      "faltou",
-      "cancelada",
-    ]) {
+    for (const status of ["pendente", "confirmada", "realizada", "faltou", "cancelada"]) {
       const { chamouNext } = rodarMiddleware(validateStatusBody, {
         body: { status },
       });
@@ -184,9 +161,7 @@ describe("validateProcedimentoBody", () => {
     const { res } = rodarMiddleware(validateProcedimentoBody, {
       body: { ...procedimento, status: "feito" },
     });
-    assert.deepEqual(res.corpo.details, [
-      "Status deve ser: planejado, realizado.",
-    ]);
+    assert.deepEqual(res.corpo.details, ["Status deve ser: planejado, realizado."]);
   });
 });
 
@@ -199,9 +174,7 @@ describe("validatePacienteBody", () => {
         endereco: texto256,
       },
     });
-    assert.deepEqual(res.corpo.details, [
-      "O campo Endereço deve ter no máximo 255 caracteres.",
-    ]);
+    assert.deepEqual(res.corpo.details, ["O campo Endereço deve ter no máximo 255 caracteres."]);
   });
 });
 
@@ -224,17 +197,13 @@ describe("validateChangePassword", () => {
     const { res } = rodarMiddleware(validateChangePassword, {
       body: { senhaAtual: "NovaSenha123", novaSenha: "NovaSenha123" },
     });
-    assert.deepEqual(res.corpo.details, [
-      "A nova senha deve ser diferente da atual.",
-    ]);
+    assert.deepEqual(res.corpo.details, ["A nova senha deve ser diferente da atual."]);
   });
 
   test("recusa nova senha com menos de 8 caracteres", () => {
     const { res } = rodarMiddleware(validateChangePassword, {
       body: { senhaAtual: "senha123", novaSenha: "curta" },
     });
-    assert.deepEqual(res.corpo.details, [
-      "A nova senha deve ter entre 8 e 72 caracteres.",
-    ]);
+    assert.deepEqual(res.corpo.details, ["A nova senha deve ter entre 8 e 72 caracteres."]);
   });
 });

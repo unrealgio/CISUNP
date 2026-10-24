@@ -21,15 +21,7 @@ function Vazio({ children }) {
   return <span className="text-(--cis-muted)">{children}</span>;
 }
 
-export default function Details({
-  schedule,
-  onSave,
-  onCancelar,
-  onMudarStatus,
-  onFechar,
-  editField,
-  setEditField,
-}) {
+export default function Details({ schedule, onSave, onCancelar, onMudarStatus, onFechar, editField, setEditField }) {
   const [editMode, setEditMode] = useState(Boolean(editField));
   const [patient, setPatient] = useState(schedule?.patient || "");
   const [cpf, setCpf] = useState(schedule?.cpf || "");
@@ -132,11 +124,7 @@ export default function Details({
           <p className="text-xs font-semibold uppercase tracking-wide text-(--cis-muted)">
             {schedule.time} · {schedule.date}
           </p>
-          {!editMode && (
-            <p className="text-lg font-bold text-(--cis-navy) wrap-anywhere">
-              {schedule.patient}
-            </p>
-          )}
+          {!editMode && <p className="text-lg font-bold text-(--cis-navy) wrap-anywhere">{schedule.patient}</p>}
           {schedule.id && schedule.status && (
             <span
               className="mt-1 inline-block px-2 py-0.5 rounded text-xs font-semibold"
@@ -237,19 +225,14 @@ export default function Details({
               status: schedule.status,
               date: schedule.dateISO,
             }}
-            onEscolher={(status) =>
-              onMudarStatus && onMudarStatus(schedule, status)
-            }
+            onEscolher={(status) => onMudarStatus && onMudarStatus(schedule, status)}
           />
         </div>
       )}
 
       <div className="mt-4 flex flex-col gap-2">
         {editMode ? (
-          <button
-            className="cis-primary-button flex items-center justify-center gap-1"
-            onClick={handleSave}
-          >
+          <button className="cis-primary-button flex items-center justify-center gap-1" onClick={handleSave}>
             <MdSave /> Salvar
           </button>
         ) : (

@@ -26,10 +26,7 @@ function ConteudoPaciente({ cpf }) {
   });
   const navigate = useNavigate();
 
-  const buscaPaciente = useBuscarDados(
-    `/api/pacientes/${encodeURIComponent(cpf)}`,
-    "Erro ao carregar paciente.",
-  );
+  const buscaPaciente = useBuscarDados(`/api/pacientes/${encodeURIComponent(cpf)}`, "Erro ao carregar paciente.");
   const erro = buscaPaciente.status === 404 ? "" : buscaPaciente.erro;
   const paciente =
     buscaPaciente.carregando && !buscaPaciente.dados
@@ -47,9 +44,7 @@ function ConteudoPaciente({ cpf }) {
     `/api/prescricoes?cpf=${encodeURIComponent(cpf)}`,
     "Erro ao carregar prescrições.",
   );
-  const prescricoes = Array.isArray(buscaPrescricoes.dados)
-    ? buscaPrescricoes.dados
-    : [];
+  const prescricoes = Array.isArray(buscaPrescricoes.dados) ? buscaPrescricoes.dados : [];
   const erroPrescricoes = buscaPrescricoes.erro;
 
   function handleAddPrescricao(nova) {
@@ -88,13 +83,7 @@ function ConteudoPaciente({ cpf }) {
       <>
         <Header />
         <Menu active="pacientes" />
-        <div className="p-6">
-          {erro ? (
-            <ErrorMessage>{erro}</ErrorMessage>
-          ) : (
-            "Paciente não encontrado!"
-          )}
-        </div>
+        <div className="p-6">{erro ? <ErrorMessage>{erro}</ErrorMessage> : "Paciente não encontrado!"}</div>
       </>
     );
   }
@@ -109,19 +98,14 @@ function ConteudoPaciente({ cpf }) {
           <PacienteInfoCard
             paciente={paciente}
             onPacienteAtualizado={buscaPaciente.recarregar}
-            onPacienteExcluido={() =>
-              navigate("/buscar-paciente", { replace: true })
-            }
+            onPacienteExcluido={() => navigate("/buscar-paciente", { replace: true })}
           />
           {buscaResumo.erro && (
             <ErrorMessage compacto className="mb-2">
               {buscaResumo.erro}
             </ErrorMessage>
           )}
-          <PacienteResumoCards
-            resumo={buscaResumo.dados}
-            onAction={handleCardAction}
-          />
+          <PacienteResumoCards resumo={buscaResumo.dados} onAction={handleCardAction} />
         </div>
         {activeTab === "prescricoes" && (
           <TabPrescricoes
@@ -140,9 +124,7 @@ function ConteudoPaciente({ cpf }) {
           />
         )}
         {activeTab === "prontuario" && <TabProntuario cpf={cpf} />}
-        {activeTab === "arquivos" && (
-          <TabArquivos cpf={cpf} onAlterado={buscaResumo.recarregar} />
-        )}
+        {activeTab === "arquivos" && <TabArquivos cpf={cpf} onAlterado={buscaResumo.recarregar} />}
       </div>
     </>
   );

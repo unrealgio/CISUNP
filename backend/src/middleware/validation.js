@@ -2,10 +2,7 @@ const { STATUS_AGENDAMENTO } = require("../utils/statusAgendamento");
 const { hojeLocal, horaLocal } = require("../utils/datas");
 const { apenasDigitos, isTelefone } = require("../utils/telefone");
 const { STATUS_PROCEDIMENTO } = require("../utils/statusProcedimento");
-const {
-  CATEGORIAS_ARQUIVO,
-  EXTENSOES_PERMITIDAS,
-} = require("../utils/arquivos");
+const { CATEGORIAS_ARQUIVO, EXTENSOES_PERMITIDAS } = require("../utils/arquivos");
 
 function fail(res, errors) {
   return res.status(400).json({ error: "Dados inválidos.", details: errors });
@@ -21,9 +18,7 @@ function isDate(value) {
   }
 
   const date = new Date(`${value}T00:00:00Z`);
-  return (
-    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
-  );
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
 }
 
 function isTime(value) {
@@ -53,11 +48,7 @@ function validateChangePassword(req, res, next) {
   if (typeof senhaAtual !== "string" || !senhaAtual) {
     errors.push("Informe a senha atual.");
   }
-  if (
-    typeof novaSenha !== "string" ||
-    novaSenha.length < 8 ||
-    novaSenha.length > 72
-  ) {
+  if (typeof novaSenha !== "string" || novaSenha.length < 8 || novaSenha.length > 72) {
     errors.push("A nova senha deve ter entre 8 e 72 caracteres.");
   }
   if (novaSenha === senhaAtual) {
@@ -68,21 +59,15 @@ function validateChangePassword(req, res, next) {
 }
 
 function validateCpfParam(req, res, next) {
-  return isCpf(req.params.cpf)
-    ? next()
-    : fail(res, ["CPF deve conter 11 números."]);
+  return isCpf(req.params.cpf) ? next() : fail(res, ["CPF deve conter 11 números."]);
 }
 
 function validateCpfQuery(req, res, next) {
-  return isCpf(req.query.cpf)
-    ? next()
-    : fail(res, ["CPF deve conter 11 números."]);
+  return isCpf(req.query.cpf) ? next() : fail(res, ["CPF deve conter 11 números."]);
 }
 
 function validateIdParam(req, res, next) {
-  return /^\d+$/.test(req.params.id) && Number(req.params.id) > 0
-    ? next()
-    : fail(res, ["Identificador inválido."]);
+  return /^\d+$/.test(req.params.id) && Number(req.params.id) > 0 ? next() : fail(res, ["Identificador inválido."]);
 }
 
 function validarTamanhos(body, campos, errors) {
@@ -105,11 +90,7 @@ function validarTelefone(phone, errors) {
 function validarCamposPaciente(body, errors) {
   const { patient, idade } = body;
 
-  if (
-    typeof patient !== "string" ||
-    patient.trim().length < 2 ||
-    patient.length > 120
-  ) {
+  if (typeof patient !== "string" || patient.trim().length < 2 || patient.length > 120) {
     errors.push("Nome do paciente deve ter entre 2 e 120 caracteres.");
   }
   if (
@@ -152,9 +133,7 @@ function validatePacienteUpdate(req, res, next) {
 }
 
 function validateAgendamentoQuery(req, res, next) {
-  return isDate(req.query.date)
-    ? next()
-    : fail(res, ["Data deve estar no formato AAAA-MM-DD."]);
+  return isDate(req.query.date) ? next() : fail(res, ["Data deve estar no formato AAAA-MM-DD."]);
 }
 
 function validateIntervaloQuery(req, res, next) {
@@ -162,9 +141,7 @@ function validateIntervaloQuery(req, res, next) {
   if (!isDate(inicio) || !isDate(fim)) {
     return fail(res, ["Início e fim devem estar no formato AAAA-MM-DD."]);
   }
-  return inicio <= fim
-    ? next()
-    : fail(res, ["A data de início deve ser anterior à data de fim."]);
+  return inicio <= fim ? next() : fail(res, ["A data de início deve ser anterior à data de fim."]);
 }
 
 function validateAgendamentoBody(req, res, next) {
@@ -174,11 +151,7 @@ function validateAgendamentoBody(req, res, next) {
 
   if (!isTime(time)) errors.push("Horário deve estar no formato HH:MM.");
   if (!isDate(date)) errors.push("Data deve estar no formato AAAA-MM-DD.");
-  if (
-    typeof patient !== "string" ||
-    patient.trim().length < 2 ||
-    patient.length > 120
-  ) {
+  if (typeof patient !== "string" || patient.trim().length < 2 || patient.length > 120) {
     errors.push("Nome do paciente deve ter entre 2 e 120 caracteres.");
   }
   if (cpf && !isCpf(cpf)) {
@@ -195,9 +168,7 @@ function validateAgendamentoFuturo(req, res, next) {
   const { date, time } = req.body;
   const hoje = hojeLocal();
   const passou = date < hoje || (date === hoje && time < horaLocal());
-  return passou
-    ? fail(res, ["Não é possível agendar em data ou horário que já passou."])
-    : next();
+  return passou ? fail(res, ["Não é possível agendar em data ou horário que já passou."]) : next();
 }
 
 function validateBuscaPacienteQuery(req, res, next) {
@@ -219,18 +190,10 @@ function validatePrescricaoBody(req, res, next) {
   const errors = [];
 
   if (!isCpf(cpf)) errors.push("CPF deve conter 11 números.");
-  if (
-    typeof medicamento !== "string" ||
-    medicamento.trim().length < 2 ||
-    medicamento.length > 255
-  ) {
+  if (typeof medicamento !== "string" || medicamento.trim().length < 2 || medicamento.length > 255) {
     errors.push("Medicamento deve ter entre 2 e 255 caracteres.");
   }
-  validarTamanhos(
-    req.body || {},
-    { dose: "Dose", frequencia: "Frequência", observacao: "Observação" },
-    errors,
-  );
+  validarTamanhos(req.body || {}, { dose: "Dose", frequencia: "Frequência", observacao: "Observação" }, errors);
 
   return errors.length ? fail(res, errors) : next();
 }

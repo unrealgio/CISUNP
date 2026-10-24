@@ -28,10 +28,7 @@ exports.listarPorCpf = async (req, res) => {
 exports.enviar = async (req, res) => {
   const { categoria, nome } = req.query;
   const tipoMime = req.get("Content-Type");
-  const caminho = path.join(
-    String(req.paciente.id),
-    `${crypto.randomUUID()}${EXTENSOES_PERMITIDAS[tipoMime]}`,
-  );
+  const caminho = path.join(String(req.paciente.id), `${crypto.randomUUID()}${EXTENSOES_PERMITIDAS[tipoMime]}`);
   const destino = path.join(PASTA_ARQUIVOS, caminho);
   try {
     await fs.mkdir(path.dirname(destino), { recursive: true });
@@ -65,9 +62,7 @@ exports.baixar = async (req, res) => {
       { headers: { "Content-Type": arquivo.tipoMime } },
       (err) => {
         if (err && !res.headersSent) {
-          res
-            .status(404)
-            .json({ error: "Arquivo não encontrado no servidor." });
+          res.status(404).json({ error: "Arquivo não encontrado no servidor." });
         }
       },
     );

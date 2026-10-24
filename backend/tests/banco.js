@@ -8,14 +8,7 @@ if (sequelize.config.database !== "cis_test") {
   throw new Error("Os testes só podem usar o banco cis_test.");
 }
 
-const cli = path.join(
-  __dirname,
-  "..",
-  "node_modules",
-  "sequelize-cli",
-  "lib",
-  "sequelize",
-);
+const cli = path.join(__dirname, "..", "node_modules", "sequelize-cli", "lib", "sequelize");
 
 function rodarMigrations(...argumentos) {
   execFileSync(process.execPath, [cli, ...argumentos], {

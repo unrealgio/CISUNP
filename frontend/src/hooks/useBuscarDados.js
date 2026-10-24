@@ -2,11 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { apiFetch, mensagemDeErro } from "../api";
 
 // BUSCA DADOS DA API E LIDA COM ERROS E CARREGAMENTO
-export function useBuscarDados(
-  url,
-  mensagemPadrao = "Erro ao carregar dados.",
-  versao = 0,
-) {
+export function useBuscarDados(url, mensagemPadrao = "Erro ao carregar dados.", versao = 0) {
   const [recarga, setRecarga] = useState(0);
   const [resultado, setResultado] = useState({
     chave: null,
@@ -52,8 +48,7 @@ export function useBuscarDados(
 
   // ATUALIZA OS DADOS SEM RECARREGAR
   const alterarDados = useCallback(
-    (atualizar) =>
-      setResultado((atual) => ({ ...atual, dados: atualizar(atual.dados) })),
+    (atualizar) => setResultado((atual) => ({ ...atual, dados: atualizar(atual.dados) })),
     [],
   );
 

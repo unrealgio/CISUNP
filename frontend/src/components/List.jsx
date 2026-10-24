@@ -6,14 +6,7 @@ import BuscaPaciente from "./BuscaPaciente";
 import CampoTelefone from "./CampoTelefone";
 import { STATUS } from "../utils/statusAgendamento";
 
-export default function List({
-  schedules,
-  selected,
-  onSelect,
-  currentDate,
-  onCancelar,
-  onSavePatient,
-}) {
+export default function List({ schedules, selected, onSelect, currentDate, onCancelar, onSavePatient }) {
   const [editingIndex, setEditingIndex] = useState(null);
   const [patientName, setPatientName] = useState("");
   const [medicoName, setMedicoName] = useState("");
@@ -57,14 +50,7 @@ export default function List({
     }
     setError("");
     // SÓ LIMPA SE SALVOU; EM CASO DE ERRO, MANTÉM O QUE FOI DIGITADO
-    const salvou = await onSavePatient(
-      item,
-      patientName.trim(),
-      medicoName.trim(),
-      cpf,
-      phone,
-      notes,
-    );
+    const salvou = await onSavePatient(item, patientName.trim(), medicoName.trim(), cpf, phone, notes);
     if (salvou) limparEdicao();
   }
 
@@ -152,15 +138,9 @@ export default function List({
                       inputMode="numeric"
                       maxLength={11}
                       value={cpf}
-                      onChange={(e) =>
-                        setCpf(e.target.value.replace(/\D/g, ""))
-                      }
+                      onChange={(e) => setCpf(e.target.value.replace(/\D/g, ""))}
                     />
-                    <CampoTelefone
-                      value={phone}
-                      onChange={setPhone}
-                      placeholder="Telefone"
-                    />
+                    <CampoTelefone value={phone} onChange={setPhone} placeholder="Telefone" />
                     <input
                       type="text"
                       className="cis-input"
@@ -176,22 +156,13 @@ export default function List({
                   <span className="text-(--cis-muted) italic">Encerrado</span>
                 ) : (
                   <>
-                    <span className="text-(--cis-muted) italic">
-                      Disponível
-                    </span>
+                    <span className="text-(--cis-muted) italic">Disponível</span>
                     <button
                       className="cis-icon-button cis-icone-acao"
                       aria-label="Adicionar paciente"
                       onClick={(e) => {
                         e.stopPropagation();
-                        startEdit(
-                          idx,
-                          item.patient,
-                          item.medico,
-                          item.cpf,
-                          item.phone,
-                          item.notes,
-                        );
+                        startEdit(idx, item.patient, item.medico, item.cpf, item.phone, item.notes);
                       }}
                       title="Adicionar paciente"
                     >
@@ -212,27 +183,16 @@ export default function List({
                     onKeyDown={(e) => handleKeyDown(e, item)}
                   />
                 ) : item.medico ? (
-                  <span className="font-semibold text-(--cis-blue)">
-                    {item.medico}
-                  </span>
+                  <span className="font-semibold text-(--cis-blue)">{item.medico}</span>
                 ) : encerrado ? null : (
                   <>
-                    <span className="text-(--cis-muted) italic">
-                      Disponível
-                    </span>
+                    <span className="text-(--cis-muted) italic">Disponível</span>
                     <button
                       className="cis-icon-button cis-icone-acao"
                       aria-label="Adicionar médico"
                       onClick={(e) => {
                         e.stopPropagation();
-                        startEdit(
-                          idx,
-                          item.patient,
-                          "",
-                          item.cpf,
-                          item.phone,
-                          item.notes,
-                        );
+                        startEdit(idx, item.patient, "", item.cpf, item.phone, item.notes);
                       }}
                       title="Adicionar médico"
                     >
@@ -268,14 +228,7 @@ export default function List({
                       aria-label="Editar"
                       onClick={(e) => {
                         e.stopPropagation();
-                        startEdit(
-                          idx,
-                          item.patient,
-                          item.medico,
-                          item.cpf,
-                          item.phone,
-                          item.notes,
-                        );
+                        startEdit(idx, item.patient, item.medico, item.cpf, item.phone, item.notes);
                       }}
                       disabled={encerrado}
                       title="Editar"

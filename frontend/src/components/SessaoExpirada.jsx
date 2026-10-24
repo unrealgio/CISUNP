@@ -1,10 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  apiUrl,
-  emailDoToken,
-  mensagemDeErro,
-  registrarPedidoDeLogin,
-} from "../api";
+import { apiUrl, emailDoToken, mensagemDeErro, registrarPedidoDeLogin } from "../api";
 import { ErrorMessage } from "./StatusMessage";
 
 export default function SessaoExpirada() {
@@ -70,12 +65,9 @@ export default function SessaoExpirada() {
       }}
     >
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm flex flex-col items-center">
-        <h3 className="text-lg font-semibold mb-2 text-(--cis-unp-blue)">
-          Sua sessão expirou
-        </h3>
+        <h3 className="text-lg font-semibold mb-2 text-(--cis-unp-blue)">Sua sessão expirou</h3>
         <p className="text-sm text-(--cis-muted) text-center mb-1">
-          Digite sua senha para continuar. O que você preencheu não será
-          perdido.
+          Digite sua senha para continuar. O que você preencheu não será perdido.
         </p>
         <p className="text-sm font-semibold text-(--cis-ink) mb-4">{email}</p>
         <form className="w-full" onSubmit={handleSubmit}>

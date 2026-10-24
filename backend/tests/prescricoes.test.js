@@ -35,10 +35,7 @@ describe("prescrições", () => {
       cpf: "12312312312",
       medicamento: "Ibuprofeno",
     });
-    const { status, corpo } = await api.chamar(
-      "GET",
-      "/api/prescricoes?cpf=12312312312",
-    );
+    const { status, corpo } = await api.chamar("GET", "/api/prescricoes?cpf=12312312312");
     assert.equal(status, 200);
     assert.deepEqual(
       corpo.map((item) => item.medicamento),
@@ -47,10 +44,7 @@ describe("prescrições", () => {
   });
 
   test("não mistura prescrições de outro paciente", async () => {
-    const { corpo } = await api.chamar(
-      "GET",
-      "/api/prescricoes?cpf=98798798798",
-    );
+    const { corpo } = await api.chamar("GET", "/api/prescricoes?cpf=98798798798");
     assert.deepEqual(corpo, []);
   });
 

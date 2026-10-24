@@ -44,9 +44,7 @@ export default function PassChange({ senhaAtual, onSenhaAlterada }) {
       }}
     >
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm flex flex-col items-center">
-        <h3 className="text-lg font-semibold mb-4 text-(--cis-unp-blue)">
-          Troque sua senha para acessar o sistema
-        </h3>
+        <h3 className="text-lg font-semibold mb-4 text-(--cis-unp-blue)">Troque sua senha para acessar o sistema</h3>
         <form className="w-full" onSubmit={handleSubmit}>
           <input
             type="password"
@@ -66,16 +64,8 @@ export default function PassChange({ senhaAtual, onSenhaAlterada }) {
             {loading ? "Alterando..." : "Alterar senha"}
           </button>
         </form>
-        {mensagem && (
-          <div className="text-(--cis-success) text-sm mt-2 text-center">
-            {mensagem}
-          </div>
-        )}
-        {erro && (
-          <div className="text-(--cis-danger) text-sm mt-2 text-center">
-            {erro}
-          </div>
-        )}
+        {mensagem && <div className="text-(--cis-success) text-sm mt-2 text-center">{mensagem}</div>}
+        {erro && <div className="text-(--cis-danger) text-sm mt-2 text-center">{erro}</div>}
       </div>
     </div>
   );
